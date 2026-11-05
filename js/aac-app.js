@@ -322,7 +322,7 @@ class AacApp {
         if (rateLabel) rateLabel.textContent = `${Math.round(window.aacAudio.rate * 100)}%`;
         if (pitchLabel) pitchLabel.textContent = `${Math.round(window.aacAudio.pitch * 100)}%`;
 
-        window.aacAudio.playTone(520, 0.08, "triangle");
+        window.aacAudio.playTap();
         window.aacAudio.speakIntro();
       });
     });
@@ -588,19 +588,19 @@ class AacApp {
     const boards = window.aacData.getAllBoardSummaries();
     this.el.categoryNav.innerHTML = "";
 
-    // 1. 🏠 Home Core Button
+    // 1. Home Core Button
     const homeBtn = document.createElement("button");
     homeBtn.className = `category-tab ${this.currentBoardId === "core_master" ? "active" : ""}`;
-    homeBtn.innerHTML = `<span>🏠</span> Home Core`;
+    homeBtn.innerHTML = `<svg class="ui-icon" style="color:#58a6ff;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home Core`;
     homeBtn.addEventListener("click", () => this.navigateToBoard("core_master"));
     this.el.categoryNav.appendChild(homeBtn);
 
-    // 2. ⭐ Favorites & Learned Phrases Button
+    // 2. Favorites & Learned Phrases Button
     const favBtn = document.createElement("button");
     favBtn.className = `category-tab ${this.currentBoardId === "board_favorites" ? "active" : ""}`;
     favBtn.style.borderColor = "var(--gh-accent-yellow)";
     favBtn.style.color = "#fef08a";
-    favBtn.innerHTML = `<span>⭐</span> Favorites`;
+    favBtn.innerHTML = `<svg class="ui-icon" style="color:#eab308;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Favorites`;
     favBtn.addEventListener("click", () => this.navigateToBoard("board_favorites"));
     this.el.categoryNav.appendChild(favBtn);
 
@@ -625,20 +625,20 @@ class AacApp {
       return a.name.localeCompare(b.name);
     });
 
-    const categoryIcons = {
-      urgent_needs: "🚨",
-      food_drinks: "🍎",
-      feelings: "😊",
-      actions_play: "🎮",
-      people_family: "👨‍👩‍👦",
-      places: "🏙️"
+    const categoryIconsSvg = {
+      urgent_needs: `<svg class="ui-icon" style="color:#f85149;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+      food_drinks: `<svg class="ui-icon" style="color:#f0883e;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`,
+      feelings: `<svg class="ui-icon" style="color:#eab308;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`,
+      actions_play: `<svg class="ui-icon" style="color:#22c55e;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>`,
+      people_family: `<svg class="ui-icon" style="color:#3b82f6;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+      places: `<svg class="ui-icon" style="color:#bc8cff;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`
     };
 
     topicBoards.forEach(b => {
       const tab = document.createElement("button");
       tab.className = `category-tab ${b.id === this.currentBoardId ? "active" : ""}`;
-      const icon = categoryIcons[b.id] || "📂";
-      tab.innerHTML = `<span>${icon}</span> ${b.name}`;
+      const iconSvg = categoryIconsSvg[b.id] || `<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>`;
+      tab.innerHTML = `${iconSvg} ${b.name}`;
       tab.addEventListener("click", () => this.navigateToBoard(b.id));
       this.el.categoryNav.appendChild(tab);
     });
@@ -648,7 +648,7 @@ class AacApp {
     allMenuBtn.className = "category-tab";
     allMenuBtn.style.borderColor = "var(--gh-accent-blue)";
     allMenuBtn.style.color = "#58a6ff";
-    allMenuBtn.innerHTML = `<span>☰</span> All Categories...`;
+    allMenuBtn.innerHTML = `<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> All Categories...`;
     allMenuBtn.addEventListener("click", () => this.openMenuScreen());
     this.el.categoryNav.appendChild(allMenuBtn);
 
@@ -658,7 +658,7 @@ class AacApp {
       addBoardBtn.className = "category-tab";
       addBoardBtn.style.borderColor = "var(--gh-accent-green)";
       addBoardBtn.style.color = "var(--gh-accent-green)";
-      addBoardBtn.innerHTML = `<span>➕</span> New Board`;
+      addBoardBtn.innerHTML = `<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> New Board`;
       addBoardBtn.addEventListener("click", () => this.promptCreateBoard());
       this.el.categoryNav.appendChild(addBoardBtn);
     }
@@ -712,7 +712,7 @@ class AacApp {
           <span class="tile-label" style="font-size:0.8rem;">${phrase.label || phrase.text}</span>
         `;
         phraseBtn.addEventListener("click", () => {
-          window.aacAudio.playTone(560, 0.08, "triangle");
+          window.aacAudio.playSpeechPromptChime();
           window.aacAudio.speak(phrase.text);
           if (phrase.chips) {
             phrase.chips.forEach(c => this.sentenceStrip.push(JSON.parse(JSON.stringify(c))));
@@ -865,11 +865,11 @@ class AacApp {
       } else if (this.touchMode === "release") {
         // Touch on Release (Drag & Lift) - give immediate audio/visual feedback on touch
         btn.classList.add("tile-pressed");
-        window.aacAudio.playTone(420, 0.04, "sine");
+        window.aacAudio.playTap();
       } else if (this.touchMode === "dwell" || this.dwellTimeMs > 0) {
         // Dwell / Hold Duration Timer with Visual SVG Ring Countdown
         btn.classList.add("tile-pressed", "dwell-active");
-        window.aacAudio.playTone(380, 0.03, "triangle");
+        window.aacAudio.playTap();
 
         const ring = ensureDwellRing();
         const fill = ring.querySelector(".dwell-circle-fill");
@@ -1043,6 +1043,7 @@ class AacApp {
   speakSentence() {
     if (this.sentenceStrip.length === 0) return;
     const fullText = this.sentenceStrip.map(c => c.speech).join(" ");
+    window.aacAudio.playSpeechPromptChime();
     window.aacAudio.speak(fullText);
 
     // Learn multi-word phrase!
@@ -1089,7 +1090,7 @@ class AacApp {
       chip.innerHTML = `<span>${p.icon || "⭐"}</span><span>"${p.text}"</span>`;
       chip.title = "Tap to speak this favorite phrase aloud";
       chip.addEventListener("click", () => {
-        window.aacAudio.playTone(540, 0.08, "triangle");
+        window.aacAudio.playSpeechPromptChime();
         window.aacAudio.speak(p.text);
         if (p.chips) {
           p.chips.forEach(c => this.sentenceStrip.push(JSON.parse(JSON.stringify(c))));
@@ -1120,7 +1121,7 @@ class AacApp {
       this.sentenceStrip = [];
       this.renderSentenceStrip();
       this.showUndoButton();
-      window.aacAudio.playTone(280, 0.08, "sine");
+      window.aacAudio.playWipeSwoosh();
     }
   }
 
@@ -1149,7 +1150,7 @@ class AacApp {
       this.lastClearedSentence = null;
       this.hideUndoButton();
       this.renderSentenceStrip();
-      window.aacAudio.playTone(560, 0.12, "triangle");
+      window.aacAudio.playUndoRestoration();
       window.aacAudio.speak("Restored sentence");
     }
   }
@@ -1157,7 +1158,7 @@ class AacApp {
   backspaceSentence() {
     if (this.sentenceStrip.length > 0) {
       this.sentenceStrip.pop();
-      window.aacAudio.playTone(300, 0.05, "sine");
+      window.aacAudio.playBackspaceClick();
       this.renderSentenceStrip();
     }
   }
@@ -1183,7 +1184,7 @@ class AacApp {
     if (this.sentenceStrip.length === 0) return;
     const text = this.sentenceStrip.map(c => c.speech).join(" ");
     navigator.clipboard.writeText(text).then(() => {
-      window.aacAudio.playTone(520, 0.1, "sine");
+      window.aacAudio.playTap();
       alert(`Copied sentence: "${text}"`);
     });
   }
@@ -1242,7 +1243,7 @@ class AacApp {
     tiles.forEach((t, idx) => {
       t.classList.toggle("switch-highlight", idx === this.switchScanning.currentIndex);
     });
-    window.aacAudio.playTone(500, 0.03, "sine");
+    window.aacAudio.playScanTick();
   }
 
   handleSwitchActivation() {
@@ -1574,7 +1575,7 @@ class AacApp {
           fbBox.style.background = "rgba(248, 81, 73, 0.15)";
           fbBox.style.color = "#f85149";
           fbBox.innerHTML = `<strong>Let's try again!</strong> Listen carefully to the ending sound.`;
-          window.aacAudio.playTone(220, 0.2, "sawtooth");
+          window.aacAudio.playTap();
           window.aacAudio.speak(`Not quite. Try another one!`);
         }
       });
@@ -1741,7 +1742,7 @@ class AacApp {
     this.setGridDensity(nextCols);
     const gridSelect = document.getElementById("setting-grid-density");
     if (gridSelect) gridSelect.value = nextCols;
-    window.aacAudio.playTone(480, 0.08, "sine");
+    window.aacAudio.playTap();
   }
 
   setTheme(theme) {
@@ -1808,7 +1809,7 @@ class AacApp {
       document.getElementById("btn-edit-mode").classList.add("active");
       this.renderCurrentBoard();
       this.renderCategoryNav();
-      window.aacAudio.playTone(600, 0.1, "sine");
+      window.aacAudio.playTap();
     } else if (pin !== null) {
       alert("Incorrect PIN. Edit mode is locked.");
     }
@@ -1905,7 +1906,7 @@ class AacApp {
 
       this.mediaRecorder.start();
       document.getElementById("btn-record-voice").textContent = "⏹️ Stop Recording";
-      window.aacAudio.playTone(660, 0.1, "sine");
+      window.aacAudio.playTap();
     }).catch(err => {
       alert("Microphone permission denied or unavailable: " + err.message);
     });
@@ -2349,7 +2350,7 @@ class AacApp {
         } else {
           this.activateTile(tile);
           this.closeSearchModal();
-          window.aacAudio.playTone(520, 0.08, "triangle");
+          window.aacAudio.playTap();
         }
       });
 
@@ -2383,7 +2384,7 @@ class AacApp {
   openHelpModal() {
     if (this.el.helpGuideModal) {
       this.el.helpGuideModal.style.display = "flex";
-      window.aacAudio.playTone(480, 0.08, "sine");
+      window.aacAudio.playTap();
     }
   }
 
@@ -2400,7 +2401,7 @@ class AacApp {
   openMenuScreen() {
     if (!this.el.menuScreenModal) return;
     this.el.menuScreenModal.style.display = "flex";
-    window.aacAudio.playTone(520, 0.08, "triangle");
+    window.aacAudio.playTap();
 
     // Update live device inspector in menu header
     if (window.deviceScaleEngine) {

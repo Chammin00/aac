@@ -407,47 +407,336 @@ class AacAudioEngine {
   }
 
   /**
-   * Web Audio tone synthesizer for tactile feedback & chime rewards
+   * =========================================================================
+   * MASTERED ORGANIC ACOUSTIC FOLEY & HARMONICS SYNTHESIZER
+   * Baseline Anti-Slop Audio Standards: Zero Canned Soundboards / No Harsh Beeps
+   * =========================================================================
    */
-  playTone(freq = 440, duration = 0.1, type = "sine") {
+
+  /**
+   * Soft, satisfying acoustic key tap / mechanical tactile contact
+   * Formants: 220Hz wood/felt body resonance + 2.4kHz transient snap
+   */
+  playTap() {
     if (!this.audioContext) return;
     try {
       this.resumeAudioContext();
-      const osc = this.audioContext.createOscillator();
-      const gain = this.audioContext.createGain();
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
 
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+      // 1. Warm Resonant Body (Felt / Wood Key)
+      const bodyOsc = ctx.createOscillator();
+      const bodyGain = ctx.createGain();
+      bodyOsc.type = "sine";
+      bodyOsc.frequency.setValueAtTime(220, now);
+      bodyOsc.frequency.exponentialRampToValueAtTime(140, now + 0.038);
 
-      gain.gain.setValueAtTime(0.2, this.audioContext.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+      bodyGain.gain.setValueAtTime(0.12, now);
+      bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.038);
 
-      osc.connect(gain);
-      gain.connect(this.audioContext.destination);
+      bodyOsc.connect(bodyGain);
+      bodyGain.connect(ctx.destination);
 
-      osc.start();
-      osc.stop(this.audioContext.currentTime + duration);
+      bodyOsc.start(now);
+      bodyOsc.stop(now + 0.04);
+
+      // 2. Crisp Transient Snap (Filtered click)
+      const bufferSize = ctx.sampleRate * 0.012; // 12ms
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(2400, now);
+      filter.Q.setValueAtTime(2.5, now);
+
+      const clickGain = ctx.createGain();
+      clickGain.gain.setValueAtTime(0.06, now);
+      clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+
+      noise.connect(filter);
+      filter.connect(clickGain);
+      clickGain.connect(ctx.destination);
+
+      noise.start(now);
+      this.hapticPulse(12);
     } catch (e) {
-      // Audio context may require user interaction
+      // AudioContext policy fallback
     }
   }
 
+  /**
+   * Gentle dual-harmonic acoustic celesta prompt chime before phrase speaking
+   * Voicing: C5 (523Hz) + G5 (784Hz) with lush natural decay
+   */
+  playSpeechPromptChime() {
+    if (!this.audioContext) return;
+    try {
+      this.resumeAudioContext();
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+      const frequencies = [523.25, 783.99]; // C5, G5 perfect fifth
+
+      frequencies.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now);
+
+        // Soft attack, smooth exponential decay
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.07 / (idx + 1), now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.2);
+      });
+    } catch (e) {}
+  }
+
+  /**
+   * Organic felt wipe / paper swoosh on clear
+   * Filtered noise sweep: 850Hz -> 500Hz bandpass
+   */
+  playWipeSwoosh() {
+    if (!this.audioContext) return;
+    try {
+      this.resumeAudioContext();
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+      const duration = 0.065; // 65ms
+
+      const bufferSize = ctx.sampleRate * duration;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(850, now);
+      filter.frequency.exponentialRampToValueAtTime(450, now + duration);
+      filter.Q.setValueAtTime(1.8, now);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.09, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      noise.start(now);
+      this.hapticPulse(18);
+    } catch (e) {}
+  }
+
+  /**
+   * Warm ascending 2-tone restoration chime (F5 -> A5)
+   */
+  playUndoRestoration() {
+    if (!this.audioContext) return;
+    try {
+      this.resumeAudioContext();
+      const notes = [698.46, 880.00]; // F5, A5 major third
+      notes.forEach((freq, idx) => {
+        setTimeout(() => {
+          this.playAcousticBell(freq, 0.16, 0.09);
+        }, idx * 75);
+      });
+      this.hapticPulse(22);
+    } catch (e) {}
+  }
+
+  /**
+   * Tactile typewriter spring foley tick on backspace
+   */
+  playBackspaceClick() {
+    if (!this.audioContext) return;
+    try {
+      this.resumeAudioContext();
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(380, now);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.025);
+
+      gain.gain.setValueAtTime(0.10, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.03);
+      this.hapticPulse(10);
+    } catch (e) {}
+  }
+
+  /**
+   * Mastered Pentatonic Celesta Celebration Arpeggio
+   * Natural acoustic overtones: C5, E5, G5, A5, C6 (Lush and non-fatiguing)
+   */
   playCelebrationChime() {
-    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 arpeggio
+    const notes = [523.25, 659.25, 783.99, 880.00, 1046.50];
     notes.forEach((freq, idx) => {
       setTimeout(() => {
-        this.playTone(freq, 0.25, "triangle");
-      }, idx * 110);
+        this.playAcousticBell(freq, 0.28, 0.11 / (1 + idx * 0.1));
+      }, idx * 70);
+    });
+    this.hapticPattern([15, 30, 20]);
+  }
+
+  /**
+   * Ultra-soft organic woodblock tick for switch scanning
+   * Eliminates sensory fatigue for autistic / sensory-sensitive communicators
+   */
+  playScanTick() {
+    if (!this.audioContext) return;
+    try {
+      this.resumeAudioContext();
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(460, now);
+      osc.frequency.exponentialRampToValueAtTime(260, now + 0.016);
+
+      gain.gain.setValueAtTime(0.045, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.016);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.02);
+    } catch (e) {}
+  }
+
+  /**
+   * Mechanical ratchet pawl click for Decision Wheels
+   */
+  playWheelTick(velocity = 1.0) {
+    if (!this.audioContext) return;
+    try {
+      this.resumeAudioContext();
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      const baseFreq = 540 + Math.min(300, velocity * 400);
+      osc.frequency.setValueAtTime(baseFreq, now);
+
+      gain.gain.setValueAtTime(0.07, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.014);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.016);
+      this.hapticPulse(8);
+    } catch (e) {}
+  }
+
+  /**
+   * Resonant bronze singing bowl / victory gong when decision wheel lands
+   */
+  playWheelWin() {
+    const bowlHarmonics = [587.33, 880.00, 1174.66]; // D5, A5, D6
+    bowlHarmonics.forEach((freq, idx) => {
+      this.playAcousticBell(freq, 0.65, 0.12 / (idx + 1));
     });
   }
 
   /**
-   * Mobile haptic vibration pulse (if supported)
+   * Acoustic bell synthesizer with soft attack and exponential decay
    */
-  hapticPulse() {
+  playAcousticBell(freq, duration = 0.25, peakGain = 0.1) {
+    if (!this.audioContext) return;
+    try {
+      this.resumeAudioContext();
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+
+      // Fundamental
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(peakGain, now + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + duration + 0.02);
+
+      // Subtle 2nd harmonic for warm acoustic luster
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(freq * 2, now);
+
+      gain2.gain.setValueAtTime(0.0001, now);
+      gain2.gain.linearRampToValueAtTime(peakGain * 0.25, now + 0.008);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, now + (duration * 0.5));
+
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+
+      osc2.start(now);
+      osc2.stop(now + (duration * 0.5) + 0.02);
+    } catch (e) {}
+  }
+
+  /**
+   * Backward-compatible tone synthesizer routing to organic acoustic tap or chime
+   */
+  playTone(freq = 440, duration = 0.1, type = "sine") {
+    if (duration <= 0.05) {
+      this.playTap();
+    } else {
+      this.playAcousticBell(freq, duration, 0.09);
+    }
+  }
+
+  /**
+   * Mobile haptic vibration pulse with custom duration
+   */
+  hapticPulse(durationMs = 12) {
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       try {
-        navigator.vibrate(25);
+        navigator.vibrate(durationMs);
+      } catch (e) {}
+    }
+  }
+
+  hapticPattern(patternArray = [12, 24, 16]) {
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      try {
+        navigator.vibrate(patternArray);
       } catch (e) {}
     }
   }

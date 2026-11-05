@@ -301,13 +301,13 @@ class FoodWheelManager {
 
     // Give a powerful random angular kick (between 0.28 and 0.48 rad/frame)
     this.angularVelocity = 0.32 + Math.random() * 0.24;
-    window.aacAudio.playTone(340, 0.08, "triangle");
+    window.aacAudio.playTap();
 
     const animate = () => {
       this.currentAngle = (this.currentAngle + this.angularVelocity) % (Math.PI * 2);
       this.angularVelocity *= this.friction;
 
-      // Play subtle tick chime when slice boundary passes top pointer (top pointer is at -PI/2)
+      // Play organic mechanical ratchet tick when slice boundary passes top pointer
       const wheel = this.getActiveWheel();
       const numSlices = wheel.items.length;
       const sliceAngle = (Math.PI * 2) / numSlices;
@@ -317,8 +317,7 @@ class FoodWheelManager {
 
       if (currentSegment !== this.lastTickSegment) {
         this.lastTickSegment = currentSegment;
-        window.aacAudio.playTone(600 + (currentSegment * 25), 0.03, "sine");
-        window.aacAudio.hapticPulse();
+        window.aacAudio.playWheelTick(this.angularVelocity);
       }
 
       this.drawWheel();
@@ -331,8 +330,8 @@ class FoodWheelManager {
         const winner = wheel.items[currentSegment];
         this.lastWinner = winner;
 
-        // Celebrations!
-        window.aacAudio.playCelebrationChime();
+        // Resonant bronze singing bowl victory chime
+        window.aacAudio.playWheelWin();
         if (typeof confetti === "function") {
           confetti({ particleCount: 50, spread: 80, origin: { y: 0.6 } });
         }

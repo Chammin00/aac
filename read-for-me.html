@@ -476,7 +476,7 @@
         kidsIconEl.textContent = icon;
         kidsStatusLabel.textContent = `Found word: "${word}" ✨`;
 
-        window.aacAudio.playTone(520, 0.1, "triangle");
+        window.aacAudio.playTap();
         window.aacAudio.speak(word, 1.05, 0.9);
 
         if (typeof confetti === "function") {
@@ -486,7 +486,7 @@
 
       // Kids Button 1: Repeat Word
       document.getElementById("btn-kids-repeat").addEventListener("click", () => {
-        window.aacAudio.playTone(440, 0.08, "sine");
+        window.aacAudio.playTap();
         window.aacAudio.speak(currentScannedWord, 1.05, 0.9);
       });
 
@@ -604,7 +604,7 @@
           const next = window.aacAudio.currentPreset === "screen_reader" ? "afro_euro" : "screen_reader";
           window.aacAudio.setPreset(next);
           updateVoiceHudDisplay();
-          window.aacAudio.playTone(560, 0.08, "triangle");
+          window.aacAudio.playTap();
           window.aacAudio.speakIntro();
         });
       }

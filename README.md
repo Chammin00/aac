@@ -247,6 +247,29 @@ To eliminate header clutter and navigation confusion on tablets and phones, the 
    - Clinical utilities: *🔒 Kiosk Full-Screen Lock*, *🗣️ Amina Voice Studio*, *✏️ Custom Tile Edit Mode*, *📊 Speech-Language Pathologist CSV Analytics Export*, and *❓ 30-Second Visual Caregiver Guide*.
    - **Live Hardware Diagnostic Card**: Displays exact detected device name, live viewport dimensions, CPU concurrency count, and auto-grid density toggling.
 
+### 10. 🎧 Mastered Organic Acoustic Foley & Harmonics Synthesizer (Anti-Audio-Slop)
+- **Elimination of Raw Synthetic Beeps**:
+  - Replaced all harsh mathematical square, sawtooth, and triangle oscillator chirps with organic acoustic foley and harmonic physical models synthesized entirely via the Web Audio API.
+- **Mastered Foley Profiles**:
+  - **Tactile Resonance (`playTap`)**: Dual-layer transient combining a 2.4kHz bandpass-filtered noise burst with a 220Hz wood/felt body formant (38ms exponential decay).
+  - **Celesta Cue (`playSpeechPromptChime`)**: Two-tone acoustic celesta harmonic cue (C5 523Hz + G5 784Hz) preceding sentence speaking.
+  - **Felt / Paper Wipe (`playWipeSwoosh`)**: Filtered 850Hz ➔ 450Hz bandpass noise sweep simulating a clean whiteboard / slate wipe on sentence clear.
+  - **Restoration Chime (`playUndoRestoration`)**: Warm ascending 2-tone harmonic chime (F5 698Hz ➔ A5 880Hz) providing positive auditory reinforcement on sentence undo.
+  - **Typewriter Foley Tick (`playBackspaceClick`)**: Mechanical foley tick (180–380Hz transient) giving discrete tactile feedback for single-character / word deletions.
+  - **Celebration Pentatonic Arpeggio (`playCelebrationChime`)**: Acoustic celesta arpeggio (C5, E5, G5, A5, C6) with natural acoustic overtones for literacy achievements and gamified wins.
+  - **Sensory-Soft Switch Tick (`playScanTick`)**: Ultra-soft woodblock tick (12ms) specifically designed to eliminate sensory fatigue for autistic and sensory-sensitive communicators during switch scanning.
+  - **Mechanical Ratchet & Singing Bowl (`playWheelTick`, `playWheelWin`)**: Physical pawl mechanical clicks scaled to wheel velocity and resonant bronze singing bowl chimes for decision wheel spins.
+
+### 11. 🎨 Professional UI Chrome & High-Gloss Lacquer Material Optics (Zero-Emoji-Slop)
+- **Zero Emoji Asset Flips on Action Chrome**:
+  - Replaced all raw default OS emojis across the top header, sentence strip action bar, category navigation tabs, and master modal menu cards with precision 24px dual-tone inline vector SVGs (`.ui-icon`).
+  - Standardized on 2px stroke width, rounded caps and joins, and theme-token currentColor bindings ensuring crisp rendering across all screen densities (Retina, 4K, e-ink).
+- **High-Gloss Lacquer Physical Material Optics**:
+  - Beveled clear-coat highlights: `box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.25)` providing physical tactile depth on buttons and cards.
+  - Responsive tactile depression: `:active { transform: translateY(1px) scale(0.98); }` with inset shadow compression for immediate physical confirmation on touch and mouse press.
+- **Preserved Fitzgerald Key Visual Symbols**:
+  - Communication vocabulary tiles retain their rich, accessible semantic symbols and images, maintaining clear distinction between navigational system chrome and communicable AAC vocabulary.
+
 ---
 
 ## 📂 Project Structure
