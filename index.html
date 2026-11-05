@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Amina AAC & Phonics Studio | Universal Adaptive Communicator</title>
+  
+  <!-- PWA & Mobile Web App Meta -->
+  <meta name="theme-color" content="#090d16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Universal AAC Communication Board and Systematic Hooked on Phonics Learning Suite with Afro-European Female Narrator Voice.">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Core Theme Stylesheets -->
+  <link rel="stylesheet" href="css/aac-theme.css">
+  
+  <!-- Canvas Confetti for Phonics Celebrations -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+</head>
+<body class="theme-dark">
+  <div id="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo-icon">🗣️</div>
+        <div class="brand-badge">
+          <span>AMINA AAC</span>
+        </div>
+
+        <button class="narrator-pill" id="btn-narrator-pill" title="Default Narrator: Afro-Euro Female Voice">
+          <img src="assets/amina-avatar.svg" alt="Amina Avatar" class="narrator-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23f0883e\'/><circle cx=\'50\' cy=\'40\' r=\'24\' fill=\'%235c341b\'/><path d=\'M20 90 Q50 60 80 90\' fill=\'%235c341b\'/><circle cx=\'42\' cy=\'38\' r=\'3\' fill=\'%23fff\'/><circle cx=\'58\' cy=\'38\' r=\'3\' fill=\'%23fff\'/><path d=\'M42 50 Q50 58 58 50\' stroke=\'%23fff\' stroke-width=\'3\' fill=\'none\'/></svg>'">
+          <span>Amina (Afro-Euro Voice)</span>
+          <span style="color:#22c55e; font-size:0.75rem;">●</span>
+        </button>
+
+        <button class="header-btn" id="btn-quick-back" title="Go to previous folder">
+          <span>⬅️</span>
+          <span>Back</span>
+        </button>
+
+        <div id="board-title-badge" style="font-size:0.85rem; font-weight:700; color:var(--gh-accent-blue); padding:4px 8px; background:rgba(88,166,255,0.1); border-radius:6px; border:1px solid rgba(88,166,255,0.2);">
+          Universal Core 36
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Main Mode Tabs -->
+        <button class="header-btn active" id="btn-tab-aac">
+          <span>💬</span>
+          <span>AAC Board</span>
+        </button>
+        <button class="header-btn" id="btn-tab-phonics">
+          <span>🔤</span>
+          <span>Hooked on Phonics</span>
+        </button>
+
+        <a href="read-for-me.html" class="header-btn" style="text-decoration:none; background:rgba(240,136,62,0.15); border-color:#f0883e; color:#f0883e;" title="Open Read This For Me Gaming Dialogue Camera">
+          <span>🎮</span>
+          <span>Read For Me (Game Lens)</span>
+        </a>
+
+        <!-- Edit & Settings -->
+        <button class="header-btn" id="btn-edit-mode" title="Therapist/Caregiver PIN Edit Mode">
+          <span>🔒</span>
+          <span>Edit Mode</span>
+        </button>
+        <button class="header-btn" id="btn-settings" title="Settings & Accessibility">
+          <span>⚙️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Sentence Builder Strip (Message Bar) -->
+    <section class="sentence-strip-container">
+      <div class="sentence-display" id="sentence-display">
+        <!-- Dynamic chips injected here -->
+      </div>
+
+      <div class="strip-controls">
+        <!-- Speak Button -->
+        <button class="strip-btn btn-speak" id="btn-speak-sentence">
+          <span style="font-size:1.4rem;">🔊</span>
+          <span>SPEAK</span>
+        </button>
+
+        <!-- Morphological Modifiers -->
+        <button class="strip-btn" id="btn-mod-s" title="Add plural/third-person 's'">
+          <span style="font-size:1rem; font-weight:800;">+S</span>
+          <span>Plural</span>
+        </button>
+        <button class="strip-btn" id="btn-mod-ing" title="Add present continuous 'ing'">
+          <span style="font-size:0.85rem; font-weight:800;">+ING</span>
+          <span>Action</span>
+        </button>
+        <button class="strip-btn" id="btn-mod-ed" title="Add past tense 'ed'">
+          <span style="font-size:0.85rem; font-weight:800;">+ED</span>
+          <span>Past</span>
+        </button>
+
+        <!-- Actions -->
+        <button class="strip-btn btn-backspace" id="btn-backspace" title="Delete last word">
+          <span style="font-size:1.1rem;">⌫</span>
+          <span>Back</span>
+        </button>
+        <button class="strip-btn btn-clear" id="btn-clear-sentence" title="Clear all words">
+          <span style="font-size:1.1rem;">🗑️</span>
+          <span>Clear</span>
+        </button>
+        <button class="strip-btn" id="btn-copy-sentence" title="Copy text to clipboard">
+          <span style="font-size:1.1rem;">📋</span>
+          <span>Copy</span>
+        </button>
+        <button class="strip-btn" id="btn-share-sentence" title="Share sentence">
+          <span style="font-size:1.1rem;">📤</span>
+          <span>Share</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Category Folders Nav Bar -->
+    <nav class="category-nav-bar" id="category-nav">
+      <!-- Injected via JavaScript -->
+    </nav>
+
+    <!-- Main Viewport Area -->
+    <main class="main-viewport">
+      <!-- AAC View -->
+      <div id="aac-view" class="aac-grid-wrapper">
+        <div class="aac-grid" id="aac-grid">
+          <!-- Tiles injected via JavaScript -->
+        </div>
+      </div>
+
+      <!-- Phonics Learning Suite View -->
+      <div id="phonics-view" style="display:none; width:100%; height:100%;">
+        <!-- Injected via JavaScript -->
+      </div>
+    </main>
+
+    <!-- Amina Narrator HUD (Bottom Floating Card) -->
+    <aside class="narrator-hud-card" id="narrator-hud">
+      <div class="narrator-portrait-wrap">
+        <img src="assets/amina-avatar.svg" alt="Amina Narrator" class="narrator-portrait" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23f0883e\'/><circle cx=\'50\' cy=\'40\' r=\'24\' fill=\'%235c341b\'/><path d=\'M20 90 Q50 60 80 90\' fill=\'%235c341b\'/><circle cx=\'42\' cy=\'38\' r=\'3\' fill=\'%23fff\'/><circle cx=\'58\' cy=\'38\' r=\'3\' fill=\'%23fff\'/><path d=\'M42 50 Q50 58 58 50\' stroke=\'%23fff\' stroke-width=\'3\' fill=\'none\'/></svg>'">
+        <span class="narrator-speech-indicator"></span>
+      </div>
+      <div>
+        <div style="font-size:0.75rem; font-weight:700; color:var(--gh-accent-amber); text-transform:uppercase;">Narrator Amina</div>
+        <div id="narrator-subtitle" style="font-size:0.85rem; color:var(--gh-text-primary); max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          Ready to speak with you
+        </div>
+      </div>
+      <button class="header-btn" id="btn-test-voice" onclick="window.aacAudio.speak('Hello! I am Amina, your speech and phonics companion.');" style="padding:4px 8px; font-size:0.72rem;">
+        Test Voice 🔊
+      </button>
+    </aside>
+
+    <!-- =====================================================================
+         MODALS
+         ===================================================================== -->
+
+    <!-- Settings Modal -->
+    <div class="modal-backdrop" id="settings-modal" style="display:none;">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">⚙️ AAC & Audio Settings</h3>
+          <button class="modal-close-btn" id="btn-close-settings">&times;</button>
+        </div>
+        <div class="modal-body">
+          <!-- Voice Selection -->
+          <div class="form-group">
+            <label class="form-label">Narrator Voice (Afro-Euro Female Priority)</label>
+            <select id="setting-voice-select" class="form-select"></select>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Voice Rate (<span id="label-voice-rate">92%</span>)</label>
+              <input type="range" id="setting-voice-rate" min="0.5" max="1.5" step="0.05" value="0.92">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Voice Pitch (<span id="label-voice-pitch">105%</span>)</label>
+              <input type="range" id="setting-voice-pitch" min="0.7" max="1.4" step="0.05" value="1.05">
+            </div>
+          </div>
+
+          <!-- Visual Display & Themes -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Grid Columns</label>
+              <select id="setting-grid-density" class="form-select">
+                <option value="2">2 Columns (Toddler / Motor)</option>
+                <option value="3">3 Columns (Early Communicator)</option>
+                <option value="4">4 Columns (Standard Simple)</option>
+                <option value="6" selected>6 Columns (Universal Core)</option>
+                <option value="8">8 Columns (Advanced Full)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Visual Theme</label>
+              <select id="setting-theme-select" class="form-select">
+                <option value="dark" selected>High-Gloss Dark (Lacquer)</option>
+                <option value="high-contrast">Yellow on Black (Low Vision)</option>
+                <option value="light">Crisp Light (Classroom)</option>
+                <option value="cvi">CVI Mode (High Saturation)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Switch Scanning & Accessibility -->
+          <div class="form-group" style="background:var(--gh-canvas-inset); padding:12px; border-radius:10px; border:1px solid var(--gh-border-muted);">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <strong style="font-size:0.9rem;">Single-Switch Scanning</strong>
+                <p style="font-size:0.75rem; color:var(--gh-text-secondary);">Cycle tiles automatically with Spacebar or single switch.</p>
+              </div>
+              <input type="checkbox" id="setting-switch-scan" style="width:20px; height:20px;">
+            </div>
+          </div>
+
+          <!-- Open Board Format & Data -->
+          <div class="form-group">
+            <label class="form-label">Open Board Format (OBF) & Cloud Backup</label>
+            <div style="display:flex; gap:8px;">
+              <button class="header-btn" id="btn-export-obf" style="flex:1;">⬇️ Export OBF (.obf)</button>
+              <button class="header-btn" id="btn-import-obf" style="flex:1;">⬆️ Import OBF File</button>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid var(--gh-border-muted);">
+            <button class="header-btn" id="btn-reset-defaults" style="color:#f85149;">⚠️ Reset All to Default</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Tile Modal (Therapist / Caregiver Customization) -->
+    <div class="modal-backdrop" id="edit-tile-modal" style="display:none;">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">✏️ Customize Communication Button</h3>
+          <button class="modal-close-btn" id="btn-close-edit-tile">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Button Label</label>
+              <input type="text" id="edit-tile-label" class="form-input" placeholder="e.g. Water">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Spoken Speech Text</label>
+              <input type="text" id="edit-tile-speech" class="form-input" placeholder="e.g. I would like water">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Icon / Symbol</label>
+              <input type="text" id="edit-tile-icon" class="form-input" placeholder="Emoji or character (e.g. 💧)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fitzgerald Color Category</label>
+              <select id="edit-tile-category" class="form-select">
+                <option value="people">Yellow - People / Pronouns</option>
+                <option value="verb">Green - Verbs / Actions</option>
+                <option value="noun">Orange - Nouns / Things</option>
+                <option value="adjective">Blue - Descriptors / Adjectives</option>
+                <option value="social">Pink - Social / Greetings</option>
+                <option value="question">Purple - Questions</option>
+                <option value="misc">White/Gray - Prepositions / Little Words</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Folder Link (Optional)</label>
+            <select id="edit-tile-target-board" class="form-select"></select>
+          </div>
+
+          <!-- Real Voice Recorder -->
+          <div class="form-group" style="background:var(--gh-canvas-inset); padding:12px; border-radius:10px; border:1px solid var(--gh-border-muted);">
+            <label class="form-label">🎙️ Custom Voice Recording</label>
+            <p id="label-record-status" style="font-size:0.75rem; margin-bottom:8px;">No custom recording</p>
+            <button class="header-btn" id="btn-record-voice">🎙️ Record Real Voice</button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="header-btn" id="btn-delete-tile" style="color:#f85149; margin-right:auto;">🗑️ Delete</button>
+          <button class="header-btn accent-btn" id="btn-save-tile">💾 Save Button</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/aac-audio.js"></script>
+  <script src="js/aac-data.js"></script>
+  <script src="js/phonics-data.js"></script>
+  <script src="js/aac-app.js"></script>
+
+  <!-- Service Worker Registration for Offline PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW notice:', err));
+      });
+    }
+  </script>
+</body>
+</html>

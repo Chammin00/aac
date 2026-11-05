@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Read This For Me | Gaming Camera & Dialogue Translator</title>
+  
+  <meta name="theme-color" content="#090d16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="Instant camera OCR, translation, and karaoke speech reader for video game dialogues, quest text, and dyslexia assistance.">
+
+  <!-- HUD Stylesheet -->
+  <link rel="stylesheet" href="css/game-hud.css">
+  
+  <!-- Tesseract.js for Client-Side Zero-Latency OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Application Header -->
+  <header class="game-hud-header">
+    <div class="hud-brand">
+      <a href="index.html" class="hud-btn" style="text-decoration:none;">
+        <span>⬅️</span>
+        <span>AAC Board</span>
+      </a>
+      <div class="hud-brand-badge">GAME LENS</div>
+      <span>Read This For Me</span>
+    </div>
+
+    <div class="hud-actions">
+      <!-- Input Source Switcher -->
+      <button class="hud-btn active" id="btn-mode-camera" title="Point phone or webcam at game screen">
+        <span>📷 Camera</span>
+      </button>
+      <button class="hud-btn" id="btn-mode-screen" title="Share PC game window directly">
+        <span>🖥️ Screen Share</span>
+      </button>
+
+      <!-- Language Selector -->
+      <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:8px; border:1px solid var(--hud-border);">
+        <span style="font-size:0.75rem; color:var(--hud-text-secondary);">From:</span>
+        <select id="select-source-lang" style="background:transparent; border:none; color:#fff; font-size:0.8rem; outline:none; font-weight:600;">
+          <option value="autodetect" selected>Auto-Detect</option>
+          <option value="eng">English (eng)</option>
+          <option value="jpn">Japanese (日本語)</option>
+          <option value="spa">Spanish (Español)</option>
+          <option value="fra">French (Français)</option>
+          <option value="deu">German (Deutsch)</option>
+          <option value="kor">Korean (한국어)</option>
+          <option value="chi_sim">Chinese (中文)</option>
+        </select>
+        <span style="font-size:0.75rem; color:var(--hud-text-secondary);">➔ To:</span>
+        <select id="select-target-lang" style="background:transparent; border:none; color:var(--hud-accent-cyan); font-size:0.8rem; outline:none; font-weight:700;">
+          <option value="en" selected>English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="ja">Japanese</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Split Layout -->
+  <main class="game-hud-main">
+
+    <!-- Left: Video Viewfinder & Reticle -->
+    <section class="viewfinder-section" id="viewfinder-container">
+      <video id="camera-video" autoplay playsinline muted></video>
+
+      <!-- Interactive Dialogue Target Reticle -->
+      <div class="reticle-overlay" id="dialogue-reticle" style="top:58%; left:10%; width:80%; height:32%;">
+        <div class="reticle-corner tl"></div>
+        <div class="reticle-corner tr"></div>
+        <div class="reticle-corner bl"></div>
+        <div class="reticle-corner br"></div>
+        <div class="reticle-label">🎯 Dialogue Target Area</div>
+      </div>
+
+      <!-- Flash Animation on Snap -->
+      <div class="snap-flash" id="snap-flash"></div>
+
+      <!-- Bottom Floating Controls -->
+      <div class="viewfinder-toolbar">
+        <button class="btn-snap-giant" id="btn-snap-read">
+          <span>📸 SNAP & READ</span>
+        </button>
+        <button class="hud-btn" id="btn-demo-dialogue" title="Try sample game dialogue">
+          <span>🎮 Demo RPG</span>
+        </button>
+        <span id="ocr-status-pill" style="font-size:0.75rem; color:var(--hud-accent-cyan); font-weight:700;">
+          Ready to scan
+        </span>
+      </div>
+    </section>
+
+    <!-- Right: Translation, Dyslexia Simplifier & Narration Console -->
+    <section class="reader-section">
+
+      <!-- Card 1: Live Karaoke Translation & Narration -->
+      <div class="reader-card">
+        <div class="reader-card-header">
+          <div class="reader-badge">
+            <span>🗣️</span>
+            <span>Spoken Narration & Translation</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="hud-btn" id="btn-read-aloud" style="height:30px; padding:0 10px; font-size:0.75rem;">
+              <span>🔊 Replay</span>
+            </button>
+            <button class="hud-btn" id="btn-pause-speech" style="height:30px; padding:0 10px; font-size:0.75rem;">
+              <span>⏸️ Stop</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Karaoke Spoken Words Container -->
+        <div class="translation-output-box" id="karaoke-display">
+          Tap "SNAP & READ" or point your camera at any game dialogue box to translate and hear it spoken aloud.
+        </div>
+
+        <!-- Original Scanned Text -->
+        <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;">
+          <span style="font-size:0.72rem; text-transform:uppercase; color:var(--hud-text-secondary); font-weight:700;">Original Game Text:</span>
+          <div class="original-text-box" id="original-display">---</div>
+        </div>
+      </div>
+
+      <!-- Card 2: Dyslexia & Lore Simplifier (TL;DR) -->
+      <div class="reader-card" style="border-color:rgba(56, 189, 248, 0.4);">
+        <div class="reader-card-header">
+          <div class="reader-badge" style="color:var(--hud-accent-amber);">
+            <span>⚡</span>
+            <span>Dyslexia & Fast Lore Simplifier (TL;DR)</span>
+          </div>
+          <button class="hud-btn btn-primary" id="btn-send-to-aac" style="height:30px; padding:0 10px; font-size:0.75rem;">
+            <span>➕ Send to AAC Board</span>
+          </button>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div id="simplified-summary" style="font-size:0.95rem; color:#fef08a; font-weight:600;">
+            Awaiting dialogue scan...
+          </div>
+          <div id="quest-goal-tag" style="font-size:0.85rem; color:#4ade80; font-weight:700;"></div>
+        </div>
+      </div>
+
+      <!-- Card 3: Dialogue Quest Log Journal -->
+      <div class="reader-card">
+        <div class="reader-card-header">
+          <div class="reader-badge" style="color:var(--hud-accent-purple);">
+            <span>📜</span>
+            <span>Dialogue History Journal</span>
+          </div>
+          <button class="hud-btn" id="btn-clear-journal" style="height:26px; padding:0 8px; font-size:0.7rem; color:#f85149;">
+            Clear
+          </button>
+        </div>
+
+        <div class="dialogue-history-list" id="journal-list">
+          <div style="color:var(--hud-text-secondary); font-size:0.8rem; font-style:italic; padding:6px;">
+            No past dialogues logged yet.
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Engines -->
+  <script src="js/aac-audio.js"></script>
+  <script src="js/ocr-engine.js"></script>
+  <script src="js/translator-engine.js"></script>
+
+  <!-- Page Controller Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const videoEl = document.getElementById("camera-video");
+      window.gameOcr.setVideoElement(videoEl);
+
+      const karaokeDisplay = document.getElementById("karaoke-display");
+      const originalDisplay = document.getElementById("original-display");
+      const simplifiedSummary = document.getElementById("simplified-summary");
+      const questGoalTag = document.getElementById("quest-goal-tag");
+      const statusPill = document.getElementById("ocr-status-pill");
+      const snapFlash = document.getElementById("snap-flash");
+      const journalList = document.getElementById("journal-list");
+
+      let dialogueHistory = [];
+      let latestTranslation = "";
+
+      // Start default camera
+      try {
+        await window.gameOcr.startCamera();
+        statusPill.textContent = "Camera active ●";
+        statusPill.style.color = "#22c55e";
+      } catch (e) {
+        statusPill.textContent = "Camera notice: " + e.message;
+        statusPill.style.color = "#f0883e";
+      }
+
+      // Input Mode Switchers
+      document.getElementById("btn-mode-camera").addEventListener("click", async () => {
+        document.getElementById("btn-mode-camera").classList.add("active");
+        document.getElementById("btn-mode-screen").classList.remove("active");
+        try {
+          await window.gameOcr.startCamera();
+          statusPill.textContent = "Camera active ●";
+          statusPill.style.color = "#22c55e";
+        } catch (e) {
+          alert(e.message);
+        }
+      });
+
+      document.getElementById("btn-mode-screen").addEventListener("click", async () => {
+        document.getElementById("btn-mode-screen").classList.add("active");
+        document.getElementById("btn-mode-camera").classList.remove("active");
+        try {
+          await window.gameOcr.startScreenCapture();
+          statusPill.textContent = "Screen sharing active ●";
+          statusPill.style.color = "#38bdf8";
+        } catch (e) {
+          alert(e.message);
+        }
+      });
+
+      // Draggable Reticle
+      setupReticleDragging();
+
+      // Snap & Read Action
+      async function performSnapAndRead() {
+        // Trigger visual flash
+        snapFlash.classList.add("active");
+        setTimeout(() => snapFlash.classList.remove("active"), 120);
+
+        statusPill.textContent = "Scanning dialogue...";
+        statusPill.style.color = "#38bdf8";
+
+        try {
+          const ocrResult = await window.gameOcr.recognizeText((msg) => {
+            statusPill.textContent = msg;
+          });
+
+          if (!ocrResult || !ocrResult.text) {
+            statusPill.textContent = "No text detected in target area";
+            statusPill.style.color = "#f85149";
+            return;
+          }
+
+          originalDisplay.textContent = ocrResult.text;
+
+          // Translation
+          const srcLang = document.getElementById("select-source-lang").value;
+          const targetLang = document.getElementById("select-target-lang").value;
+
+          statusPill.textContent = "Translating...";
+          const transResult = await window.gameTranslator.translate(ocrResult.text, srcLang, targetLang);
+          latestTranslation = transResult.translatedText || ocrResult.text;
+
+          // Dyslexia & Lore Simplifier
+          const simplified = window.gameTranslator.simplifyDialogue(latestTranslation);
+          simplifiedSummary.textContent = `"${simplified.simplified}"`;
+          questGoalTag.textContent = simplified.objective || "💡 Quick Tip: Read with Afro-Euro Narrator voice.";
+
+          // Vocalize with karaoke highlight!
+          statusPill.textContent = "Speaking aloud 🔊";
+          statusPill.style.color = "#22c55e";
+          window.gameTranslator.speakWithKaraoke(latestTranslation, karaokeDisplay, () => {
+            statusPill.textContent = "Ready to scan";
+            statusPill.style.color = "#38bdf8";
+          });
+
+          // Add to journal history
+          addDialogueToJournal(ocrResult.text, latestTranslation);
+
+        } catch (err) {
+          statusPill.textContent = "Error: " + err.message;
+          statusPill.style.color = "#f85149";
+        }
+      }
+
+      document.getElementById("btn-snap-read").addEventListener("click", performSnapAndRead);
+
+      // Keyboard shortcut: Spacebar triggers snap if not typing in input
+      window.addEventListener("keydown", (e) => {
+        if (e.code === "Space" && e.target.tagName !== "INPUT" && e.target.tagName !== "SELECT") {
+          e.preventDefault();
+          performSnapAndRead();
+        }
+      });
+
+      // Demo RPG Dialogue Button
+      document.getElementById("btn-demo-dialogue").addEventListener("click", () => {
+        const demoQuotes = [
+          "Elder Morvath: 'Thou must travel to the Jagged Mountains and seek the sacred sunstone before the eclipse consumes the realm!'",
+          "長老：『皆の者、急ぎ神殿へ向かうのじゃ！魔王の復活を阻止せねばならぬ！』 (Elder: 'Everyone, make haste to the temple! We must stop the Demon King's resurrection!')",
+          "Commander Valen: 'The scouts report a massive goblin vanguard approaching the eastern gate. Prepare the archers immediately!'",
+          "Tabitha: 'Can you bring me 3 blue glowberries from the weeping forest? I will brew you an elixir of strength!'"
+        ];
+        const quote = demoQuotes[Math.floor(Math.random() * demoQuotes.length)];
+        originalDisplay.textContent = quote;
+
+        window.gameTranslator.translate(quote, "autodetect", "en").then(res => {
+          latestTranslation = res.translatedText;
+          const simp = window.gameTranslator.simplifyDialogue(latestTranslation);
+          simplifiedSummary.textContent = `"${simp.simplified}"`;
+          questGoalTag.textContent = simp.objective || "🎯 Objective Identified";
+          window.gameTranslator.speakWithKaraoke(latestTranslation, karaokeDisplay);
+          addDialogueToJournal(quote, latestTranslation);
+        });
+      });
+
+      // Audio Control Buttons
+      document.getElementById("btn-read-aloud").addEventListener("click", () => {
+        if (latestTranslation) {
+          window.gameTranslator.speakWithKaraoke(latestTranslation, karaokeDisplay);
+        }
+      });
+
+      document.getElementById("btn-pause-speech").addEventListener("click", () => {
+        window.gameTranslator.stopSpeaking();
+      });
+
+      // Send to AAC Board
+      document.getElementById("btn-send-to-aac").addEventListener("click", () => {
+        if (!latestTranslation) {
+          alert("Scan a dialogue line first!");
+          return;
+        }
+        // Save to sessionStorage for AAC board pick-up
+        sessionStorage.setItem("AAC_INCOMING_DIALOGUE", latestTranslation);
+        window.location.href = "index.html?fromGameLens=1";
+      });
+
+      // Dialogue Journal Functions
+      function addDialogueToJournal(orig, trans) {
+        dialogueHistory.unshift({
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+          original: orig,
+          translated: trans
+        });
+        renderJournal();
+      }
+
+      function renderJournal() {
+        if (dialogueHistory.length === 0) {
+          journalList.innerHTML = `<div style="color:var(--hud-text-secondary); font-size:0.8rem; font-style:italic; padding:6px;">No past dialogues logged yet.</div>`;
+          return;
+        }
+        journalList.innerHTML = dialogueHistory.map((item, idx) => `
+          <div class="history-item" data-idx="${idx}">
+            <span class="history-time">${item.time}</span>
+            <span class="history-text"><strong>${item.translated}</strong></span>
+          </div>
+        `).join("");
+
+        journalList.querySelectorAll(".history-item").forEach(el => {
+          el.addEventListener("click", () => {
+            const idx = parseInt(el.getAttribute("data-idx"), 10);
+            const item = dialogueHistory[idx];
+            latestTranslation = item.translated;
+            originalDisplay.textContent = item.original;
+            window.gameTranslator.speakWithKaraoke(item.translated, karaokeDisplay);
+          });
+        });
+      }
+
+      document.getElementById("btn-clear-journal").addEventListener("click", () => {
+        dialogueHistory = [];
+        renderJournal();
+      });
+
+      // Setup interactive reticle positioning
+      function setupReticleDragging() {
+        const reticle = document.getElementById("dialogue-reticle");
+        const container = document.getElementById("viewfinder-container");
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+
+        reticle.addEventListener("mousedown", (e) => {
+          isDragging = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          initialLeft = reticle.offsetLeft;
+          initialTop = reticle.offsetTop;
+        });
+
+        window.addEventListener("mousemove", (e) => {
+          if (!isDragging) return;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+
+          const newLeft = Math.max(0, Math.min(container.clientWidth - reticle.clientWidth, initialLeft + dx));
+          const newTop = Math.max(0, Math.min(container.clientHeight - reticle.clientHeight, initialTop + dy));
+
+          reticle.style.left = `${newLeft}px`;
+          reticle.style.top = `${newTop}px`;
+
+          // Update percentage in OCR engine
+          const xPct = newLeft / container.clientWidth;
+          const yPct = newTop / container.clientHeight;
+          const wPct = reticle.clientWidth / container.clientWidth;
+          const hPct = reticle.clientHeight / container.clientHeight;
+          window.gameOcr.setReticle(xPct, yPct, wPct, hPct);
+        });
+
+        window.addEventListener("mouseup", () => {
+          isDragging = false;
+        });
+
+        // Touch support for mobile phones
+        reticle.addEventListener("touchstart", (e) => {
+          const t = e.touches[0];
+          isDragging = true;
+          startX = t.clientX;
+          startY = t.clientY;
+          initialLeft = reticle.offsetLeft;
+          initialTop = reticle.offsetTop;
+        });
+
+        window.addEventListener("touchmove", (e) => {
+          if (!isDragging) return;
+          const t = e.touches[0];
+          const dx = t.clientX - startX;
+          const dy = t.clientY - startY;
+
+          const newLeft = Math.max(0, Math.min(container.clientWidth - reticle.clientWidth, initialLeft + dx));
+          const newTop = Math.max(0, Math.min(container.clientHeight - reticle.clientHeight, initialTop + dy));
+
+          reticle.style.left = `${newLeft}px`;
+          reticle.style.top = `${newTop}px`;
+
+          const xPct = newLeft / container.clientWidth;
+          const yPct = newTop / container.clientHeight;
+          const wPct = reticle.clientWidth / container.clientWidth;
+          const hPct = reticle.clientHeight / container.clientHeight;
+          window.gameOcr.setReticle(xPct, yPct, wPct, hPct);
+        });
+
+        window.addEventListener("touchend", () => {
+          isDragging = false;
+        });
+      }
+    });
+  </script>
+</body>
+</html>

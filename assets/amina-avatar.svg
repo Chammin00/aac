@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.95"/>
+    </radialGradient>
+    <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2a1810"/>
+      <stop offset="100%" stop-color="#120a07"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#9a623f"/>
+      <stop offset="100%" stop-color="#734426"/>
+    </linearGradient>
+    <linearGradient id="clothingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0883e"/>
+      <stop offset="100%" stop-color="#bc8cff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base Circle -->
+  <circle cx="60" cy="60" r="58" fill="url(#bgGlow)" stroke="#30363d" stroke-width="2"/>
+
+  <!-- Back Hair Volume (Afro-Puff / Updo) -->
+  <circle cx="60" cy="40" r="34" fill="url(#hairGrad)"/>
+  <circle cx="42" cy="36" r="14" fill="url(#hairGrad)"/>
+  <circle cx="78" cy="36" r="14" fill="url(#hairGrad)"/>
+  <circle cx="60" cy="24" r="16" fill="url(#hairGrad)"/>
+
+  <!-- Neck & Shoulders -->
+  <path d="M52 74 L52 86 L68 86 L68 74 Z" fill="url(#skinGrad)"/>
+  <path d="M28 116 C30 92 46 86 60 86 C74 86 90 92 92 116 Z" fill="url(#clothingGrad)"/>
+  
+  <!-- Collar / Necklace -->
+  <path d="M50 86 C55 94 65 94 70 86" fill="none" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Head / Face -->
+  <ellipse cx="60" cy="58" rx="20" ry="23" fill="url(#skinGrad)"/>
+
+  <!-- Front Hair Details -->
+  <path d="M40 48 C48 38 72 38 80 48 C76 42 66 38 60 38 C54 38 44 42 40 48 Z" fill="url(#hairGrad)"/>
+
+  <!-- Stylish Glasses (Warm Amber / Gold Frame) -->
+  <rect x="42" y="52" width="14" height="11" rx="4" fill="none" stroke="#f0883e" stroke-width="2"/>
+  <rect x="64" y="52" width="14" height="11" rx="4" fill="none" stroke="#f0883e" stroke-width="2"/>
+  <line x1="56" y1="56" x2="64" y2="56" stroke="#f0883e" stroke-width="2"/>
+
+  <!-- Eyes -->
+  <circle cx="49" cy="57" r="2.5" fill="#2a1810"/>
+  <circle cx="71" cy="57" r="2.5" fill="#2a1810"/>
+  <circle cx="50" cy="56" r="0.8" fill="#ffffff"/>
+  <circle cx="72" cy="56" r="0.8" fill="#ffffff"/>
+
+  <!-- Eyebrows -->
+  <path d="M44 49 Q49 47 54 49" fill="none" stroke="#2a1810" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M66 49 Q71 47 76 49" fill="none" stroke="#2a1810" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Nose -->
+  <path d="M58 64 Q60 66 62 64" fill="none" stroke="#5c341b" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Warm Smile -->
+  <path d="M52 70 Q60 76 68 70" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M54 70 Q60 75 66 70" fill="#dc2626"/>
+
+  <!-- Gold Hoop Earrings -->
+  <ellipse cx="39" cy="62" rx="2" ry="4" fill="none" stroke="#fef08a" stroke-width="1.5"/>
+  <ellipse cx="81" cy="62" rx="2" ry="4" fill="none" stroke="#fef08a" stroke-width="1.5"/>
+</svg>

@@ -1,0 +1,341 @@
+/* ==========================================================================
+   READ THIS FOR ME - GAMING CAMERA & SCREEN DIALOGUE TRANSLATOR HUD
+   High-Gloss Lacquer Gaming Optics, Targeting Reticle & Subtitle Reader
+   ========================================================================== */
+
+:root {
+  --hud-bg: #090d16;
+  --hud-panel-bg: rgba(13, 17, 23, 0.92);
+  --hud-card-bg: rgba(22, 27, 34, 0.85);
+  --hud-border: #30363d;
+  --hud-border-active: #58a6ff;
+  --hud-accent-cyan: #38bdf8;
+  --hud-accent-amber: #f0883e;
+  --hud-accent-green: #22c55e;
+  --hud-accent-purple: #bc8cff;
+  --hud-text-primary: #f0f6fc;
+  --hud-text-secondary: #8b949e;
+  --hud-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+  --shadow-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 8px 24px -4px rgba(0, 0, 0, 0.75);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: var(--hud-bg);
+  color: var(--hud-text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.game-hud-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(13, 17, 23, 0.95);
+  border-bottom: 1px solid var(--hud-border);
+  z-index: 50;
+  flex-shrink: 0;
+  backdrop-filter: blur(8px);
+}
+
+.hud-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.hud-brand-badge {
+  background: linear-gradient(135deg, #f0883e 0%, #38bdf8 100%);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.hud-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  height: 38px;
+  border-radius: 8px;
+  background: var(--hud-card-bg);
+  border: 1px solid var(--hud-border);
+  color: var(--hud-text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.hud-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--hud-text-secondary);
+}
+.hud-btn.active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: var(--hud-accent-cyan);
+  color: var(--hud-accent-cyan);
+}
+.hud-btn.btn-primary {
+  background: linear-gradient(135deg, #f0883e 0%, #ea580c 100%);
+  border-color: #fdba74;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(240, 136, 62, 0.4);
+}
+.hud-btn.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* Main Split View: Viewfinder & Translation Reader */
+.game-hud-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (max-width: 900px) {
+  .game-hud-main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+}
+
+/* Left: Viewfinder & Targeting Canvas */
+.viewfinder-section {
+  position: relative;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-right: 1px solid var(--hud-border);
+}
+
+#camera-video, #screen-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Cyberpunk Dialogue Targeting Reticle Overlay */
+.reticle-overlay {
+  position: absolute;
+  border: 2px dashed var(--hud-accent-cyan);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55), 0 0 20px rgba(56, 189, 248, 0.5);
+  border-radius: 8px;
+  cursor: move;
+  pointer-events: auto;
+  min-width: 160px;
+  min-height: 80px;
+  z-index: 20;
+}
+
+.reticle-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: #f0883e;
+  border-style: solid;
+}
+.reticle-corner.tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; }
+.reticle-corner.tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; }
+.reticle-corner.bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; }
+.reticle-corner.br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; }
+
+.reticle-label {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  background: var(--hud-accent-cyan);
+  color: #000;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Snap Flash Effect */
+.snap-flash {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 40;
+  transition: opacity 0.25s ease-out;
+}
+.snap-flash.active {
+  opacity: 0.85;
+  transition: none;
+}
+
+/* Floating Viewfinder Controls */
+.viewfinder-toolbar {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(13, 17, 23, 0.88);
+  border: 1px solid var(--hud-border);
+  padding: 8px 16px;
+  border-radius: 9999px;
+  backdrop-filter: blur(8px);
+  z-index: 30;
+  box-shadow: var(--hud-shadow);
+}
+
+.btn-snap-giant {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #f0883e 0%, #ea580c 100%);
+  border: 2px solid #fdba74;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(240, 136, 62, 0.6);
+  transition: all 0.15s ease;
+}
+.btn-snap-giant:hover {
+  transform: scale(1.04);
+  box-shadow: 0 6px 24px rgba(240, 136, 62, 0.8);
+}
+
+/* Right: Translation & Reader Console */
+.reader-section {
+  display: flex;
+  flex-direction: column;
+  background: var(--hud-panel-bg);
+  overflow-y: auto;
+  padding: 16px;
+  gap: 16px;
+}
+
+.reader-card {
+  background: var(--hud-card-bg);
+  border: 1px solid var(--hud-border);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-bevel);
+  position: relative;
+}
+
+.reader-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 8px;
+}
+
+.reader-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--hud-accent-cyan);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.translation-output-box {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  font-weight: 500;
+  color: #ffffff;
+  min-height: 80px;
+  user-select: text;
+}
+
+.original-text-box {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--hud-text-secondary);
+  font-style: italic;
+  user-select: text;
+}
+
+/* Karaoke Spoken Word Highlight */
+.karaoke-word {
+  display: inline;
+  padding: 1px 3px;
+  border-radius: 4px;
+  transition: background-color 0.1s ease;
+}
+.karaoke-word.speaking {
+  background-color: rgba(240, 136, 62, 0.4);
+  color: #fef08a;
+  font-weight: 700;
+}
+
+/* Quest Dialogue Journal Log */
+.dialogue-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.history-item {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--hud-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.history-item:hover {
+  border-color: var(--hud-accent-cyan);
+}
+.history-time {
+  font-size: 0.68rem;
+  color: var(--hud-text-secondary);
+}
+.history-text {
+  font-size: 0.85rem;
+  color: var(--hud-text-primary);
+}
