@@ -348,23 +348,62 @@ class AacAudioEngine {
       'x': 'ks',
       'y': 'yuh',
       'z': 'zzz',
+      // Digraphs & Teams
       'ch': 'chuh, as in chair',
       'sh': 'shhh, as in ship',
       'th': 'th, as in thumb',
       'wh': 'wuh, as in whale',
-      'ck': 'kuh'
+      'ck': 'kuh',
+      'ph': 'fff',
+      'ng': 'ng, as in ring',
+      // Consonant Blends
+      'bl': 'bluh',
+      'cl': 'cluh',
+      'fl': 'fluh',
+      'gl': 'gluh',
+      'pl': 'pluh',
+      'sl': 'sluh',
+      'br': 'bruh',
+      'cr': 'cruh',
+      'dr': 'druh',
+      'fr': 'fruh',
+      'gr': 'gruh',
+      'pr': 'pruh',
+      'tr': 'truh',
+      'st': 'stuh',
+      'sp': 'spuh',
+      'sk': 'skuh',
+      'sm': 'smuh',
+      'sn': 'snuh',
+      'sw': 'swuh',
+      // Vowel Teams & Magic-E
+      'ai': 'ay, as in rain',
+      'ay': 'ay, as in play',
+      'ee': 'eee, as in tree',
+      'ea': 'eee, as in leaf',
+      'oa': 'oh, as in boat',
+      'oo': 'ooo, as in moon',
+      'ar': 'ar, as in star',
+      'or': 'or, as in corn',
+      'er': 'er, as in tiger',
+      'ir': 'er, as in bird',
+      'ur': 'er, as in turtle',
+      'long a': 'ay, as in cake',
+      'long i': 'eye, as in kite',
+      'long o': 'oh, as in bone',
+      'long u': 'you, as in cube'
     };
 
     const key = letter.toLowerCase();
     const phoneticSpeech = soundLabel || phonemeMap[key] || letter;
-    this.playTone(320, 0.08, "triangle");
+    this.playTap();
     setTimeout(() => {
       this.speak(phoneticSpeech, 1.0, 0.88);
-    }, 60);
+    }, 40);
   }
 
   /**
-   * Hooked on Phonics Blending Sequence:
+   * Phonics Blending Sequence:
    * Speaks sound 1 -> sound 2 -> sound 3 -> then whole blended word!
    */
   blendAndSpeak(sounds, wholeWord, onStepCallback = null) {
@@ -375,7 +414,7 @@ class AacAudioEngine {
     sounds.forEach((snd, index) => {
       setTimeout(() => {
         if (onStepCallback) onStepCallback(index);
-        this.playTone(400 + (index * 60), 0.12, "sine");
+        this.playAcousticBell(440 + (index * 80), 0.12, 0.2);
         this.speakPhoneme(snd);
       }, delay);
       delay += stepDuration;

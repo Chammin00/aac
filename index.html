@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#090d16">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Universal AAC Communication Board and Systematic Hooked on Phonics Learning Suite with Afro-European Female Narrator Voice.">
+  <meta name="description" content="Universal AAC Communication Board and Systematic Phonics Literacy Suite with Afro-European Female Narrator Voice.">
   <link rel="manifest" href="manifest.json">
 
   <!-- Core Theme Stylesheets -->
@@ -81,7 +81,7 @@
           </button>
           <button class="header-btn" id="btn-tab-phonics">
             <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            <span>Hooked on Phonics</span>
+            <span>Phonics</span>
           </button>
           <button class="header-btn" id="btn-tab-wheels" title="Spin Decision Wheels for Snacks, Restaurants, and Homecooked Meals">
             <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m4.93 19.07 4.24-4.24"/></svg>
@@ -678,19 +678,23 @@
 
           <!-- Card 4: Phonics & Wheels -->
           <div style="background:var(--gh-canvas-inset); border:1px solid var(--gh-border-default); border-radius:12px; padding:12px; display:flex; gap:12px; align-items:flex-start;">
-            <div style="font-size:2rem; background:rgba(240,136,62,0.15); border-radius:10px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">🔤</div>
+            <div style="background:rgba(240,136,62,0.15); border-radius:10px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg class="ui-icon ui-icon-lg" style="color:#f0883e;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
             <div>
               <strong style="color:#f0883e; font-size:0.95rem;">4. Phonics & Food Decision Wheels</strong>
-              <p style="font-size:0.8rem; color:var(--gh-text-primary); margin:2px 0 0 0;">Switch tabs anytime to practice reading on the <strong>Hooked on Phonics</strong> blending board, or spin the <strong>Food Wheels</strong> when a child is stuck deciding what to eat!</p>
+              <p style="font-size:0.8rem; color:var(--gh-text-primary); margin:2px 0 0 0;">Switch tabs anytime to practice reading on the <strong>Phonics</strong> blending board, or spin the <strong>Food Wheels</strong> when a child is stuck deciding what to eat!</p>
             </div>
           </div>
 
           <!-- Card 5: Tablet Keyguards -->
           <div style="background:var(--gh-canvas-inset); border:1px solid var(--gh-border-default); border-radius:12px; padding:12px; display:flex; gap:12px; align-items:flex-start;">
-            <div style="font-size:2rem; background:rgba(139,92,246,0.15); border-radius:10px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">📱</div>
+            <div style="background:rgba(139,92,246,0.15); border-radius:10px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg class="ui-icon ui-icon-lg" style="color:#a78bfa;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            </div>
             <div>
               <strong style="color:#a78bfa; font-size:0.95rem;">5. Clinical Tablet Access & Keyguards</strong>
-              <p style="font-size:0.8rem; color:var(--gh-text-primary); margin:2px 0 0 0;">Have a child with tremors or cerebral palsy? Open <strong>⚙️ Settings</strong> to enable <em>Touch on Release</em>, <em>Hold Duration (Dwell)</em>, or <em>Deep Keyguard Insets</em>.</p>
+              <p style="font-size:0.8rem; color:var(--gh-text-primary); margin:2px 0 0 0;">Have a child with tremors or cerebral palsy? Open <strong>Settings</strong> to enable <em>Touch on Release</em>, <em>Hold Duration (Dwell)</em>, or <em>Deep Keyguard Insets</em>.</p>
             </div>
           </div>
 
@@ -1064,13 +1068,13 @@
   </div>
 
   <!-- Application Logic Scripts -->
-  <script src="js/aac-audio.js?v=4"></script>
-  <script src="js/aac-data.js?v=4"></script>
-  <script src="js/phonics-data.js?v=4"></script>
-  <script src="js/food-wheel.js?v=4"></script>
-  <script src="js/favorites-engine.js?v=4"></script>
-  <script src="js/device-engine.js?v=4"></script>
-  <script src="js/aac-app.js?v=4"></script>
+  <script src="js/aac-audio.js?v=7"></script>
+  <script src="js/aac-data.js?v=7"></script>
+  <script src="js/phonics-data.js?v=7"></script>
+  <script src="js/food-wheel.js?v=7"></script>
+  <script src="js/favorites-engine.js?v=7"></script>
+  <script src="js/device-engine.js?v=7"></script>
+  <script src="js/aac-app.js?v=7"></script>
 
   <!-- Service Worker Registration for Offline PWA -->
   <script>

@@ -191,7 +191,7 @@ class SmartDictionaryEngine {
   }
 
   /**
-   * Hooked on Phonics Phoneme Dissector for Age 3+:
+   * Systematic Phonics Phoneme Dissector for Age 3+:
    * Breaks word into phoneme sounds so child can hear it step-by-step
    */
   dissectPhonemes(word) {

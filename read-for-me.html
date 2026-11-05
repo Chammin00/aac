@@ -490,7 +490,7 @@
         window.aacAudio.speak(currentScannedWord, 1.05, 0.9);
       });
 
-      // Kids Button 2: Say Slowly with Hooked on Phonics sounds!
+      // Kids Button 2: Say Slowly with Phonics letter sounds!
       document.getElementById("btn-kids-phonics").addEventListener("click", () => {
         const letters = window.smartDictionary.dissectPhonemes(currentScannedWord);
         window.aacAudio.blendAndSpeak(letters, currentScannedWord);

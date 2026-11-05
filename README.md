@@ -12,7 +12,7 @@
 
 **Amina AAC & Phonics Studio** is a universal Augmentative and Alternative Communication (AAC) platform engineered for individuals of all ages and cognitive/motor profiles—ranging from minimally verbal toddlers and children on the autism spectrum to adult communicators recovering from stroke/aphasia or living with ALS and cerebral palsy.
 
-Unlike conventional AAC devices that isolate communication from literacy instruction, Amina uniquely integrates an **AAC Motor Planning Grid** with an interactive **Hooked on Phonics Learning Suite**, bridged by an **Afro-European Female Narrator voice engine ("Amina")**.
+Unlike conventional AAC devices that isolate communication from literacy instruction, Amina uniquely integrates an **AAC Motor Planning Grid** with an interactive **Phonics Learning Suite**, bridged by an **Afro-European Female Narrator voice engine ("Amina")**.
 
 Communicators can transition seamlessly between building sentences in daily life and mastering letter-sound phonemes, CVC word blending, and decodable stories—with single-tap word transfers between learning and speaking modes.
 
@@ -20,7 +20,7 @@ Communicators can transition seamlessly between building sentences in daily life
 
 ## 🏛️ Open-Source Lineage & GitHub Reference Research
 
-In designing Amina, we synthesized best practices and open standards from the leading open-source AAC initiatives on GitHub:
+In designing Amina, we synthesized best practices and open standards from the leading open-source AAC and phonics initiatives on GitHub:
 
 1. **[Cboard (cboard-org/cboard)](https://github.com/cboard-org/cboard)**:
    - Modular, progressive web app architecture designed to run on low-spec tablets and phones.
@@ -28,7 +28,11 @@ In designing Amina, we synthesized best practices and open standards from the le
 2. **[Open-AAC & Open Board Format (open-aac/openboardformat)](https://github.com/open-aac/openboardformat)**:
    - Native support for the open standard `.obf` (Open Board Format) and `.obz` JSON schemas to prevent proprietary vendor lock-in.
    - Interoperable board importing/exporting compatible with CoughDrop and open AAC tools.
-3. **Modified Fitzgerald Key Color Coding**:
+3. **[Phonics App (cocojojo5213/phonics-app)](https://github.com/cocojojo5213/phonics-app)**:
+   - Scientific multi-category phonics classification: Alphabet & Short Vowels, Consonant Digraphs (`ch`, `sh`, `th`, `wh`, `ck`, `ph`, `ng`), Consonant Blends (`bl`, `cl`, `fl`, `st`, `sp`, `tr`, `gr`), Magic E / Split Vowels (`a_e`, `i_e`, `o_e`, `u_e`), and Vowel Teams (`ai`, `ay`, `ee`, `ea`, `oa`, `oo`).
+4. **[Yara Reads (finereli/yarareads)](https://github.com/finereli/yarareads)**:
+   - "The help lives on the word" tactile micro-phonics architecture: visual sound buttons embedded directly under decodable story words with single-letter dots (`•`), digraph/blend bars (`━`), and magic-e connector arcs (`⌢`).
+5. **Modified Fitzgerald Key Color Coding**:
    - Standard clinical color hierarchy facilitating grammatical sentence expansion:
      - 🟨 **Yellow (People & Pronouns)**: *I, You, We, They, Mom, Dad, Teacher*
      - 🟩 **Green (Actions & Verbs)**: *Want, Like, Go, Stop, Help, Make, Eat, Drink, Play*
@@ -66,18 +70,19 @@ In designing Amina, we synthesized best practices and open standards from the le
   - Dynamic vector avatar portrait with animated lip/speaking glow states, speech bubble subtitles, and instant audio preview testing.
   - Allows parents, teachers, and speech therapists to record real, personalized voices (e.g., Mom's voice saying custom nicknames or family phrases) directly onto any tile using the `MediaRecorder` API.
 
-### 2. 🔤 Hooked on Phonics Learning Suite
+### 2. 🔤 Phonics Learning Suite & Systematic Literacy Engine
 A systematic, multi-sensory reading and phonics curriculum built directly into the AAC interface:
 
-1. **Interactive Blending Board**:
-   - 3-tile onset-vowel-coda slider (e.g., `[ C ] ➔ [ A ] ➔ [ T ]`).
-   - Pure acoustic letter sounds vocalized sequentially, culminating in an animated **"Sweep & Blend Word"** button that pronounces the full word with celebration chimes and confetti.
-   - Single-tap **"➕ Send to AAC Message"** button pushes blended words directly to the live communication strip.
-2. **The Sound Wall**:
-   - Systematic coverage of short vowels (`a, e, i, o, u`), 21 consonants, and high-frequency digraphs (`ch, sh, th, wh, ck`).
-   - Every tile includes anchor pictures and physiological mouth articulation guides (e.g. *“Mouth round like an O, jaw dropped”*).
-3. **Decodable Phonics Stories**:
+1. **Interactive Blending Board with Tactile Sound Buttons ("The Help Lives on the Word")**:
+   - 3-tile onset-vowel-coda slider (e.g., `[ C ] ➔ [ A ] ➔ [ T ]`) coupled with interactive breakdown sound buttons displaying single-letter dots (`•`), blend/digraph bars (`━`), and magic-e arcs (`⌢`).
+   - Tapping individual sound buttons vocalizes pure phonemes, while the **"Sweep & Blend Word"** button sequentially illuminates each sound with warm celesta harmonics, culminating in celebratory pentatonic chimes and confetti.
+   - Single-tap **"Send to AAC Message"** button pushes blended words directly to the live communication strip.
+2. **Multi-Category Articulation Sound Wall**:
+   - 6-category interactive filter tabs: *All Sounds*, *ABC & Short Vowels (26)*, *Digraphs (CH, SH, TH, WH, CK, PH, NG)*, *Blends (BL, CL, FL, ST, TR...)*, *Magic E (A_E, I_E, O_E, U_E)*, and *Vowel Teams & R-Controlled*.
+   - Every card includes anchor vocabulary pictures and physiological mouth articulation guides (e.g. *“Mouth round like an O, jaw dropped”*).
+3. **Decodable Phonics Stories with Micro-Phonics Tap-to-Sound-Out**:
    - Level-graded stories featuring CVC decodable sentences alongside high-frequency AAC core words.
+   - Every single word in the story is an interactive tactile chip: tapping any word expands its breakdown sound buttons right below the sentence line and sounds it out step-by-step!
    - Individual line read-aloud buttons and instant message-strip transfer.
 4. **Word Family Jam (Gamified Quiz)**:
    - Auditory rhyme and phoneme identification drills with live fire streak counter (`🔥 Streak`), score counter (`⭐ Score`), and auditory feedback.
@@ -287,7 +292,7 @@ AAC/
 │   ├── aac-audio.js        # Speech synthesis, Afro-Euro voice tuner & sound generator
 │   ├── aac-data.js         # Core vocabulary boards, categories & OBF import/export
 │   ├── device-engine.js    # Hardware concurrency, viewport auto-fit & device scaling
-│   ├── phonics-data.js     # Hooked on Phonics curriculum, word families & sound wall
+│   ├── phonics-data.js     # Phonics curriculum, word families & sound wall
 │   ├── food-wheel.js       # Interactive physics Food Decision Wheels & customizer
 │   ├── favorites-engine.js # Smart frequency tracker, phrase starring & next-word predictor
 │   ├── dictionary-engine.js# 2,500+ core dictionary with Levenshtein autocorrect & symbols

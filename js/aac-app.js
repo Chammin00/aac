@@ -1255,26 +1255,41 @@ class AacApp {
   }
 
   // =========================================================================
-  // HOOKED ON PHONICS LEARNING SUITE
+  // PHONICS & SYSTEMATIC LITERACY ENGINE
   // =========================================================================
 
   renderPhonicsView() {
+    if (!this.soundWallFilter) this.soundWallFilter = "all";
     const container = this.el.phonicsView;
     container.innerHTML = `
       <div class="phonics-panel">
         <div class="phonics-header">
           <div class="brand-section">
-            <div class="brand-logo-icon">🔤</div>
+            <div class="brand-logo-icon" style="background:rgba(240,136,62,0.15); border-color:#f0883e;">
+              <svg class="ui-icon ui-icon-lg" style="color:#f0883e;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
             <div>
-              <h2 style="font-size:1.15rem; font-weight:700;">Hooked on Phonics Engine</h2>
-              <p style="font-size:0.78rem; color:var(--gh-text-secondary);">Systematic Phonics & Reading Integration for AAC Communicators</p>
+              <h2 style="font-size:1.15rem; font-weight:700;">Phonics Studio</h2>
+              <p style="font-size:0.78rem; color:var(--gh-text-secondary);">Systematic Phonics, Sound Buttons & Reading Integration for AAC Communicators</p>
             </div>
           </div>
           <div class="phonics-nav-tabs">
-            <button class="phonics-tab ${this.phonicsTab === 'blender' ? 'active' : ''}" id="ph-tab-blender">🧩 Blending Board</button>
-            <button class="phonics-tab ${this.phonicsTab === 'soundwall' ? 'active' : ''}" id="ph-tab-soundwall">📢 Sound Wall</button>
-            <button class="phonics-tab ${this.phonicsTab === 'stories' ? 'active' : ''}" id="ph-tab-stories">📖 Decodable Stories</button>
-            <button class="phonics-tab ${this.phonicsTab === 'rhymejam' ? 'active' : ''}" id="ph-tab-rhymejam">⭐ Word Family Jam</button>
+            <button class="phonics-tab ${this.phonicsTab === 'blender' ? 'active' : ''}" id="ph-tab-blender">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 2v5"/><path d="M8 2v5"/><path d="M12 12v4"/></svg>
+              <span>Blending Board</span>
+            </button>
+            <button class="phonics-tab ${this.phonicsTab === 'soundwall' ? 'active' : ''}" id="ph-tab-soundwall">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span>Sound Wall</span>
+            </button>
+            <button class="phonics-tab ${this.phonicsTab === 'stories' ? 'active' : ''}" id="ph-tab-stories">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <span>Decodable Stories</span>
+            </button>
+            <button class="phonics-tab ${this.phonicsTab === 'rhymejam' ? 'active' : ''}" id="ph-tab-rhymejam">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 14.83 4.24 4.24"/></svg>
+              <span>Word Family Jam</span>
+            </button>
           </div>
         </div>
         <div id="phonics-stage-content"></div>
@@ -1293,16 +1308,17 @@ class AacApp {
     else if (this.phonicsTab === "rhymejam") this.renderRhymeJam(stage);
   }
 
-  // 1. Interactive 3-Tile Blending Slider (Hooked on Phonics Core)
+  // 1. Interactive 3-Tile Blending Slider with Sound Buttons ("The help lives on the word")
   renderBlendingBoard(container) {
-    const family = window.phonicsData.wordFamilies[this.activeFamilyIndex];
-    const currentWord = family.words[this.activeWordIndex];
+    const family = window.phonicsData.wordFamilies[this.activeFamilyIndex] || window.phonicsData.wordFamilies[0];
+    const currentWord = family.words[this.activeWordIndex] || family.words[0];
+    const breakdown = window.phonicsData.getBreakdown(currentWord.word);
 
     container.innerHTML = `
       <div class="blending-board-card">
-        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; flex-wrap:wrap; gap:8px;">
           <div>
-            <span style="font-size:0.78rem; text-transform:uppercase; color:var(--gh-accent-amber); font-weight:700;">Word Family:</span>
+            <span style="font-size:0.78rem; text-transform:uppercase; color:var(--gh-accent-amber); font-weight:700;">Progression & Family:</span>
             <select id="family-selector" class="form-select" style="padding:4px 8px; margin-left:8px; font-weight:700;">
               ${window.phonicsData.wordFamilies.map((fam, i) => `
                 <option value="${i}" ${i === this.activeFamilyIndex ? "selected" : ""}>${fam.name}</option>
@@ -1319,6 +1335,7 @@ class AacApp {
           <p style="font-size:1.1rem; font-style:italic; color:var(--gh-text-primary); margin-top:4px;">"${currentWord.sentence}"</p>
         </div>
 
+        <!-- 3-Tile Blending Slider -->
         <div class="blending-slider-track">
           <div class="sound-tile" id="tile-onset">
             <span>${currentWord.onset.toUpperCase()}</span>
@@ -1327,24 +1344,42 @@ class AacApp {
           <span class="blend-arrow">➔</span>
           <div class="sound-tile vowel-tile" id="tile-vowel">
             <span>${currentWord.vowel.toUpperCase()}</span>
-            <span class="sound-tile-sub">short ${currentWord.vowel}</span>
+            <span class="sound-tile-sub">${currentWord.vowel}</span>
           </div>
           <span class="blend-arrow">➔</span>
           <div class="sound-tile" id="tile-coda">
-            <span>${currentWord.coda.toUpperCase()}</span>
-            <span class="sound-tile-sub">/${currentWord.coda}/</span>
+            <span>${(currentWord.coda || "").toUpperCase()}</span>
+            <span class="sound-tile-sub">/${currentWord.coda || ""}/</span>
+          </div>
+        </div>
+
+        <!-- Sound Buttons Breakdown Bar ("The help lives on the word") -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px; margin:4px 0;">
+          <span style="font-size:0.75rem; color:var(--gh-text-secondary); text-transform:uppercase; font-weight:700;">Tap Sound Buttons to Sound Out:</span>
+          <div class="sound-buttons-container" id="sound-buttons-row">
+            ${breakdown.map((token, idx) => `
+              <button class="sound-btn" data-sound="${token.sound}" data-index="${idx}" title="${token.sound}">
+                <span>${token.text.toUpperCase()}</span>
+                <span class="sound-mark ${token.mark === 'dot' ? 'sound-mark-dot' : token.mark === 'bar' ? 'sound-mark-bar' : 'sound-mark-arc'}">
+                  ${token.mark === 'dot' ? '•' : token.mark === 'bar' ? '━' : '⌢'}
+                </span>
+              </button>
+            `).join("")}
           </div>
         </div>
 
         <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
           <button class="blend-action-btn" id="btn-sweep-blend">
-            <span>👉 Sweep & Blend Word</span>
+            <svg class="ui-icon" style="color:#ffffff;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+            <span>Sweep & Blend Word</span>
           </button>
           <button class="header-btn" id="btn-next-phonics-word" style="height:48px; padding:0 20px;">
-            <span>Next Word ➡️</span>
+            <span>Next Word</span>
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
           <button class="header-btn accent-btn" id="btn-transfer-to-aac" style="height:48px; padding:0 20px;">
-            <span>➕ Send to AAC Message</span>
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Send to AAC Message</span>
           </button>
         </div>
       </div>
@@ -1363,24 +1398,39 @@ class AacApp {
       window.aacAudio.speakPhoneme(currentWord.vowel);
     });
     document.getElementById("tile-coda").addEventListener("click", () => {
-      window.aacAudio.speakPhoneme(currentWord.coda);
+      if (currentWord.coda) window.aacAudio.speakPhoneme(currentWord.coda);
+    });
+
+    // Sound button clicks
+    container.querySelectorAll(".sound-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const sound = btn.getAttribute("data-sound");
+        btn.classList.add("active-sounding");
+        window.aacAudio.speakPhoneme(sound);
+        setTimeout(() => btn.classList.remove("active-sounding"), 400);
+      });
     });
 
     // Sweep & Blend sequence
     document.getElementById("btn-sweep-blend").addEventListener("click", () => {
-      const sounds = [currentWord.onset, currentWord.vowel, currentWord.coda];
+      const sounds = breakdown.map(t => t.sound || t.text);
+      const soundBtns = container.querySelectorAll(".sound-btn");
       window.aacAudio.blendAndSpeak(sounds, currentWord.word, (step) => {
         const tiles = [
           document.getElementById("tile-onset"),
           document.getElementById("tile-vowel"),
           document.getElementById("tile-coda")
         ];
-        tiles.forEach(t => t.style.borderColor = "");
+        tiles.forEach(t => t && (t.style.borderColor = ""));
+        soundBtns.forEach(b => b.classList.remove("active-sounding"));
 
-        if (step >= 0 && step < tiles.length) {
-          tiles[step].style.borderColor = "#f0883e";
+        if (typeof step === "number" && step >= 0) {
+          if (tiles[step]) tiles[step].style.borderColor = "#f0883e";
+          if (soundBtns[step]) soundBtns[step].classList.add("active-sounding");
         } else if (step === "word") {
-          tiles.forEach(t => t.style.borderColor = "#22c55e");
+          tiles.forEach(t => t && (t.style.borderColor = "#22c55e"));
+          soundBtns.forEach(b => b.classList.add("active-sounding"));
+          setTimeout(() => soundBtns.forEach(b => b.classList.remove("active-sounding")), 800);
           if (typeof confetti === "function") {
             confetti({ particleCount: 30, spread: 60, origin: { y: 0.7 } });
           }
@@ -1406,34 +1456,57 @@ class AacApp {
     });
   }
 
-  // 2. The Sound Wall (Letter-Sound Associations & Articulation Guides)
+  // 2. The Sound Wall (Letter-Sound Associations & Multi-Category Articulation Guides)
   renderSoundWall(container) {
-    const alphabet = window.phonicsData.alphabet;
-    const digraphs = window.phonicsData.digraphs;
+    const filter = this.soundWallFilter || "all";
+    const cur = window.phonicsData;
+
+    let itemsToDisplay = [];
+    if (filter === "all") {
+      itemsToDisplay = [
+        ...cur.alphabet.map(i => ({ ...i, group: "ABC & Short Vowels" })),
+        ...cur.digraphs.map(i => ({ ...i, group: "Digraphs" })),
+        ...(cur.blends || []).map(i => ({ ...i, group: "Blends" })),
+        ...(cur.magicE || []).map(i => ({ ...i, group: "Magic E" })),
+        ...(cur.vowelTeams || []).map(i => ({ ...i, group: "Vowel Teams" })),
+        ...(cur.rControlled || []).map(i => ({ ...i, group: "Bossy R" }))
+      ];
+    } else if (filter === "alphabet") {
+      itemsToDisplay = cur.alphabet.map(i => ({ ...i, group: "ABC & Short Vowels" }));
+    } else if (filter === "digraphs") {
+      itemsToDisplay = cur.digraphs.map(i => ({ ...i, group: "Digraphs" }));
+    } else if (filter === "blends") {
+      itemsToDisplay = (cur.blends || []).map(i => ({ ...i, group: "Consonant Blends" }));
+    } else if (filter === "magic_e") {
+      itemsToDisplay = (cur.magicE || []).map(i => ({ ...i, group: "Magic E (Silent E)" }));
+    } else if (filter === "vowels") {
+      itemsToDisplay = [
+        ...(cur.vowelTeams || []).map(i => ({ ...i, group: "Vowel Teams" })),
+        ...(cur.rControlled || []).map(i => ({ ...i, group: "Bossy R" }))
+      ];
+    }
 
     container.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:16px;">
         <div style="background:var(--gh-card-bg); padding:12px 16px; border-radius:12px; border:1px solid var(--gh-border-default);">
           <h3 style="font-size:0.95rem; font-weight:700; color:var(--gh-accent-blue); margin-bottom:4px;">Pure Phonics Sound Wall</h3>
-          <p style="font-size:0.78rem; color:var(--gh-text-secondary);">Tap any letter or sound to hear its pure phoneme spoken by Amina with mouth articulation cues.</p>
+          <p style="font-size:0.78rem; color:var(--gh-text-secondary);">Tap any sound card to hear its pure phoneme spoken with mouth articulation cues.</p>
         </div>
 
-        <h4 style="font-size:0.85rem; font-weight:700; color:var(--gh-text-secondary); text-transform:uppercase;">Alphabet Letters & Short Vowels</h4>
-        <div class="sound-wall-grid">
-          ${alphabet.map(item => `
-            <div class="phoneme-card lacquer-sheen" data-letter="${item.letter}" title="${item.cue}">
-              <div class="phoneme-letter" style="color:${item.type === 'vowel' ? '#f97316' : '#58a6ff'};">${item.letter}</div>
-              <div class="phoneme-icon">${item.icon}</div>
-              <div class="phoneme-word">${item.word}</div>
-            </div>
-          `).join("")}
+        <!-- Filter Bar -->
+        <div class="soundwall-filter-bar">
+          <button class="soundwall-filter-btn ${filter === 'all' ? 'active' : ''}" data-filter="all">All Sounds (${itemsToDisplay.length})</button>
+          <button class="soundwall-filter-btn ${filter === 'alphabet' ? 'active' : ''}" data-filter="alphabet">ABC & Short Vowels (26)</button>
+          <button class="soundwall-filter-btn ${filter === 'digraphs' ? 'active' : ''}" data-filter="digraphs">Digraphs (CH, SH...)</button>
+          <button class="soundwall-filter-btn ${filter === 'blends' ? 'active' : ''}" data-filter="blends">Blends (BL, ST...)</button>
+          <button class="soundwall-filter-btn ${filter === 'magic_e' ? 'active' : ''}" data-filter="magic_e">Magic E (A_E...)</button>
+          <button class="soundwall-filter-btn ${filter === 'vowels' ? 'active' : ''}" data-filter="vowels">Vowel Teams & R</button>
         </div>
 
-        <h4 style="font-size:0.85rem; font-weight:700; color:var(--gh-text-secondary); text-transform:uppercase; margin-top:12px;">Consonant Digraphs</h4>
         <div class="sound-wall-grid">
-          ${digraphs.map(item => `
+          ${itemsToDisplay.map(item => `
             <div class="phoneme-card lacquer-sheen" data-letter="${item.letter}" title="${item.cue}">
-              <div class="phoneme-letter" style="color:#bc8cff;">${item.letter}</div>
+              <div class="phoneme-letter" style="color:${item.type === 'vowel' ? '#f97316' : item.group === 'Digraphs' ? '#bc8cff' : item.group === 'Blends' ? '#38bdf8' : '#58a6ff'};">${item.letter}</div>
               <div class="phoneme-icon">${item.icon}</div>
               <div class="phoneme-word">${item.word}</div>
             </div>
@@ -1441,6 +1514,13 @@ class AacApp {
         </div>
       </div>
     `;
+
+    container.querySelectorAll(".soundwall-filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        this.soundWallFilter = btn.getAttribute("data-filter");
+        this.renderSoundWall(container);
+      });
+    });
 
     container.querySelectorAll(".phoneme-card").forEach(card => {
       card.addEventListener("click", () => {
@@ -1450,30 +1530,45 @@ class AacApp {
     });
   }
 
-  // 3. Decodable Phonics Stories
+  // 3. Decodable Phonics Stories with Interactive Words ("The help lives on the word")
   renderDecodableStories(container) {
     const stories = window.phonicsData.decodableStories;
 
     container.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:16px;">
-        ${stories.map(story => `
+        ${stories.map((story, sIdx) => `
           <div class="blending-board-card" style="align-items:flex-start;">
             <div style="display:flex; align-items:center; gap:12px; width:100%; border-bottom:1px solid var(--gh-border-muted); padding-bottom:10px;">
               <span style="font-size:2rem;">${story.coverIcon}</span>
               <div>
                 <h3 style="font-size:1.1rem; font-weight:700;">${story.title}</h3>
-                <span style="font-size:0.75rem; color:var(--gh-accent-amber); font-weight:600;">${story.level}</span>
+                <span style="font-size:0.75rem; color:var(--gh-accent-amber); font-weight:600;">${story.level} • Tap any word to sound it out</span>
               </div>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:12px; width:100%; margin-top:8px;">
-              ${story.lines.map(line => `
-                <div style="display:flex; align-items:center; justify-content:space-between; background:var(--gh-canvas-inset); padding:10px 14px; border-radius:10px; border:1px solid var(--gh-border-default);">
-                  <span style="font-size:1.05rem; font-weight:600; color:var(--gh-text-primary);">${line.text}</span>
-                  <div style="display:flex; gap:8px;">
-                    <button class="header-btn line-read-btn" data-text="${line.text}">🔊 Read</button>
-                    <button class="header-btn accent-btn line-aac-btn" data-tiles="${line.aacTiles.join(',')}">➕ Send to AAC</button>
+              ${story.lines.map((line, lIdx) => `
+                <div style="background:var(--gh-canvas-inset); padding:10px 14px; border-radius:10px; border:1px solid var(--gh-border-default);">
+                  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                    <div style="font-size:1.1rem; font-weight:600; color:var(--gh-text-primary);" class="story-sentence-text" id="story-line-${sIdx}-${lIdx}">
+                      ${line.words.map(w => `
+                        <span class="story-word-interactive" data-word="${w}" title="Tap to sound out '${w}'">
+                          ${w}
+                        </span>
+                      `).join("")}
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                      <button class="header-btn line-read-btn" data-text="${line.text}">
+                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                        <span>Read</span>
+                      </button>
+                      <button class="header-btn accent-btn line-aac-btn" data-tiles="${line.aacTiles.join(',')}">
+                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <span>Send to AAC</span>
+                      </button>
+                    </div>
                   </div>
+                  <div class="story-breakdown-row" id="breakdown-${sIdx}-${lIdx}" style="display:none; margin-top:8px; padding-top:8px; border-top:1px dashed var(--gh-border-muted);"></div>
                 </div>
               `).join("")}
             </div>
@@ -1481,6 +1576,49 @@ class AacApp {
         `).join("")}
       </div>
     `;
+
+    // Interactive word sound-out
+    container.querySelectorAll(".story-word-interactive").forEach(wEl => {
+      wEl.addEventListener("click", () => {
+        const raw = wEl.getAttribute("data-word");
+        const clean = raw.toLowerCase().replace(/[^a-z]/g, "");
+        const breakdown = window.phonicsData.getBreakdown(clean);
+
+        const parentBox = wEl.closest("div[style*='border-radius']");
+        const bdRow = parentBox ? parentBox.querySelector(".story-breakdown-row") : null;
+        if (bdRow) {
+          bdRow.style.display = "flex";
+          bdRow.innerHTML = `
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:0.75rem; font-weight:700; color:var(--gh-accent-amber);">Sound Out '${raw}':</span>
+              <div class="sound-buttons-container">
+                ${breakdown.map((token, idx) => `
+                  <button class="sound-btn story-sound-subbtn" data-sound="${token.sound}" data-index="${idx}">
+                    <span>${token.text.toUpperCase()}</span>
+                    <span class="sound-mark ${token.mark === 'dot' ? 'sound-mark-dot' : token.mark === 'bar' ? 'sound-mark-bar' : 'sound-mark-arc'}">
+                      ${token.mark === 'dot' ? '•' : token.mark === 'bar' ? '━' : '⌢'}
+                    </span>
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+          `;
+          bdRow.querySelectorAll(".story-sound-subbtn").forEach(sb => {
+            sb.addEventListener("click", () => {
+              window.aacAudio.speakPhoneme(sb.getAttribute("data-sound"));
+            });
+          });
+        }
+
+        wEl.classList.add("active-reading");
+        const sounds = breakdown.map(t => t.sound || t.text);
+        window.aacAudio.blendAndSpeak(sounds, clean, (step) => {
+          if (step === "word") {
+            setTimeout(() => wEl.classList.remove("active-reading"), 800);
+          }
+        });
+      });
+    });
 
     container.querySelectorAll(".line-read-btn").forEach(btn => {
       btn.addEventListener("click", () => {
