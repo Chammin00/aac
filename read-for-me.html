@@ -3,73 +3,276 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Read This For Me | Gaming Camera & Dialogue Translator</title>
+  <title>Magic Read For Me | Point & Listen Camera for Kids & Gamers</title>
   
   <meta name="theme-color" content="#090d16">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="description" content="Instant camera OCR, translation, and karaoke speech reader for video game dialogues, quest text, and dyslexia assistance.">
+  <meta name="description" content="Ultra-simple Point & Listen camera for ages 3 and up. Automatically scans, spell-checks against curated dictionary, and reads words aloud with phonics.">
 
   <!-- HUD Stylesheet -->
   <link rel="stylesheet" href="css/game-hud.css">
   
+  <!-- Canvas Confetti for Celebrations -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
   <!-- Tesseract.js for Client-Side Zero-Latency OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <style>
+    /* Kids & Magic Scan View Styling */
+    .magic-scan-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #000000;
+      overflow: hidden;
+    }
+
+    .magic-viewfinder {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Friendly Glowing Center Target Ring (No dragging required for kids!) */
+    .magic-focus-ring {
+      position: absolute;
+      width: 78%;
+      max-width: 460px;
+      height: 48%;
+      border: 3.5px solid #38bdf8;
+      border-radius: 24px;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45), 0 0 24px rgba(56, 189, 248, 0.6);
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      animation: magicPulse 2s infinite alternate;
+    }
+
+    @keyframes magicPulse {
+      0% { border-color: #38bdf8; box-shadow: 0 0 0 9999px rgba(0,0,0,0.45), 0 0 16px rgba(56, 189, 248, 0.4); }
+      100% { border-color: #f0883e; box-shadow: 0 0 0 9999px rgba(0,0,0,0.45), 0 0 28px rgba(240, 136, 62, 0.7); }
+    }
+
+    .magic-ring-badge {
+      background: linear-gradient(135deg, #f0883e 0%, #38bdf8 100%);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    /* Giant Result Card for Kids (Age 3+) */
+    .kids-result-dock {
+      width: 100%;
+      background: rgba(13, 17, 23, 0.96);
+      border-top: 2px solid #30363d;
+      padding: 14px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      z-index: 50;
+      box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.8);
+      max-height: 45vh;
+    }
+
+    .kids-word-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #38bdf8;
+      border-radius: 18px;
+      padding: 10px 24px;
+      width: 100%;
+      max-width: 620px;
+    }
+
+    .kids-word-icon {
+      font-size: 3.2rem;
+      line-height: 1;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+    }
+
+    .kids-word-text {
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+      text-transform: uppercase;
+      word-break: break-word;
+    }
+
+    .kids-action-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 620px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .kids-big-btn {
+      flex: 1;
+      min-width: 140px;
+      height: 54px;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.1s ease, filter 0.15s ease;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+    .kids-big-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+    .kids-big-btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-say-again {
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+      border-color: #7dd3fc;
+      color: #fff;
+    }
+    .btn-say-slowly {
+      background: linear-gradient(135deg, #f0883e 0%, #d97706 100%);
+      border-color: #fde68a;
+      color: #fff;
+    }
+    .btn-put-on-board {
+      background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+      border-color: #86efac;
+      color: #fff;
+    }
+
+    /* Mode Pill Toggle */
+    .mode-switch-pill {
+      display: flex;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      padding: 3px;
+      border: 1px solid var(--hud-border);
+    }
+    .mode-switch-btn {
+      padding: 4px 14px;
+      border-radius: 9999px;
+      border: none;
+      background: transparent;
+      color: var(--hud-text-secondary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .mode-switch-btn.active {
+      background: var(--hud-accent-cyan);
+      color: #000;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Top Application Header -->
+  <!-- Top Header -->
   <header class="game-hud-header">
     <div class="hud-brand">
       <a href="index.html" class="hud-btn" style="text-decoration:none;">
         <span>⬅️</span>
         <span>AAC Board</span>
       </a>
-      <div class="hud-brand-badge">GAME LENS</div>
-      <span>Read This For Me</span>
+      <div class="hud-brand-badge" style="background:linear-gradient(135deg, #38bdf8 0%, #22c55e 100%);">MAGIC SCAN</div>
+      <span>Read For Me</span>
+    </div>
+
+    <!-- Toggle: Kids Auto-Scan (Age 3+) vs Pro Gamer Subtitles -->
+    <div class="mode-switch-pill">
+      <button class="mode-switch-btn active" id="btn-toggle-kids">🧸 Kids Point & Scan</button>
+      <button class="mode-switch-btn" id="btn-toggle-gamer">🎮 Gamer & Translate</button>
     </div>
 
     <div class="hud-actions">
-      <!-- Input Source Switcher -->
-      <button class="hud-btn active" id="btn-mode-camera" title="Point phone or webcam at game screen">
+      <button class="hud-btn active" id="btn-mode-camera" title="Use Camera">
         <span>📷 Camera</span>
       </button>
-      <button class="hud-btn" id="btn-mode-screen" title="Share PC game window directly">
-        <span>🖥️ Screen Share</span>
+      <button class="hud-btn" id="btn-mode-screen" title="Screen Share">
+        <span>🖥️ Screen</span>
       </button>
-
-      <!-- Language Selector -->
-      <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:8px; border:1px solid var(--hud-border);">
-        <span style="font-size:0.75rem; color:var(--hud-text-secondary);">From:</span>
-        <select id="select-source-lang" style="background:transparent; border:none; color:#fff; font-size:0.8rem; outline:none; font-weight:600;">
-          <option value="autodetect" selected>Auto-Detect</option>
-          <option value="eng">English (eng)</option>
-          <option value="jpn">Japanese (日本語)</option>
-          <option value="spa">Spanish (Español)</option>
-          <option value="fra">French (Français)</option>
-          <option value="deu">German (Deutsch)</option>
-          <option value="kor">Korean (한국어)</option>
-          <option value="chi_sim">Chinese (中文)</option>
-        </select>
-        <span style="font-size:0.75rem; color:var(--hud-text-secondary);">➔ To:</span>
-        <select id="select-target-lang" style="background:transparent; border:none; color:var(--hud-accent-cyan); font-size:0.8rem; outline:none; font-weight:700;">
-          <option value="en" selected>English</option>
-          <option value="es">Spanish</option>
-          <option value="fr">French</option>
-          <option value="de">German</option>
-          <option value="ja">Japanese</option>
-        </select>
-      </div>
     </div>
   </header>
 
-  <!-- Main Split Layout -->
-  <main class="game-hud-main">
+  <!-- =======================================================================
+       1. KIDS & EARLY CHILDHOOD MAGIC SCAN MODE (DEFAULT - AGES 3+)
+       Ultra-Simple: Hold in front of word -> Auto-detects -> Auto-speaks
+       ======================================================================= -->
+  <main id="kids-scan-view" class="magic-scan-container">
+    <div class="magic-viewfinder">
+      <video id="camera-video" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
 
-    <!-- Left: Video Viewfinder & Reticle -->
-    <section class="viewfinder-section" id="viewfinder-container">
-      <video id="camera-video" autoplay playsinline muted></video>
+      <!-- Center Glowing Target Box -->
+      <div class="magic-focus-ring">
+        <div class="magic-ring-badge">
+          <span>✨ Point at any word or picture</span>
+        </div>
+        <div style="font-size:0.75rem; color:#fef08a; font-weight:700; background:rgba(0,0,0,0.6); padding:2px 10px; border-radius:9999px;" id="kids-status-label">
+          Scanning automatically ●
+        </div>
+      </div>
 
-      <!-- Interactive Dialogue Target Reticle -->
+      <!-- Flash on Detection -->
+      <div class="snap-flash" id="snap-flash"></div>
+    </div>
+
+    <!-- Bottom Giant Result Dock -->
+    <section class="kids-result-dock">
+      <div class="kids-word-display">
+        <span class="kids-word-icon" id="kids-icon">📖</span>
+        <span class="kids-word-text" id="kids-word">Point camera at a word!</span>
+      </div>
+
+      <!-- Three Big Friendly Buttons -->
+      <div class="kids-action-row">
+        <button class="kids-big-btn btn-say-again" id="btn-kids-repeat">
+          <span>🔊 Say Word</span>
+        </button>
+        <button class="kids-big-btn btn-say-slowly" id="btn-kids-phonics">
+          <span>✨ Say Slowly</span>
+        </button>
+        <button class="kids-big-btn btn-put-on-board" id="btn-kids-to-board">
+          <span>➕ Put on My Board</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- =======================================================================
+       2. GAMER & ADVANCED SUBTITLE TRANSLATION MODE
+       For older players who want translation, RPG simplifier, and quest journal
+       ======================================================================= -->
+  <main id="gamer-scan-view" class="game-hud-main" style="display:none;">
+    <!-- Viewfinder left -->
+    <section class="viewfinder-section" id="gamer-viewfinder-container">
       <div class="reticle-overlay" id="dialogue-reticle" style="top:58%; left:10%; width:80%; height:32%;">
         <div class="reticle-corner tl"></div>
         <div class="reticle-corner tr"></div>
@@ -78,27 +281,21 @@
         <div class="reticle-label">🎯 Dialogue Target Area</div>
       </div>
 
-      <!-- Flash Animation on Snap -->
-      <div class="snap-flash" id="snap-flash"></div>
-
-      <!-- Bottom Floating Controls -->
       <div class="viewfinder-toolbar">
-        <button class="btn-snap-giant" id="btn-snap-read">
+        <button class="btn-snap-giant" id="btn-gamer-snap">
           <span>📸 SNAP & READ</span>
         </button>
-        <button class="hud-btn" id="btn-demo-dialogue" title="Try sample game dialogue">
+        <button class="hud-btn" id="btn-demo-dialogue">
           <span>🎮 Demo RPG</span>
         </button>
-        <span id="ocr-status-pill" style="font-size:0.75rem; color:var(--hud-accent-cyan); font-weight:700;">
-          Ready to scan
+        <span id="gamer-status-pill" style="font-size:0.75rem; color:var(--hud-accent-cyan); font-weight:700;">
+          Ready
         </span>
       </div>
     </section>
 
-    <!-- Right: Translation, Dyslexia Simplifier & Narration Console -->
+    <!-- Reader Console right -->
     <section class="reader-section">
-
-      <!-- Card 1: Live Karaoke Translation & Narration -->
       <div class="reader-card">
         <div class="reader-card-header">
           <div class="reader-badge">
@@ -106,343 +303,251 @@
             <span>Spoken Narration & Translation</span>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="hud-btn" id="btn-read-aloud" style="height:30px; padding:0 10px; font-size:0.75rem;">
-              <span>🔊 Replay</span>
-            </button>
-            <button class="hud-btn" id="btn-pause-speech" style="height:30px; padding:0 10px; font-size:0.75rem;">
-              <span>⏸️ Stop</span>
-            </button>
+            <button class="hud-btn" id="btn-gamer-replay" style="height:30px; font-size:0.75rem;">🔊 Replay</button>
+            <button class="hud-btn" id="btn-gamer-stop" style="height:30px; font-size:0.75rem;">⏸️ Stop</button>
           </div>
         </div>
-
-        <!-- Karaoke Spoken Words Container -->
         <div class="translation-output-box" id="karaoke-display">
-          Tap "SNAP & READ" or point your camera at any game dialogue box to translate and hear it spoken aloud.
+          Tap "SNAP & READ" to scan dialogue.
         </div>
-
-        <!-- Original Scanned Text -->
         <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;">
-          <span style="font-size:0.72rem; text-transform:uppercase; color:var(--hud-text-secondary); font-weight:700;">Original Game Text:</span>
           <div class="original-text-box" id="original-display">---</div>
         </div>
       </div>
 
-      <!-- Card 2: Dyslexia & Lore Simplifier (TL;DR) -->
       <div class="reader-card" style="border-color:rgba(56, 189, 248, 0.4);">
         <div class="reader-card-header">
           <div class="reader-badge" style="color:var(--hud-accent-amber);">
             <span>⚡</span>
-            <span>Dyslexia & Fast Lore Simplifier (TL;DR)</span>
+            <span>Dyslexia & Fast Lore Simplifier</span>
           </div>
-          <button class="hud-btn btn-primary" id="btn-send-to-aac" style="height:30px; padding:0 10px; font-size:0.75rem;">
-            <span>➕ Send to AAC Board</span>
+          <button class="hud-btn btn-primary" id="btn-gamer-to-aac" style="height:30px; font-size:0.75rem;">
+            <span>➕ Send to AAC</span>
           </button>
         </div>
-
-        <div style="display:flex; flex-direction:column; gap:6px;">
-          <div id="simplified-summary" style="font-size:0.95rem; color:#fef08a; font-weight:600;">
-            Awaiting dialogue scan...
-          </div>
-          <div id="quest-goal-tag" style="font-size:0.85rem; color:#4ade80; font-weight:700;"></div>
+        <div id="gamer-simplified" style="font-size:0.95rem; color:#fef08a; font-weight:600;">
+          Awaiting scan...
         </div>
+        <div id="gamer-quest-goal" style="font-size:0.85rem; color:#4ade80; font-weight:700;"></div>
       </div>
 
-      <!-- Card 3: Dialogue Quest Log Journal -->
       <div class="reader-card">
         <div class="reader-card-header">
           <div class="reader-badge" style="color:var(--hud-accent-purple);">
             <span>📜</span>
-            <span>Dialogue History Journal</span>
+            <span>Dialogue Journal</span>
           </div>
-          <button class="hud-btn" id="btn-clear-journal" style="height:26px; padding:0 8px; font-size:0.7rem; color:#f85149;">
-            Clear
-          </button>
+          <button class="hud-btn" id="btn-clear-journal" style="height:26px; font-size:0.7rem; color:#f85149;">Clear</button>
         </div>
-
-        <div class="dialogue-history-list" id="journal-list">
-          <div style="color:var(--hud-text-secondary); font-size:0.8rem; font-style:italic; padding:6px;">
-            No past dialogues logged yet.
-          </div>
-        </div>
+        <div class="dialogue-history-list" id="journal-list"></div>
       </div>
-
     </section>
   </main>
 
-  <!-- Engines -->
+  <!-- Application Engines -->
   <script src="js/aac-audio.js"></script>
+  <script src="js/dictionary-engine.js"></script>
   <script src="js/ocr-engine.js"></script>
   <script src="js/translator-engine.js"></script>
 
-  <!-- Page Controller Script -->
+  <!-- Interactive Logic Script -->
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
       const videoEl = document.getElementById("camera-video");
       window.gameOcr.setVideoElement(videoEl);
 
-      const karaokeDisplay = document.getElementById("karaoke-display");
-      const originalDisplay = document.getElementById("original-display");
-      const simplifiedSummary = document.getElementById("simplified-summary");
-      const questGoalTag = document.getElementById("quest-goal-tag");
-      const statusPill = document.getElementById("ocr-status-pill");
+      const kidsView = document.getElementById("kids-scan-view");
+      const gamerView = document.getElementById("gamer-scan-view");
       const snapFlash = document.getElementById("snap-flash");
-      const journalList = document.getElementById("journal-list");
+      const kidsStatusLabel = document.getElementById("kids-status-label");
+      const kidsWordEl = document.getElementById("kids-word");
+      const kidsIconEl = document.getElementById("kids-icon");
 
-      let dialogueHistory = [];
-      let latestTranslation = "";
+      let currentMode = "kids"; // "kids" (default) or "gamer"
+      let currentScannedWord = "Cat";
+      let currentScannedIcon = "🐱";
+      let autoScanTimer = null;
+      let isScanningActive = false;
 
-      // Start default camera
+      // Start Camera
       try {
         await window.gameOcr.startCamera();
-        statusPill.textContent = "Camera active ●";
-        statusPill.style.color = "#22c55e";
-      } catch (e) {
-        statusPill.textContent = "Camera notice: " + e.message;
-        statusPill.style.color = "#f0883e";
+        kidsStatusLabel.textContent = "Scanning automatically ●";
+        startKidsAutoScan();
+      } catch (err) {
+        kidsStatusLabel.textContent = "Camera notice: " + err.message;
       }
 
-      // Input Mode Switchers
+      // Mode Switcher: Kids (Age 3+) vs Gamer Pro
+      document.getElementById("btn-toggle-kids").addEventListener("click", () => {
+        currentMode = "kids";
+        document.getElementById("btn-toggle-kids").classList.add("active");
+        document.getElementById("btn-toggle-gamer").classList.remove("active");
+        kidsView.style.display = "flex";
+        gamerView.style.display = "none";
+        startKidsAutoScan();
+      });
+
+      document.getElementById("btn-toggle-gamer").addEventListener("click", () => {
+        currentMode = "gamer";
+        document.getElementById("btn-toggle-gamer").classList.add("active");
+        document.getElementById("btn-toggle-kids").classList.remove("active");
+        kidsView.style.display = "none";
+        gamerView.style.display = "grid";
+        stopKidsAutoScan();
+      });
+
+      // Camera vs Screen Input Modes
       document.getElementById("btn-mode-camera").addEventListener("click", async () => {
         document.getElementById("btn-mode-camera").classList.add("active");
         document.getElementById("btn-mode-screen").classList.remove("active");
-        try {
-          await window.gameOcr.startCamera();
-          statusPill.textContent = "Camera active ●";
-          statusPill.style.color = "#22c55e";
-        } catch (e) {
-          alert(e.message);
-        }
+        await window.gameOcr.startCamera();
+        if (currentMode === "kids") startKidsAutoScan();
       });
 
       document.getElementById("btn-mode-screen").addEventListener("click", async () => {
         document.getElementById("btn-mode-screen").classList.add("active");
         document.getElementById("btn-mode-camera").classList.remove("active");
-        try {
-          await window.gameOcr.startScreenCapture();
-          statusPill.textContent = "Screen sharing active ●";
-          statusPill.style.color = "#38bdf8";
-        } catch (e) {
-          alert(e.message);
-        }
+        await window.gameOcr.startScreenCapture();
+        if (currentMode === "kids") startKidsAutoScan();
       });
 
-      // Draggable Reticle
-      setupReticleDragging();
+      // =====================================================================
+      // 1. KIDS AUTO-SCAN (CONTINUOUS ZERO-TOUCH SCANNING)
+      // =====================================================================
 
-      // Snap & Read Action
-      async function performSnapAndRead() {
-        // Trigger visual flash
+      function startKidsAutoScan() {
+        stopKidsAutoScan();
+        // Sets reticle to center 75% for kids automatically
+        window.gameOcr.setReticle(0.12, 0.25, 0.76, 0.5);
+
+        autoScanTimer = setInterval(async () => {
+          if (isScanningActive) return;
+          isScanningActive = true;
+
+          try {
+            const result = await window.gameOcr.recognizeText();
+            if (result && result.text) {
+              // Dissect text against the entire dictionary
+              const dissected = window.smartDictionary.dissectScannedText(result.text);
+
+              if (dissected.corrected && dissected.corrected.length > 1) {
+                applyDetectedKidsWord(dissected.corrected, dissected.primaryIcon);
+              }
+            }
+          } catch (e) {
+            // Passive scan frame catch
+          } finally {
+            isScanningActive = false;
+          }
+        }, 1800);
+      }
+
+      function stopKidsAutoScan() {
+        if (autoScanTimer) {
+          clearInterval(autoScanTimer);
+          autoScanTimer = null;
+        }
+      }
+
+      function applyDetectedKidsWord(word, icon = "📖") {
+        currentScannedWord = word;
+        currentScannedIcon = icon;
+
+        // Visual flash & sound
         snapFlash.classList.add("active");
         setTimeout(() => snapFlash.classList.remove("active"), 120);
 
-        statusPill.textContent = "Scanning dialogue...";
-        statusPill.style.color = "#38bdf8";
+        kidsWordEl.textContent = word;
+        kidsIconEl.textContent = icon;
+        kidsStatusLabel.textContent = `Found word: "${word}" ✨`;
 
-        try {
-          const ocrResult = await window.gameOcr.recognizeText((msg) => {
-            statusPill.textContent = msg;
-          });
+        window.aacAudio.playTone(520, 0.1, "triangle");
+        window.aacAudio.speak(word, 1.05, 0.9);
 
-          if (!ocrResult || !ocrResult.text) {
-            statusPill.textContent = "No text detected in target area";
-            statusPill.style.color = "#f85149";
-            return;
-          }
-
-          originalDisplay.textContent = ocrResult.text;
-
-          // Translation
-          const srcLang = document.getElementById("select-source-lang").value;
-          const targetLang = document.getElementById("select-target-lang").value;
-
-          statusPill.textContent = "Translating...";
-          const transResult = await window.gameTranslator.translate(ocrResult.text, srcLang, targetLang);
-          latestTranslation = transResult.translatedText || ocrResult.text;
-
-          // Dyslexia & Lore Simplifier
-          const simplified = window.gameTranslator.simplifyDialogue(latestTranslation);
-          simplifiedSummary.textContent = `"${simplified.simplified}"`;
-          questGoalTag.textContent = simplified.objective || "💡 Quick Tip: Read with Afro-Euro Narrator voice.";
-
-          // Vocalize with karaoke highlight!
-          statusPill.textContent = "Speaking aloud 🔊";
-          statusPill.style.color = "#22c55e";
-          window.gameTranslator.speakWithKaraoke(latestTranslation, karaokeDisplay, () => {
-            statusPill.textContent = "Ready to scan";
-            statusPill.style.color = "#38bdf8";
-          });
-
-          // Add to journal history
-          addDialogueToJournal(ocrResult.text, latestTranslation);
-
-        } catch (err) {
-          statusPill.textContent = "Error: " + err.message;
-          statusPill.style.color = "#f85149";
+        if (typeof confetti === "function") {
+          confetti({ particleCount: 25, spread: 60, origin: { y: 0.8 } });
         }
       }
 
-      document.getElementById("btn-snap-read").addEventListener("click", performSnapAndRead);
+      // Kids Button 1: Repeat Word
+      document.getElementById("btn-kids-repeat").addEventListener("click", () => {
+        window.aacAudio.playTone(440, 0.08, "sine");
+        window.aacAudio.speak(currentScannedWord, 1.05, 0.9);
+      });
 
-      // Keyboard shortcut: Spacebar triggers snap if not typing in input
-      window.addEventListener("keydown", (e) => {
-        if (e.code === "Space" && e.target.tagName !== "INPUT" && e.target.tagName !== "SELECT") {
-          e.preventDefault();
-          performSnapAndRead();
+      // Kids Button 2: Say Slowly with Hooked on Phonics sounds!
+      document.getElementById("btn-kids-phonics").addEventListener("click", () => {
+        const letters = window.smartDictionary.dissectPhonemes(currentScannedWord);
+        window.aacAudio.blendAndSpeak(letters, currentScannedWord);
+      });
+
+      // Kids Button 3: Put on My Board (Send to AAC Sentence Strip)
+      document.getElementById("btn-kids-to-board").addEventListener("click", () => {
+        sessionStorage.setItem("AAC_INCOMING_DIALOGUE", currentScannedWord);
+        window.location.href = "index.html?fromKidsScan=1";
+      });
+
+      // Touch camera viewfinder directly to trigger instant scan
+      videoEl.addEventListener("click", async () => {
+        if (currentMode === "kids") {
+          kidsStatusLabel.textContent = "Scanning now...";
+          const res = await window.gameOcr.recognizeText();
+          if (res && res.text) {
+            const dissected = window.smartDictionary.dissectScannedText(res.text);
+            applyDetectedKidsWord(dissected.corrected, dissected.primaryIcon);
+          }
         }
       });
 
-      // Demo RPG Dialogue Button
+      // =====================================================================
+      // 2. GAMER SUBTITLE MODE LOGIC
+      // =====================================================================
+      document.getElementById("btn-gamer-snap").addEventListener("click", async () => {
+        const gamerStatus = document.getElementById("gamer-status-pill");
+        gamerStatus.textContent = "Scanning...";
+        const res = await window.gameOcr.recognizeText();
+        if (res && res.text) {
+          document.getElementById("original-display").textContent = res.text;
+          const trans = await window.gameTranslator.translate(res.text, "autodetect", "en");
+          const simp = window.gameTranslator.simplifyDialogue(trans.translatedText);
+          document.getElementById("gamer-simplified").textContent = `"${simp.simplified}"`;
+          document.getElementById("gamer-quest-goal").textContent = simp.objective || "";
+          window.gameTranslator.speakWithKaraoke(trans.translatedText, document.getElementById("karaoke-display"));
+          gamerStatus.textContent = "Spoken 🔊";
+        }
+      });
+
       document.getElementById("btn-demo-dialogue").addEventListener("click", () => {
         const demoQuotes = [
-          "Elder Morvath: 'Thou must travel to the Jagged Mountains and seek the sacred sunstone before the eclipse consumes the realm!'",
-          "長老：『皆の者、急ぎ神殿へ向かうのじゃ！魔王の復活を阻止せねばならぬ！』 (Elder: 'Everyone, make haste to the temple! We must stop the Demon King's resurrection!')",
-          "Commander Valen: 'The scouts report a massive goblin vanguard approaching the eastern gate. Prepare the archers immediately!'",
-          "Tabitha: 'Can you bring me 3 blue glowberries from the weeping forest? I will brew you an elixir of strength!'"
+          "Seek the enchanted key inside the dragon cave!",
+          "長老：急ぎ神殿へ向かうのじゃ！ (Elder: Make haste to the temple!)",
+          "Find 3 red apples for the baker in town."
         ];
         const quote = demoQuotes[Math.floor(Math.random() * demoQuotes.length)];
-        originalDisplay.textContent = quote;
-
+        document.getElementById("original-display").textContent = quote;
         window.gameTranslator.translate(quote, "autodetect", "en").then(res => {
-          latestTranslation = res.translatedText;
-          const simp = window.gameTranslator.simplifyDialogue(latestTranslation);
-          simplifiedSummary.textContent = `"${simp.simplified}"`;
-          questGoalTag.textContent = simp.objective || "🎯 Objective Identified";
-          window.gameTranslator.speakWithKaraoke(latestTranslation, karaokeDisplay);
-          addDialogueToJournal(quote, latestTranslation);
+          const simp = window.gameTranslator.simplifyDialogue(res.translatedText);
+          document.getElementById("gamer-simplified").textContent = `"${simp.simplified}"`;
+          document.getElementById("gamer-quest-goal").textContent = simp.objective || "";
+          window.gameTranslator.speakWithKaraoke(res.translatedText, document.getElementById("karaoke-display"));
         });
       });
 
-      // Audio Control Buttons
-      document.getElementById("btn-read-aloud").addEventListener("click", () => {
-        if (latestTranslation) {
-          window.gameTranslator.speakWithKaraoke(latestTranslation, karaokeDisplay);
-        }
-      });
-
-      document.getElementById("btn-pause-speech").addEventListener("click", () => {
-        window.gameTranslator.stopSpeaking();
-      });
-
-      // Send to AAC Board
-      document.getElementById("btn-send-to-aac").addEventListener("click", () => {
-        if (!latestTranslation) {
-          alert("Scan a dialogue line first!");
-          return;
-        }
-        // Save to sessionStorage for AAC board pick-up
-        sessionStorage.setItem("AAC_INCOMING_DIALOGUE", latestTranslation);
+      document.getElementById("btn-gamer-to-aac").addEventListener("click", () => {
+        const text = document.getElementById("gamer-simplified").textContent;
+        sessionStorage.setItem("AAC_INCOMING_DIALOGUE", text);
         window.location.href = "index.html?fromGameLens=1";
       });
 
-      // Dialogue Journal Functions
-      function addDialogueToJournal(orig, trans) {
-        dialogueHistory.unshift({
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-          original: orig,
-          translated: trans
-        });
-        renderJournal();
-      }
-
-      function renderJournal() {
-        if (dialogueHistory.length === 0) {
-          journalList.innerHTML = `<div style="color:var(--hud-text-secondary); font-size:0.8rem; font-style:italic; padding:6px;">No past dialogues logged yet.</div>`;
-          return;
-        }
-        journalList.innerHTML = dialogueHistory.map((item, idx) => `
-          <div class="history-item" data-idx="${idx}">
-            <span class="history-time">${item.time}</span>
-            <span class="history-text"><strong>${item.translated}</strong></span>
-          </div>
-        `).join("");
-
-        journalList.querySelectorAll(".history-item").forEach(el => {
-          el.addEventListener("click", () => {
-            const idx = parseInt(el.getAttribute("data-idx"), 10);
-            const item = dialogueHistory[idx];
-            latestTranslation = item.translated;
-            originalDisplay.textContent = item.original;
-            window.gameTranslator.speakWithKaraoke(item.translated, karaokeDisplay);
-          });
-        });
-      }
-
-      document.getElementById("btn-clear-journal").addEventListener("click", () => {
-        dialogueHistory = [];
-        renderJournal();
+      document.getElementById("btn-gamer-replay").addEventListener("click", () => {
+        const text = document.getElementById("karaoke-display").textContent;
+        window.gameTranslator.speakWithKaraoke(text, document.getElementById("karaoke-display"));
       });
 
-      // Setup interactive reticle positioning
-      function setupReticleDragging() {
-        const reticle = document.getElementById("dialogue-reticle");
-        const container = document.getElementById("viewfinder-container");
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-
-        reticle.addEventListener("mousedown", (e) => {
-          isDragging = true;
-          startX = e.clientX;
-          startY = e.clientY;
-          initialLeft = reticle.offsetLeft;
-          initialTop = reticle.offsetTop;
-        });
-
-        window.addEventListener("mousemove", (e) => {
-          if (!isDragging) return;
-          const dx = e.clientX - startX;
-          const dy = e.clientY - startY;
-
-          const newLeft = Math.max(0, Math.min(container.clientWidth - reticle.clientWidth, initialLeft + dx));
-          const newTop = Math.max(0, Math.min(container.clientHeight - reticle.clientHeight, initialTop + dy));
-
-          reticle.style.left = `${newLeft}px`;
-          reticle.style.top = `${newTop}px`;
-
-          // Update percentage in OCR engine
-          const xPct = newLeft / container.clientWidth;
-          const yPct = newTop / container.clientHeight;
-          const wPct = reticle.clientWidth / container.clientWidth;
-          const hPct = reticle.clientHeight / container.clientHeight;
-          window.gameOcr.setReticle(xPct, yPct, wPct, hPct);
-        });
-
-        window.addEventListener("mouseup", () => {
-          isDragging = false;
-        });
-
-        // Touch support for mobile phones
-        reticle.addEventListener("touchstart", (e) => {
-          const t = e.touches[0];
-          isDragging = true;
-          startX = t.clientX;
-          startY = t.clientY;
-          initialLeft = reticle.offsetLeft;
-          initialTop = reticle.offsetTop;
-        });
-
-        window.addEventListener("touchmove", (e) => {
-          if (!isDragging) return;
-          const t = e.touches[0];
-          const dx = t.clientX - startX;
-          const dy = t.clientY - startY;
-
-          const newLeft = Math.max(0, Math.min(container.clientWidth - reticle.clientWidth, initialLeft + dx));
-          const newTop = Math.max(0, Math.min(container.clientHeight - reticle.clientHeight, initialTop + dy));
-
-          reticle.style.left = `${newLeft}px`;
-          reticle.style.top = `${newTop}px`;
-
-          const xPct = newLeft / container.clientWidth;
-          const yPct = newTop / container.clientHeight;
-          const wPct = reticle.clientWidth / container.clientWidth;
-          const hPct = reticle.clientHeight / container.clientHeight;
-          window.gameOcr.setReticle(xPct, yPct, wPct, hPct);
-        });
-
-        window.addEventListener("touchend", () => {
-          isDragging = false;
-        });
-      }
+      document.getElementById("btn-gamer-stop").addEventListener("click", () => {
+        window.gameTranslator.stopSpeaking();
+      });
     });
   </script>
 </body>

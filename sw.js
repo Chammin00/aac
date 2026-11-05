@@ -12,6 +12,7 @@ const ASSETS_TO_CACHE = [
   './assets/amina-avatar.svg',
   './read-for-me.html',
   './css/game-hud.css',
+  './js/dictionary-engine.js',
   './js/ocr-engine.js',
   './js/translator-engine.js'
 ];
