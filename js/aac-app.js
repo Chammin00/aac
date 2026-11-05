@@ -1157,17 +1157,24 @@ class AacApp {
     const badgeEl = document.getElementById("active-voice-badge");
     const engineEl = document.getElementById("active-voice-engine-name");
     if (titleEl) {
-      if (curPreset === "afro_euro") titleEl.textContent = "Amina (Afro-British / Euro-African)";
+      if (curPreset === "screen_reader") titleEl.textContent = "Screen Reader Voice (System Synchronized)";
+      else if (curPreset === "afro_euro") titleEl.textContent = "Amina (Afro-British / Euro-African)";
       else if (curPreset === "nigerian") titleEl.textContent = "Zainab (Nigerian / West African English)";
       else if (curPreset === "south_african") titleEl.textContent = "Nandi (South African English)";
       else if (curPreset === "uk_multicultural") titleEl.textContent = "Serena (UK Multicultural English)";
       else titleEl.textContent = "Amina (Afro-European Voice)";
     }
     if (badgeEl) {
-      badgeEl.textContent = curVoice ? (curVoice.localService ? "LOCAL ● ACTIVE" : "NATURAL ● ACTIVE") : "ACTIVE";
+      if (curPreset === "screen_reader") {
+        badgeEl.textContent = "SCREEN READER ● SYNCED";
+        badgeEl.style.background = "#0284c7";
+      } else {
+        badgeEl.textContent = curVoice ? (curVoice.localService ? "LOCAL ● ACTIVE" : "NATURAL ● ACTIVE") : "ACTIVE";
+        badgeEl.style.background = "#238636";
+      }
     }
     if (engineEl) {
-      engineEl.textContent = curVoice ? `${curVoice.name} (${curVoice.lang})` : "Default Speech Engine";
+      engineEl.textContent = curVoice ? `${curVoice.name} (${curVoice.lang})` : "Default System Screen Reader";
     }
 
     // Sync sliders
@@ -1198,7 +1205,8 @@ class AacApp {
     if (pill) {
       const span = pill.querySelector("span:not([style*='color'])");
       if (span) {
-        if (curPreset === "afro_euro") span.textContent = "Amina (Afro-Euro Voice)";
+        if (curPreset === "screen_reader") span.textContent = "Screen Reader Voice";
+        else if (curPreset === "afro_euro") span.textContent = "Amina (Afro-Euro Voice)";
         else if (curPreset === "nigerian") span.textContent = "Zainab (Nigerian Voice)";
         else if (curPreset === "south_african") span.textContent = "Nandi (South African Voice)";
         else span.textContent = "Amina (Afro-Euro Voice)";

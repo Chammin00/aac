@@ -49,11 +49,14 @@ In designing Amina, we synthesized best practices and open standards from the le
   - Automatically queries available system and browser voices via `speechSynthesis`.
   - Implements an intelligent scoring algorithm that heavily penalizes male voices (e.g. David, Mark, Ryan, Google UK Male) to ensure Amina always uses a warm, expressive female voice.
   - Automatically elevates authentic Afro-European, Nigerian (`en-NG`), South African (`en-ZA`), Ghanaian (`en-GH`), Kenyan (`en-KE`), and UK/European English female profiles (*Google UK English Female*, *Microsoft Sonia / Libby Natural*, *Serena*, *Stephanie*, *Tessa*, *Hazel*).
-- **Four Distinct Accent & Cultural Profiles**:
+- **Five Distinct Accent & Voice Profiles**:
+  - 🖥️ **Screen Reader App Voice (System Synchronized)**: Binds directly to the operating system's default screen reader voice (`v.default` / Windows Narrator, NVDA, JAWS, VoiceOver, TalkBack) and broadcasts every tile and sentence strip activation through an invisible `aria-live="assertive"` channel so external screen reader software speaks natively!
   - 🌍 **Afro-British (Amina)** [Default]: Warm, melodic, rhythmic cadence (Pitch `1.06`, Rate `0.92`).
   - 🇳🇬 **Nigerian English (Zainab)**: Syllable-timed, lively, expressive prosody (Pitch `1.04`, Rate `0.94`).
   - 🇿🇦 **South African (Nandi)**: Crisp, articulate consonants and warm delivery (Pitch `1.05`, Rate `0.90`).
   - 🇬🇧 **UK Multicultural (Serena)**: Melodic, supportive classroom tone (Pitch `1.08`, Rate `0.92`).
+- **Synchronized with "Read This For Me" Camera**:
+  - The "Read This For Me" gaming camera and screen reader app (`read-for-me.html`) includes a top-bar voice toggle button (`🖥️ Screen Reader Voice` ➔ `🌍 Afro-Euro Voice`) that synchronizes preferences automatically across the entire app suite.
 - **One-Tap Interactive Voice Testing**:
   - Tap **"🔊 Test Voice"** to hear Amina introduce herself.
   - Quick phrase testing buttons: *"Hello, I am Amina!"*, *"I want water please"*, *"Let's learn new words"*, and *"Read this for me"*.

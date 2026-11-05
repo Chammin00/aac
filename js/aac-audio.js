@@ -65,20 +65,54 @@ class AacAudioEngine {
 
   setPreset(presetKey) {
     this.currentPreset = presetKey;
-    if (presetKey === "afro_euro") {
+    if (presetKey === "screen_reader") {
+      this.pitch = 1.0;
+      this.rate = 1.0;
+      const sysDefault = this.voices.find(v => v.default) || (this.voices.length > 0 ? this.voices[0] : null);
+      if (sysDefault) {
+        this.selectedVoice = sysDefault;
+        this.voiceName = sysDefault.name;
+      }
+    } else if (presetKey === "afro_euro") {
       this.pitch = 1.06;
       this.rate = 0.92;
+      this.loadVoices(); // Re-evaluate optimal Afro-Euro voice
     } else if (presetKey === "nigerian") {
       this.pitch = 1.04;
       this.rate = 0.94;
+      this.loadVoices();
     } else if (presetKey === "south_african") {
       this.pitch = 1.05;
       this.rate = 0.90;
+      this.loadVoices();
     } else if (presetKey === "uk_multicultural") {
       this.pitch = 1.08;
       this.rate = 0.92;
+      this.loadVoices();
     }
     this.saveSettings();
+  }
+
+  /**
+   * Broadcasts spoken text to operating system screen readers
+   * (Windows Narrator, NVDA, JAWS, iOS VoiceOver, Android TalkBack)
+   */
+  announceToScreenReader(text) {
+    if (typeof document === "undefined") return;
+    let announcer = document.getElementById("screen-reader-live-announcer");
+    if (!announcer) {
+      announcer = document.createElement("div");
+      announcer.id = "screen-reader-live-announcer";
+      announcer.setAttribute("aria-live", "assertive");
+      announcer.setAttribute("aria-atomic", "true");
+      announcer.setAttribute("role", "alert");
+      announcer.style.cssText = "position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;";
+      document.body.appendChild(announcer);
+    }
+    announcer.textContent = "";
+    setTimeout(() => {
+      announcer.textContent = text;
+    }, 25);
   }
 
   initAudioContext() {
@@ -162,6 +196,16 @@ class AacAudioEngine {
     this.voices = this.synth.getVoices();
     if (!this.voices || this.voices.length === 0) return;
 
+    // If screen reader preset is active, bind directly to the OS default voice
+    if (this.currentPreset === "screen_reader") {
+      const sysDefault = this.voices.find(v => v.default) || (this.voices.length > 0 ? this.voices[0] : null);
+      if (sysDefault) {
+        this.selectedVoice = sysDefault;
+        this.voiceName = sysDefault.name;
+        return;
+      }
+    }
+
     // Check if user previously saved a specific voice name that exists
     if (this.voiceName && this.voiceName !== "Default Afro-Euro Female") {
       const savedVoice = this.voices.find(v => v.name === this.voiceName);
@@ -191,7 +235,8 @@ class AacAudioEngine {
       const score = this.scoreVoiceForAfroEuro(v);
       const isAfroEuro = score >= 70;
       let badge = "";
-      if (score >= 120) badge = "⭐ [Afro-African]";
+      if (v.default) badge = "🖥️ [Screen Reader Default]";
+      else if (score >= 120) badge = "⭐ [Afro-African]";
       else if (score >= 70) badge = "🌍 [Afro-Euro / UK]";
       else if (score > 0) badge = "[Female]";
       else badge = "[Standard]";
@@ -217,11 +262,16 @@ class AacAudioEngine {
   }
 
   speakIntro() {
-    this.speak("Hello! I am Amina, your Afro-European voice. I am here to help you communicate, read, and learn!");
+    if (this.currentPreset === "screen_reader") {
+      this.speak("Screen reader voice is active and synchronized.");
+    } else {
+      this.speak("Hello! I am Amina, your Afro-European voice. I am here to help you communicate, read, and learn!");
+    }
   }
 
   /**
    * Speak arbitrary text via Web Speech API with Afro-Euro pacing
+   * and broadcast to operating system screen readers via ARIA live region
    */
   speak(text, customPitch = null, customRate = null) {
     if (!this.synth) return;
@@ -235,6 +285,9 @@ class AacAudioEngine {
 
     const cleanText = text.trim();
     if (!cleanText) return;
+
+    // Broadcast to system screen reader live region
+    this.announceToScreenReader(cleanText);
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     if (this.selectedVoice) {

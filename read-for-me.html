@@ -213,6 +213,10 @@
     </div>
 
     <div class="hud-actions">
+      <button class="hud-btn" id="btn-toggle-screenreader-voice" style="background:rgba(56,189,248,0.15); border-color:#38bdf8; color:#38bdf8;" title="Click to switch voice (Screen Reader Voice vs Afro-Euro Voice)">
+        <span id="label-hud-voice-icon">🖥️</span>
+        <span id="label-hud-voice-text">Screen Reader Voice</span>
+      </button>
       <button class="hud-btn active" id="btn-mode-camera" title="Use Camera">
         <span>📷 Camera</span>
       </button>
@@ -548,6 +552,43 @@
       document.getElementById("btn-gamer-stop").addEventListener("click", () => {
         window.gameTranslator.stopSpeaking();
       });
+
+      // Voice Toggle (Screen Reader Voice vs Afro-Euro Voice)
+      const voiceBtn = document.getElementById("btn-toggle-screenreader-voice");
+      const voiceIcon = document.getElementById("label-hud-voice-icon");
+      const voiceText = document.getElementById("label-hud-voice-text");
+
+      function updateVoiceHudDisplay() {
+        if (!window.aacAudio) return;
+        const curPreset = window.aacAudio.currentPreset || "afro_euro";
+        if (curPreset === "screen_reader") {
+          voiceIcon.textContent = "🖥️";
+          voiceText.textContent = "Screen Reader Voice";
+          voiceBtn.style.borderColor = "#38bdf8";
+          voiceBtn.style.color = "#38bdf8";
+        } else {
+          voiceIcon.textContent = "🌍";
+          voiceText.textContent = "Afro-Euro Voice";
+          voiceBtn.style.borderColor = "#f0883e";
+          voiceBtn.style.color = "#f0883e";
+        }
+      }
+
+      if (window.aacAudio) {
+        window.aacAudio.onVoicesUpdated = () => updateVoiceHudDisplay();
+        updateVoiceHudDisplay();
+      }
+
+      if (voiceBtn) {
+        voiceBtn.addEventListener("click", () => {
+          if (!window.aacAudio) return;
+          const next = window.aacAudio.currentPreset === "screen_reader" ? "afro_euro" : "screen_reader";
+          window.aacAudio.setPreset(next);
+          updateVoiceHudDisplay();
+          window.aacAudio.playTone(560, 0.08, "triangle");
+          window.aacAudio.speakIntro();
+        });
+      }
     });
   </script>
 </body>
