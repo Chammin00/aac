@@ -130,8 +130,6 @@ Meal and snack choices can frequently trigger decision fatigue or anxiety for ne
   - Inertia and friction-based spinning with realistic tick chimes as slices pass the pointer.
   - Confetti burst and fanfare when the wheel settles.
   - Spoken voice announcement by Amina: *"The wheel landed on: Buttery Popcorn! That sounds wonderful!"*
-- **One-Tap Bridge to AAC**:
-  - Clicking **"➕ I Want This! (Send to AAC)"** immediately constructs the sentence: `I` + `WANT` + `[WINNING FOOD]` + `PLEASE` directly on the AAC message strip!
 - **Family Favorites Customizer**:
   - Add custom foods, pick icons/emojis, customize colors, or delete items to match each household or dietary need.
 
@@ -139,6 +137,24 @@ Meal and snack choices can frequently trigger decision fatigue or anxiety for ne
 - Secure PIN-protected Edit Mode (`Default: 1234`) prevents accidental button relocation during therapy sessions.
 - Edit button labels, speech pronunciations, symbols/emojis, colors, and folder targets.
 - Create new category folders and custom sub-boards.
+
+### 8. ⭐ Smart Favorites & Adaptive Word/Phrase Learning Engine
+For communicators with motor challenges or low fatigue thresholds, re-navigating nested boards to find frequently used daily expressions takes too much energy. Amina features an intelligent, privacy-first **Smart Favorites & Adaptive Learning Engine** that learns and surfaces preferred language in real time:
+- **Quick Favorites Ribbon (Top Bar)**:
+  - Glides directly above the AAC grid showing instant 1-tap buttons for the communicator's highest-priority survival phrases and most frequent tiles (e.g. `⭐ Yes`, `⭐ No`, `⭐ I Want`, `⭐ Help`, `⭐ Bathroom`, `⭐ More`).
+- **One-Tap Sentence Strip Star (`⭐ Star`)**:
+  - Whenever a communicator or caregiver crafts a meaningful or recurring sentence on the message strip (e.g. *"I want pizza please"* or *"I feel tired"*), tapping the golden **⭐ Star** button instantly saves it to their personal favorites library.
+- **Dedicated Favorites Board (`board_favorites`)**:
+  - Accessible directly from the main navigation bar. Displays categorized tiles for saved whole phrases, high-frequency core words, and urgent survival requests with visual frequency badges (`🔥 12x`).
+- **Bigram Next-Word Predictions**:
+  - Predicts the next likely words based on the current sentence context (e.g. selecting `I` immediately elevates `WANT`, `LIKE`, `NEED`, `FEEL`).
+- **100% On-Device Privacy & Analytics**:
+  - All frequency metrics and custom phrases are stored in `localStorage` under `amina_aac_favorites_v1`. Parents and clinicians can inspect usage stats or reset tracking data anytime in Settings without external data harvesting.
+
+### 9. 📖 2,500+ Early-Childhood & Gaming Core Dictionary Engine
+- Dissects and cleans raw camera OCR tokens against a curated 2,500+ word dictionary.
+- Includes Levenshtein phonetic spell-correction for OCR misreads (e.g. `c4t` ➔ `cat`, `0k` ➔ `OK`).
+- Real-time symbol auto-mapper associates spoken and written words with corresponding AAC icons (e.g., `dog` ➔ 🐶, `happy` ➔ 😊).
 
 ---
 
@@ -158,6 +174,8 @@ AAC/
 │   ├── aac-data.js         # Core vocabulary boards, categories & OBF import/export
 │   ├── phonics-data.js     # Hooked on Phonics curriculum, word families & sound wall
 │   ├── food-wheel.js       # Interactive physics Food Decision Wheels & customizer
+│   ├── favorites-engine.js # Smart frequency tracker, phrase starring & next-word predictor
+│   ├── dictionary-engine.js# 2,500+ core dictionary with Levenshtein autocorrect & symbols
 │   ├── aac-app.js          # Core app controller, switch scanner, and event pipeline
 │   ├── ocr-engine.js       # Video stream capture, contrast preprocessor & Tesseract OCR
 │   └── translator-engine.js# Multi-language translation, dyslexia simplifier & karaoke TTS

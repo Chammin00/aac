@@ -46,6 +46,7 @@ class AacApp {
     this.renderCurrentBoard();
     this.renderSentenceStrip();
     this.renderCategoryNav();
+    this.renderFavoritesRibbon();
     this.checkIncomingGameDialogue();
   }
 
@@ -73,6 +74,7 @@ class AacApp {
       categoryNav: document.getElementById("category-nav"),
       aacGrid: document.getElementById("aac-grid"),
       sentenceDisplay: document.getElementById("sentence-display"),
+      favoritesRibbon: document.getElementById("favorites-ribbon"),
       boardTitleBadge: document.getElementById("board-title-badge"),
       narratorHud: document.getElementById("narrator-hud"),
       narratorSubtitle: document.getElementById("narrator-subtitle"),
@@ -94,6 +96,7 @@ class AacApp {
     document.getElementById("btn-speak-sentence").addEventListener("click", () => this.speakSentence());
     document.getElementById("btn-clear-sentence").addEventListener("click", () => this.clearSentence());
     document.getElementById("btn-backspace").addEventListener("click", () => this.backspaceSentence());
+    document.getElementById("btn-star-sentence").addEventListener("click", () => this.starCurrentSentence());
     document.getElementById("btn-copy-sentence").addEventListener("click", () => this.copySentenceText());
     document.getElementById("btn-share-sentence").addEventListener("click", () => this.shareSentence());
 
@@ -219,6 +222,15 @@ class AacApp {
     homeBtn.addEventListener("click", () => this.navigateToBoard("core_master"));
     this.el.categoryNav.appendChild(homeBtn);
 
+    // ⭐ Favorites & Learned Phrases Button
+    const favBtn = document.createElement("button");
+    favBtn.className = `category-tab ${this.currentBoardId === "board_favorites" ? "active" : ""}`;
+    favBtn.style.borderColor = "var(--gh-accent-yellow)";
+    favBtn.style.color = "#fef08a";
+    favBtn.innerHTML = `<span>⭐</span> Favorites`;
+    favBtn.addEventListener("click", () => this.navigateToBoard("board_favorites"));
+    this.el.categoryNav.appendChild(favBtn);
+
     boards.forEach(b => {
       const tab = document.createElement("button");
       tab.className = `category-tab ${b.id === this.currentBoardId ? "active" : ""}`;
@@ -265,6 +277,57 @@ class AacApp {
   }
 
   renderCurrentBoard() {
+    if (this.currentBoardId === "board_favorites") {
+      this.el.boardTitleBadge.textContent = "⭐ My Favorites & Learned Phrases";
+      this.el.aacGrid.className = `aac-grid grid-cols-${this.gridDensity || 4}`;
+      this.el.aacGrid.innerHTML = "";
+
+      const topPhrases = window.smartFavorites.getTopPhrases(8);
+      const topWords = window.smartFavorites.getTopWords(12);
+
+      // Render Pinned/Learned Whole Phrases first
+      topPhrases.forEach((phrase) => {
+        const phraseBtn = document.createElement("button");
+        phraseBtn.className = `aac-tile cat-${phrase.category || "social"} lacquer-sheen`;
+        phraseBtn.style.borderStyle = "dashed";
+        phraseBtn.style.borderWidth = "3px";
+        phraseBtn.innerHTML = `
+          <span class="tile-folder-indicator" style="background:rgba(234,179,8,0.25); color:#eab308;">FAVORITE PHRASE ⭐</span>
+          <div class="tile-icon-wrap">
+            <span class="tile-icon">${phrase.icon || "💬"}</span>
+          </div>
+          <span class="tile-label" style="font-size:0.8rem;">${phrase.label || phrase.text}</span>
+        `;
+        phraseBtn.addEventListener("click", () => {
+          window.aacAudio.playTone(560, 0.08, "triangle");
+          window.aacAudio.speak(phrase.text);
+          if (phrase.chips) {
+            phrase.chips.forEach(c => this.sentenceStrip.push(JSON.parse(JSON.stringify(c))));
+          } else {
+            this.sentenceStrip.push({ id: "fav_" + Date.now(), label: phrase.text.toUpperCase(), speech: phrase.text, icon: phrase.icon || "⭐", category: "social" });
+          }
+          this.renderSentenceStrip();
+        });
+        this.el.aacGrid.appendChild(phraseBtn);
+      });
+
+      // Render Top Learned Single Words
+      topWords.forEach((tile) => {
+        const tileBtn = document.createElement("button");
+        tileBtn.className = `aac-tile cat-${tile.category} lacquer-sheen`;
+        tileBtn.innerHTML = `
+          <div class="tile-icon-wrap">
+            <span class="tile-icon">${tile.icon || "💬"}</span>
+          </div>
+          <span class="tile-label">${tile.label}</span>
+        `;
+        this.attachTileInteraction(tileBtn, tile);
+        this.el.aacGrid.appendChild(tileBtn);
+      });
+
+      return;
+    }
+
     const board = window.aacData.getBoard(this.currentBoardId);
     this.el.boardTitleBadge.textContent = board.name;
     
@@ -386,6 +449,12 @@ class AacApp {
       category: tile.category
     });
 
+    // Learn this word!
+    if (window.smartFavorites) {
+      window.smartFavorites.recordWordUsage(tile);
+      this.renderFavoritesRibbon();
+    }
+
     this.renderSentenceStrip();
   }
 
@@ -404,14 +473,14 @@ class AacApp {
     }
 
     this.el.sentenceDisplay.innerHTML = "";
-    this.sentenceStrip.forEach((chip, index) => {
+    this.sentenceStrip.forEach((chip) => {
       const chipEl = document.createElement("div");
       chipEl.className = `strip-chip cat-${chip.category} lacquer-sheen`;
       chipEl.innerHTML = `
         <span class="strip-chip-icon">${chip.icon || "💬"}</span>
         <span class="strip-chip-text">${chip.label}</span>
       `;
-      // Click chip to speak single word again or tap & hold to remove
+      // Click chip to speak single word again
       chipEl.addEventListener("click", () => {
         window.aacAudio.speak(chip.speech);
       });
@@ -426,6 +495,74 @@ class AacApp {
     if (this.sentenceStrip.length === 0) return;
     const fullText = this.sentenceStrip.map(c => c.speech).join(" ");
     window.aacAudio.speak(fullText);
+
+    // Learn multi-word phrase!
+    if (window.smartFavorites) {
+      window.smartFavorites.recordSentenceUsage(this.sentenceStrip);
+      this.renderFavoritesRibbon();
+    }
+  }
+
+  starCurrentSentence() {
+    if (this.sentenceStrip.length === 0) {
+      alert("Build a sentence first to save it to your Favorites!");
+      return;
+    }
+    const pinned = window.smartFavorites.pinSentence(this.sentenceStrip);
+    if (pinned) {
+      window.aacAudio.playCelebrationChime();
+      if (typeof confetti === "function") {
+        confetti({ particleCount: 35, spread: 70, origin: { y: 0.25 } });
+      }
+      window.aacAudio.speak(`Saved "${pinned.text}" to your favorites!`);
+      this.renderFavoritesRibbon();
+      if (this.currentBoardId === "board_favorites") {
+        this.renderCurrentBoard();
+      }
+    }
+  }
+
+  renderFavoritesRibbon() {
+    if (!this.el.favoritesRibbon || !window.smartFavorites) return;
+    const topPhrases = window.smartFavorites.getTopPhrases(4);
+    const topWords = window.smartFavorites.getTopWords(5);
+
+    this.el.favoritesRibbon.innerHTML = `
+      <div class="fav-ribbon-label">
+        <span>⭐</span> Quick Favorites:
+      </div>
+    `;
+
+    // Render quick phrases
+    topPhrases.forEach(p => {
+      const chip = document.createElement("button");
+      chip.className = "fav-chip phrase-chip";
+      chip.innerHTML = `<span>${p.icon || "⭐"}</span><span>"${p.text}"</span>`;
+      chip.title = "Tap to speak this favorite phrase aloud";
+      chip.addEventListener("click", () => {
+        window.aacAudio.playTone(540, 0.08, "triangle");
+        window.aacAudio.speak(p.text);
+        if (p.chips) {
+          p.chips.forEach(c => this.sentenceStrip.push(JSON.parse(JSON.stringify(c))));
+        } else {
+          this.sentenceStrip.push({ id: "fav_" + Date.now(), label: p.text.toUpperCase(), speech: p.text, icon: p.icon || "⭐", category: "social" });
+        }
+        this.renderSentenceStrip();
+      });
+      this.el.favoritesRibbon.appendChild(chip);
+    });
+
+    // Render top learned words
+    topWords.forEach(w => {
+      const chip = document.createElement("button");
+      chip.className = `fav-chip cat-${w.category}`;
+      chip.innerHTML = `<span>${w.icon || "💬"}</span><span>${w.label}</span>`;
+      chip.title = `Frequently used word: ${w.label}`;
+      chip.addEventListener("click", () => {
+        this.activateTile(w);
+      });
+      this.el.favoritesRibbon.appendChild(chip);
+    });
   }
 
   clearSentence() {

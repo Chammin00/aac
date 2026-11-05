@@ -112,6 +112,10 @@
           <span style="font-size:1.1rem;">🗑️</span>
           <span>Clear</span>
         </button>
+        <button class="strip-btn" id="btn-star-sentence" title="Save current sentence to Favorites" style="color:#eab308; border-color:rgba(234,179,8,0.4);">
+          <span style="font-size:1.1rem;">⭐</span>
+          <span>Favorite</span>
+        </button>
         <button class="strip-btn" id="btn-copy-sentence" title="Copy text to clipboard">
           <span style="font-size:1.1rem;">📋</span>
           <span>Copy</span>
@@ -122,6 +126,11 @@
         </button>
       </div>
     </section>
+
+    <!-- Smart Favorites & Quick Talk Ribbon -->
+    <div class="favorites-ribbon-container" id="favorites-ribbon">
+      <!-- Injected via JavaScript -->
+    </div>
 
     <!-- Category Folders Nav Bar -->
     <nav class="category-nav-bar" id="category-nav">
@@ -308,6 +317,7 @@
   <script src="js/aac-data.js"></script>
   <script src="js/phonics-data.js"></script>
   <script src="js/food-wheel.js"></script>
+  <script src="js/favorites-engine.js"></script>
   <script src="js/aac-app.js"></script>
 
   <!-- Service Worker Registration for Offline PWA -->
