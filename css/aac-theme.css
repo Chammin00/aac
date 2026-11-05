@@ -189,6 +189,12 @@ html, body {
   height: 100dvh;
   position: relative;
   background-color: var(--gh-canvas-default);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  overscroll-behavior: none;
+  touch-action: manipulation;
 }
 
 /* Optical High-Gloss Lacquer Sheen */
@@ -623,9 +629,11 @@ html, body {
   filter: brightness(1.03);
 }
 
-.aac-tile:active {
-  transform: scale(0.97);
-  box-shadow: var(--shadow-tile-active);
+.aac-tile:active,
+.aac-tile.tile-pressed {
+  transform: scale(0.96);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.5), var(--shadow-tile-active);
+  filter: brightness(1.15);
 }
 
 /* Fitzgerald Key Category Colors */
@@ -1163,4 +1171,83 @@ html, body {
 
 .test-phrase-btn:active {
   transform: scale(0.96);
+}
+
+/* ==========================================================================
+   PROFESSIONAL TABLET & KEYGUARD ACCESS STYLES
+   ========================================================================== */
+
+/* Tablet Keyguard Spacing Modes */
+.aac-grid.keyguard-none {
+  gap: 8px;
+  padding: 8px;
+}
+
+.aac-grid.keyguard-standard {
+  gap: 14px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 18px;
+}
+.aac-grid.keyguard-standard .aac-tile {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1), 0 6px 14px rgba(0, 0, 0, 0.4);
+}
+
+.aac-grid.keyguard-deep {
+  gap: 20px;
+  padding: 16px;
+  background: #05080f;
+  border: 4px solid #1e293b;
+  border-radius: 24px;
+  box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.8), 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+.aac-grid.keyguard-deep .aac-tile {
+  box-shadow: inset 0 3px 6px rgba(255, 255, 255, 0.4), 0 8px 16px rgba(0, 0, 0, 0.7);
+  border-width: 3px;
+  transform: translateZ(0);
+}
+
+/* Tablet High-Density Grids (8x6, 10x6, 12x7) */
+.grid-cols-10 { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+.grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+
+/* Dwell Progress Radial Indicator */
+.dwell-progress-ring {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+  z-index: 10;
+}
+.dwell-circle-bg {
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 3;
+  fill: none;
+}
+.dwell-circle-fill {
+  stroke: #38bdf8;
+  stroke-width: 3;
+  fill: none;
+  stroke-dasharray: 75;
+  stroke-dashoffset: 75;
+  transition: stroke-dashoffset 0.05s linear;
+}
+
+/* Tablet Orientation Lock Overlays */
+body.orientation-warning #app-container::before {
+  content: "📱 Please rotate your tablet to Landscape for your configured Motor Plan";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(9, 13, 22, 0.95);
+  color: #f0883e;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px;
+  z-index: 99999;
 }

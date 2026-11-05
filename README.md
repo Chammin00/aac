@@ -111,9 +111,37 @@ A systematic, multi-sensory reading and phonics curriculum built directly into t
   - `3x3`: Emerging communicator core.
   - `4x4`: Standard functional vocabulary.
   - `6x6`: Universal Core (Fitzgerald column aligned).
-  - `8x8`: Comprehensive vocabulary.
+  - `8x6`: Tablet Full / WordPower clinical density.
+  - `10x6`: Tablet Wide high-density core.
+  - `12x7`: Advanced Widescreen Core (84-key SGD layout).
 
-### 5. 🎮 "Read This For Me" Gaming Dialogue Camera & Screen Reader (Game Lens)
+### 5. 📱 Professional Tablet Access Suite (Clinical SGD Standard)
+Engineered specifically for clinical speech-generating devices (SGDs) and consumer tablets (Apple iPad 10.2"/10.9"/Pro 12.9", Samsung Galaxy Tab S9/Active, Amazon Fire HD 10, Lenovo Tab M10):
+
+- **Physical Keyguard Spacing & Inset Relief**:
+  - **Flush / None (8px gap)**: Standard capacitive touch glass.
+  - **Standard Keyguard (14px inset relief)**: Accommodates laser-cut acrylic keyguards (3mm–5mm thickness).
+  - **Deep Recessed Keyguard (20px 3D Plate Relief)**: High-relief shadow-box styling for heavy-duty 3D-printed keyguards. Provides recessed cell wells so users with dyspraxia, cerebral palsy, or ataxia can rest their palm directly on the keyguard without clipping neighbouring tiles.
+- **Three Multi-Touch Access Profiles**:
+  1. **Touch on Contact (Immediate)**: Activates instantly upon finger or stylus touchdown.
+  2. **Touch on Release (Drag & Lift)**: Essential for communicators who slide or rest their hand across the tablet screen until reaching the target button, activating only when lifted.
+  3. **Hold Duration / Dwell Timer**: Requires sustained contact (100ms–1500ms) with an **animated SVG radial progress countdown ring** positioned in the upper corner of each tile, accompanied by acoustic ticks and activation chimes.
+- **Anti-Tremor Repeat Lockout Delay**:
+  - Configurable debounce filter (0ms–1200ms) that automatically ignores involuntary multi-taps or micro-tremors on the same tile.
+- **Motor Plan Orientation Locking**:
+  - Communicators memorize spatial button locations. Shifting between portrait and landscape disrupts motor memory. Amina locks layout into **Landscape** (for wheelchair and desk slant mounts) or **Portrait** (for handheld use), surfacing a visual orientation overlay if rotated inappropriately.
+- **Safe-Area Inset Handling**:
+  - Employs `env(safe-area-inset-*)` padding to guarantee zero overlap with iPad Dynamic Island, home swipe indicators, or Android system navigation bars.
+- **Palm & Edge Rejection Filter**:
+  - Filters out resting palms or edge touches (touches within 14px of screen border or touch contacts exceeding 45px diameter).
+- **Fullscreen Tablet Kiosk & Clinical Lock-In Guide**:
+  - Dedicated **Tablet Kiosk** mode (`F11` / Fullscreen API).
+  - Built-in clinical instructions for configuring **Apple iPad Guided Access** (triple-click power button lock) and **Android App Pinning** to prevent communicators from leaving the AAC board into games, web browsers, or system settings.
+- **Speech-Language Pathologist (SLP) IEP Session Data Logger & CSV Export**:
+  - Automatically records chronological communication events (Timestamp, Elapsed Seconds, Board ID, Tile ID, Word Label, Category, Spoken Text, Touch Mode).
+  - One-click **"⬇️ Export Session CSV"** downloads an IEP-compliant therapy data log for clinical progress tracking and insurance reimbursement documentation.
+
+### 6. 🎮 "Read This For Me" Gaming Dialogue Camera & Screen Reader (Game Lens)
 Designed specifically for gamers encountering lengthy in-game dialogues, quest logs, lore books, foreign game text, or dense dialogue sequences (RPGs, visual novels, retro classics, Nintendo Switch, Steam Deck, PS5, Xbox):
 - **Dual Capture Modes**:
   - **📷 Live Camera Mode**: Point your mobile phone camera or webcam directly at your TV screen, monitor, or handheld console.
@@ -133,7 +161,7 @@ Designed specifically for gamers encountering lengthy in-game dialogues, quest l
 - **Dialogue History Quest Journal**:
   - Maintains a persistent running journal of all scanned dialogue lines with timestamps. Click any past entry to replay speech.
 
-### 6. 🎡 Interactive Food Decision Wheels
+### 7. 🎡 Interactive Food Decision Wheels
 Meal and snack choices can frequently trigger decision fatigue or anxiety for neurodivergent communicators. Amina includes three dedicated, physics-based decision wheels:
 - **Three Core Meal Wheels**:
   1. 🍿 **Favorite Snacks Wheel**: *Goldfish crackers, buttery popcorn, apple slices, yogurt tube, crunchy pretzels, fruit gummies, string cheese, granola bar, chips & dip, carrot sticks.*
@@ -146,12 +174,12 @@ Meal and snack choices can frequently trigger decision fatigue or anxiety for ne
 - **Family Favorites Customizer**:
   - Add custom foods, pick icons/emojis, customize colors, or delete items to match each household or dietary need.
 
-### 7. 🛠️ Therapist & Educator PIN Customization
+### 8. 🛠️ Therapist & Educator PIN Customization
 - Secure PIN-protected Edit Mode (`Default: 1234`) prevents accidental button relocation during therapy sessions.
 - Edit button labels, speech pronunciations, symbols/emojis, colors, and folder targets.
 - Create new category folders and custom sub-boards.
 
-### 8. ⭐ Smart Favorites & Adaptive Word/Phrase Learning Engine
+### 9. ⭐ Smart Favorites & Adaptive Word/Phrase Learning Engine
 For communicators with motor challenges or low fatigue thresholds, re-navigating nested boards to find frequently used daily expressions takes too much energy. Amina features an intelligent, privacy-first **Smart Favorites & Adaptive Learning Engine** that learns and surfaces preferred language in real time:
 - **Quick Favorites Ribbon (Top Bar)**:
   - Glides directly above the AAC grid showing instant 1-tap buttons for the communicator's highest-priority survival phrases and most frequent tiles (e.g. `⭐ Yes`, `⭐ No`, `⭐ I Want`, `⭐ Help`, `⭐ Bathroom`, `⭐ More`).
@@ -164,7 +192,7 @@ For communicators with motor challenges or low fatigue thresholds, re-navigating
 - **100% On-Device Privacy & Analytics**:
   - All frequency metrics and custom phrases are stored in `localStorage` under `amina_aac_favorites_v1`. Parents and clinicians can inspect usage stats or reset tracking data anytime in Settings without external data harvesting.
 
-### 9. 📖 2,500+ Early-Childhood & Gaming Core Dictionary Engine
+### 10. 📖 2,500+ Early-Childhood & Gaming Core Dictionary Engine
 - Dissects and cleans raw camera OCR tokens against a curated 2,500+ word dictionary.
 - Includes Levenshtein phonetic spell-correction for OCR misreads (e.g. `c4t` ➔ `cat`, `0k` ➔ `OK`).
 - Real-time symbol auto-mapper associates spoken and written words with corresponding AAC icons (e.g., `dog` ➔ 🐶, `happy` ➔ 😊).

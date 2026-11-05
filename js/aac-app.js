@@ -35,11 +35,24 @@ class AacApp {
     this.quizScore = 0;
     this.quizStreak = 0;
 
+    // Tablet & Motor Access Settings
+    this.touchMode = "contact";    // "contact" | "release" | "dwell"
+    this.repeatDelayMs = 400;      // Anti-tremor lockout delay in ms
+    this.lastActivationTime = 0;
+    this.lastActivatedTileId = null;
+    this.keyguardMode = "none";    // "none" | "standard" | "deep"
+    this.orientationLock = "auto"; // "auto" | "landscape" | "portrait"
+    this.palmRejection = true;
+    this.isFullscreen = false;
+    this.sessionLog = [];          // SLP IEP session data logger
+    this.sessionStartTime = Date.now();
+
     // Custom voice recording state
     this.mediaRecorder = null;
     this.audioChunks = [];
     this.recordedAudioBase64 = null;
 
+    this.loadTabletSettings();
     this.initElements();
     this.bindEvents();
     this.setupAminaNarrator();
@@ -81,6 +94,7 @@ class AacApp {
       // Modals
       settingsModal: document.getElementById("settings-modal"),
       voiceStudioModal: document.getElementById("voice-studio-modal"),
+      kioskGuideModal: document.getElementById("kiosk-guide-modal"),
       editTileModal: document.getElementById("edit-tile-modal"),
       obfModal: document.getElementById("obf-modal"),
       pinModal: document.getElementById("pin-modal")
@@ -260,6 +274,116 @@ class AacApp {
         this.toggleSwitchScanning(e.target.checked);
       });
     }
+
+    // Tablet Kiosk & Guided Access Controls
+    const kioskBtn = document.getElementById("btn-kiosk-fullscreen");
+    if (kioskBtn) {
+      kioskBtn.addEventListener("click", () => this.toggleFullscreen());
+    }
+
+    const openKioskGuideBtn = document.getElementById("btn-open-kiosk-guide");
+    if (openKioskGuideBtn) {
+      openKioskGuideBtn.addEventListener("click", () => {
+        if (this.el.settingsModal) this.el.settingsModal.style.display = "none";
+        this.openKioskGuideModal();
+      });
+    }
+
+    const closeKioskGuideBtn = document.getElementById("btn-close-kiosk-guide");
+    if (closeKioskGuideBtn) {
+      closeKioskGuideBtn.addEventListener("click", () => this.closeKioskGuideModal());
+    }
+
+    const startFullscreenNowBtn = document.getElementById("btn-start-fullscreen-now");
+    if (startFullscreenNowBtn) {
+      startFullscreenNowBtn.addEventListener("click", () => {
+        this.toggleFullscreen(true);
+        this.closeKioskGuideModal();
+      });
+    }
+
+    const exportCsvBtn = document.getElementById("btn-export-session-csv");
+    if (exportCsvBtn) {
+      exportCsvBtn.addEventListener("click", () => this.exportSessionCSV());
+    }
+
+    // Tablet Controls inside Settings Modal
+    const touchModeSelect = document.getElementById("setting-touch-mode");
+    if (touchModeSelect) {
+      touchModeSelect.addEventListener("change", (e) => {
+        this.touchMode = e.target.value;
+        this.saveTabletSettings();
+        this.renderCurrentBoard();
+      });
+    }
+
+    const keyguardSelect = document.getElementById("setting-keyguard-mode");
+    if (keyguardSelect) {
+      keyguardSelect.addEventListener("change", (e) => {
+        this.keyguardMode = e.target.value;
+        this.saveTabletSettings();
+        this.renderCurrentBoard();
+      });
+    }
+
+    const dwellSlider = document.getElementById("setting-dwell-slider");
+    if (dwellSlider) {
+      dwellSlider.addEventListener("input", (e) => {
+        this.dwellTimeMs = parseInt(e.target.value, 10);
+        const label = document.getElementById("label-dwell-time");
+        if (label) label.textContent = this.dwellTimeMs === 0 ? "0ms / Off" : `${this.dwellTimeMs}ms`;
+        if (this.dwellTimeMs > 0 && this.touchMode !== "dwell") {
+          this.touchMode = "dwell";
+          if (touchModeSelect) touchModeSelect.value = "dwell";
+        }
+        this.saveTabletSettings();
+        this.renderCurrentBoard();
+      });
+    }
+
+    const repeatSlider = document.getElementById("setting-repeat-slider");
+    if (repeatSlider) {
+      repeatSlider.addEventListener("input", (e) => {
+        this.repeatDelayMs = parseInt(e.target.value, 10);
+        const label = document.getElementById("label-repeat-lockout");
+        if (label) label.textContent = `${this.repeatDelayMs}ms`;
+        this.saveTabletSettings();
+      });
+    }
+
+    const orientationSelect = document.getElementById("setting-orientation-lock");
+    if (orientationSelect) {
+      orientationSelect.addEventListener("change", (e) => {
+        this.orientationLock = e.target.value;
+        this.applyOrientationLock();
+        this.saveTabletSettings();
+      });
+    }
+
+    const palmCheckbox = document.getElementById("setting-palm-rejection");
+    if (palmCheckbox) {
+      palmCheckbox.addEventListener("change", (e) => {
+        this.palmRejection = e.target.checked;
+        this.saveTabletSettings();
+      });
+    }
+
+    // Fullscreen and orientation change listeners
+    document.addEventListener("fullscreenchange", () => {
+      this.isFullscreen = !!document.fullscreenElement;
+      if (kioskBtn) {
+        kioskBtn.classList.toggle("active", this.isFullscreen);
+        const labelSpan = kioskBtn.querySelector("span:last-child");
+        if (labelSpan) labelSpan.textContent = this.isFullscreen ? "Exit Kiosk" : "Tablet Kiosk";
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      this.checkOrientationWarning();
+    });
+    window.addEventListener("orientationchange", () => {
+      setTimeout(() => this.checkOrientationWarning(), 150);
+    });
   }
 
   setupAminaNarrator() {
@@ -379,7 +503,7 @@ class AacApp {
   renderCurrentBoard() {
     if (this.currentBoardId === "board_favorites") {
       this.el.boardTitleBadge.textContent = "⭐ My Favorites & Learned Phrases";
-      this.el.aacGrid.className = `aac-grid grid-cols-${this.gridDensity || 4}`;
+      this.el.aacGrid.className = `aac-grid grid-cols-${this.gridDensity || 4} keyguard-${this.keyguardMode || 'none'}`;
       this.el.aacGrid.innerHTML = "";
 
       const topPhrases = window.smartFavorites.getTopPhrases(8);
@@ -431,8 +555,8 @@ class AacApp {
     const board = window.aacData.getBoard(this.currentBoardId);
     this.el.boardTitleBadge.textContent = board.name;
     
-    // Set grid columns
-    this.el.aacGrid.className = `aac-grid grid-cols-${this.gridDensity || board.columns || 4}`;
+    // Set grid columns and keyguard spacing mode
+    this.el.aacGrid.className = `aac-grid grid-cols-${this.gridDensity || board.columns || 4} keyguard-${this.keyguardMode || 'none'}`;
     this.el.aacGrid.innerHTML = "";
 
     board.tiles.forEach((tile, index) => {
@@ -451,7 +575,7 @@ class AacApp {
         <span class="tile-label">${tile.label}</span>
       `;
 
-      // Dwell or Click activation
+      // Multi-Touch Access Profile (Contact, Release, or Dwell Timer)
       this.attachTileInteraction(tileBtn, tile);
       this.el.aacGrid.appendChild(tileBtn);
     });
@@ -479,31 +603,145 @@ class AacApp {
   }
 
   attachTileInteraction(btn, tile) {
-    if (this.dwellTimeMs > 0) {
-      btn.addEventListener("pointerdown", () => {
-        btn.style.filter = "brightness(1.15)";
-        this.dwellTimer = setTimeout(() => {
+    // Palm & Edge Rejection Filter
+    const isRejectedPalmOrEdge = (e) => {
+      if (!this.palmRejection) return false;
+      const edgeThreshold = 14;
+      if (e.clientX < edgeThreshold || e.clientX > (window.innerWidth - edgeThreshold) ||
+          e.clientY < edgeThreshold || e.clientY > (window.innerHeight - edgeThreshold)) {
+        return true;
+      }
+      if (e.width && e.width > 45 && e.height && e.height > 45) {
+        return true;
+      }
+      return false;
+    };
+
+    let dwellTimer = null;
+    let isTouching = false;
+
+    // Helper to ensure animated SVG radial countdown ring
+    const ensureDwellRing = () => {
+      let ring = btn.querySelector(".dwell-progress-ring");
+      if (!ring) {
+        ring = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        ring.setAttribute("class", "dwell-progress-ring");
+        ring.setAttribute("viewBox", "0 0 32 32");
+        ring.innerHTML = `
+          <circle class="dwell-circle-bg" cx="16" cy="16" r="12"></circle>
+          <circle class="dwell-circle-fill" cx="16" cy="16" r="12"></circle>
+        `;
+        btn.appendChild(ring);
+      }
+      return ring;
+    };
+
+    const cancelDwell = () => {
+      if (dwellTimer) {
+        clearTimeout(dwellTimer);
+        dwellTimer = null;
+      }
+      btn.classList.remove("dwell-active");
+      const ring = btn.querySelector(".dwell-progress-ring");
+      if (ring) {
+        const fill = ring.querySelector(".dwell-circle-fill");
+        if (fill) {
+          fill.style.transition = "none";
+          fill.style.strokeDashoffset = "75";
+        }
+      }
+    };
+
+    // Pointer Down Handler
+    btn.addEventListener("pointerdown", (e) => {
+      if (isRejectedPalmOrEdge(e)) {
+        e.preventDefault();
+        return;
+      }
+
+      isTouching = true;
+
+      // Shift+Click in Edit Mode
+      if (this.editMode && e.shiftKey) {
+        this.openEditTileModal(tile);
+        return;
+      }
+
+      if (this.touchMode === "contact") {
+        // Immediate Activation on Touch
+        this.activateTile(tile);
+        btn.classList.add("tile-pressed");
+        setTimeout(() => btn.classList.remove("tile-pressed"), 140);
+      } else if (this.touchMode === "release") {
+        // Touch on Release (Drag & Lift) - give immediate audio/visual feedback on touch
+        btn.classList.add("tile-pressed");
+        window.aacAudio.playTone(420, 0.04, "sine");
+      } else if (this.touchMode === "dwell" || this.dwellTimeMs > 0) {
+        // Dwell / Hold Duration Timer with Visual SVG Ring Countdown
+        btn.classList.add("tile-pressed", "dwell-active");
+        window.aacAudio.playTone(380, 0.03, "triangle");
+
+        const ring = ensureDwellRing();
+        const fill = ring.querySelector(".dwell-circle-fill");
+        const duration = this.dwellTimeMs || 800;
+        if (fill) {
+          fill.style.transition = "none";
+          fill.style.strokeDashoffset = "75";
+          // Trigger reflow
+          fill.getBoundingClientRect();
+          fill.style.transition = `stroke-dashoffset ${duration}ms linear`;
+          fill.style.strokeDashoffset = "0";
+        }
+
+        dwellTimer = setTimeout(() => {
           this.activateTile(tile);
-          btn.style.filter = "";
-        }, this.dwellTimeMs);
-      });
-      btn.addEventListener("pointerup", () => {
-        clearTimeout(this.dwellTimer);
-        btn.style.filter = "";
-      });
-      btn.addEventListener("pointerleave", () => {
-        clearTimeout(this.dwellTimer);
-        btn.style.filter = "";
-      });
-    } else {
-      btn.addEventListener("click", (e) => {
-        if (this.editMode && e.shiftKey) {
-          this.openEditTileModal(tile);
-        } else {
+          cancelDwell();
+          btn.classList.remove("tile-pressed");
+        }, duration);
+      }
+    });
+
+    // Pointer Up Handler
+    btn.addEventListener("pointerup", (e) => {
+      if (!isTouching) return;
+      isTouching = false;
+
+      if (this.touchMode === "release") {
+        btn.classList.remove("tile-pressed");
+        if (!isRejectedPalmOrEdge(e)) {
           this.activateTile(tile);
         }
-      });
-    }
+      } else if (this.touchMode === "dwell" || this.dwellTimeMs > 0) {
+        cancelDwell();
+        btn.classList.remove("tile-pressed");
+      }
+    });
+
+    // Pointer Leave & Cancel Handlers
+    btn.addEventListener("pointerleave", () => {
+      if (isTouching) {
+        isTouching = false;
+        btn.classList.remove("tile-pressed");
+        cancelDwell();
+      }
+    });
+
+    btn.addEventListener("pointercancel", () => {
+      isTouching = false;
+      btn.classList.remove("tile-pressed");
+      cancelDwell();
+    });
+
+    // Assistive Switch Scanning & Accessibility Click Handler
+    btn.addEventListener("click", (e) => {
+      // Ignore if already triggered by recent pointerdown or dwell
+      if (Date.now() - this.lastActivationTime < 200) return;
+      if (this.editMode && e.shiftKey) {
+        this.openEditTileModal(tile);
+      } else {
+        this.activateTile(tile);
+      }
+    });
 
     // Long press for editing tile in edit mode
     let pressTimer;
@@ -511,11 +749,32 @@ class AacApp {
       pressTimer = setTimeout(() => {
         if (this.editMode) this.openEditTileModal(tile);
       }, 700);
-    });
+    }, { passive: true });
     btn.addEventListener("touchend", () => clearTimeout(pressTimer));
   }
 
   activateTile(tile) {
+    // Anti-tremor lockout repeat delay
+    const now = Date.now();
+    if (this.lastActivatedTileId === tile.id && (now - this.lastActivationTime) < this.repeatDelayMs) {
+      // Suppress involuntary micro-tremor repeats
+      return;
+    }
+    this.lastActivationTime = now;
+    this.lastActivatedTileId = tile.id;
+
+    // Log activation event for Speech-Language Pathologist (SLP) IEP documentation
+    this.sessionLog.push({
+      timestamp: new Date().toISOString(),
+      tileId: tile.id,
+      label: tile.label,
+      category: tile.category || "misc",
+      speech: tile.speech || tile.label,
+      boardId: this.currentBoardId,
+      touchMode: this.touchMode,
+      elapsedSec: Math.round((now - this.sessionStartTime) / 1000)
+    });
+
     // If tile has a custom voice recording, play it!
     if (tile.customAudio) {
       window.aacAudio.playCustomRecording(tile.customAudio);
@@ -1104,6 +1363,7 @@ class AacApp {
 
   openSettingsModal() {
     this.populateVoiceSelect();
+    this.syncTabletUI();
     this.el.settingsModal.style.display = "flex";
 
     document.getElementById("btn-close-settings").onclick = () => {
@@ -1601,6 +1861,158 @@ class AacApp {
         this.renderFoodWheelView();
       }
     };
+  }
+
+  // =========================================================================
+  // PROFESSIONAL TABLET & MOTOR ACCESS METHODS
+  // =========================================================================
+
+  loadTabletSettings() {
+    try {
+      const saved = localStorage.getItem("AMINA_TABLET_SETTINGS");
+      if (saved) {
+        const cfg = JSON.parse(saved);
+        if (cfg.touchMode) this.touchMode = cfg.touchMode;
+        if (cfg.repeatDelayMs !== undefined) this.repeatDelayMs = cfg.repeatDelayMs;
+        if (cfg.keyguardMode) this.keyguardMode = cfg.keyguardMode;
+        if (cfg.orientationLock) this.orientationLock = cfg.orientationLock;
+        if (cfg.palmRejection !== undefined) this.palmRejection = cfg.palmRejection;
+        if (cfg.dwellTimeMs !== undefined) this.dwellTimeMs = cfg.dwellTimeMs;
+        if (cfg.gridDensity) this.gridDensity = cfg.gridDensity;
+      }
+    } catch (e) {
+      console.warn("Could not load tablet settings", e);
+    }
+  }
+
+  saveTabletSettings() {
+    try {
+      const cfg = {
+        touchMode: this.touchMode,
+        repeatDelayMs: this.repeatDelayMs,
+        keyguardMode: this.keyguardMode,
+        orientationLock: this.orientationLock,
+        palmRejection: this.palmRejection,
+        dwellTimeMs: this.dwellTimeMs,
+        gridDensity: this.gridDensity
+      };
+      localStorage.setItem("AMINA_TABLET_SETTINGS", JSON.stringify(cfg));
+    } catch (e) {
+      console.warn("Could not save tablet settings", e);
+    }
+  }
+
+  syncTabletUI() {
+    const touchSelect = document.getElementById("setting-touch-mode");
+    if (touchSelect) touchSelect.value = this.touchMode;
+
+    const keyguardSelect = document.getElementById("setting-keyguard-mode");
+    if (keyguardSelect) keyguardSelect.value = this.keyguardMode;
+
+    const dwellSlider = document.getElementById("setting-dwell-slider");
+    if (dwellSlider) dwellSlider.value = this.dwellTimeMs;
+    const dwellLabel = document.getElementById("label-dwell-time");
+    if (dwellLabel) dwellLabel.textContent = this.dwellTimeMs === 0 ? "0ms / Off" : `${this.dwellTimeMs}ms`;
+
+    const repeatSlider = document.getElementById("setting-repeat-slider");
+    if (repeatSlider) repeatSlider.value = this.repeatDelayMs;
+    const repeatLabel = document.getElementById("label-repeat-lockout");
+    if (repeatLabel) repeatLabel.textContent = `${this.repeatDelayMs}ms`;
+
+    const orientationSelect = document.getElementById("setting-orientation-lock");
+    if (orientationSelect) orientationSelect.value = this.orientationLock;
+
+    const palmCheckbox = document.getElementById("setting-palm-rejection");
+    if (palmCheckbox) palmCheckbox.checked = this.palmRejection;
+
+    const gridDensitySelect = document.getElementById("setting-grid-density");
+    if (gridDensitySelect) gridDensitySelect.value = this.gridDensity;
+  }
+
+  toggleFullscreen(forceTrue = false) {
+    const doc = document.documentElement;
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (doc.requestFullscreen) {
+        doc.requestFullscreen().catch(err => console.warn("Fullscreen request error:", err));
+      } else if (doc.webkitRequestFullscreen) {
+        doc.webkitRequestFullscreen();
+      }
+      this.isFullscreen = true;
+    } else if (!forceTrue) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(err => console.warn("Exit fullscreen error:", err));
+      } else if (document.webkitExitFullscreen) {
+        doc.webkitExitFullscreen();
+      }
+      this.isFullscreen = false;
+    }
+    this.applyOrientationLock();
+  }
+
+  applyOrientationLock() {
+    if (screen.orientation && screen.orientation.lock) {
+      if (this.orientationLock === "landscape") {
+        screen.orientation.lock("landscape").catch(() => {});
+      } else if (this.orientationLock === "portrait") {
+        screen.orientation.lock("portrait").catch(() => {});
+      } else {
+        screen.orientation.unlock();
+      }
+    }
+    this.checkOrientationWarning();
+  }
+
+  checkOrientationWarning() {
+    if (this.orientationLock === "landscape") {
+      const isPortrait = window.innerHeight > window.innerWidth;
+      document.body.classList.toggle("orientation-warning", isPortrait);
+    } else if (this.orientationLock === "portrait") {
+      const isLandscape = window.innerWidth > window.innerHeight;
+      document.body.classList.toggle("orientation-warning", isLandscape);
+    } else {
+      document.body.classList.remove("orientation-warning");
+    }
+  }
+
+  openKioskGuideModal() {
+    if (this.el.kioskGuideModal) {
+      this.el.kioskGuideModal.style.display = "flex";
+    }
+  }
+
+  closeKioskGuideModal() {
+    if (this.el.kioskGuideModal) {
+      this.el.kioskGuideModal.style.display = "none";
+    }
+  }
+
+  exportSessionCSV() {
+    if (this.sessionLog.length === 0) {
+      alert("No communication events recorded in this session yet. Tap symbols to generate therapy data!");
+      return;
+    }
+    const headers = ["Timestamp", "Elapsed_Sec", "Board_ID", "Tile_ID", "Label", "Category", "Spoken_Text", "Touch_Mode"];
+    const rows = this.sessionLog.map(e => [
+      `"${e.timestamp}"`,
+      e.elapsedSec,
+      `"${e.boardId}"`,
+      `"${e.tileId}"`,
+      `"${(e.label || "").replace(/"/g, '""')}"`,
+      `"${e.category}"`,
+      `"${(e.speech || "").replace(/"/g, '""')}"`,
+      `"${e.touchMode}"`
+    ]);
+
+    const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const dateStr = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `amina_slp_session_${dateStr}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    window.aacAudio.playCelebrationChime();
   }
 }
 

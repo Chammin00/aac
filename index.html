@@ -65,7 +65,11 @@
           <span>Read For Me (Game Lens)</span>
         </a>
 
-        <!-- Edit & Settings -->
+        <!-- Tablet Kiosk & Edit & Settings -->
+        <button class="header-btn" id="btn-kiosk-fullscreen" title="Full-Screen Tablet Kiosk Mode (Safe Areas & Edge Lock)">
+          <span>📱</span>
+          <span>Tablet Kiosk</span>
+        </button>
         <button class="header-btn" id="btn-edit-mode" title="Therapist/Caregiver PIN Edit Mode">
           <span>🔒</span>
           <span>Edit Mode</span>
@@ -209,13 +213,15 @@
           <!-- Visual Display & Themes -->
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <div class="form-group">
-              <label class="form-label">Grid Columns</label>
+              <label class="form-label">Grid Columns (Tablet Auto-Fit)</label>
               <select id="setting-grid-density" class="form-select">
                 <option value="2">2 Columns (Toddler / Motor)</option>
                 <option value="3">3 Columns (Early Communicator)</option>
                 <option value="4">4 Columns (Standard Simple)</option>
                 <option value="6" selected>6 Columns (Universal Core)</option>
-                <option value="8">8 Columns (Advanced Full)</option>
+                <option value="8">8 Columns (Tablet Full / WordPower)</option>
+                <option value="10">10 Columns (Tablet Wide 10x6)</option>
+                <option value="12">12 Columns (Advanced Core 12x7)</option>
               </select>
             </div>
             <div class="form-group">
@@ -226,6 +232,59 @@
                 <option value="light">Crisp Light (Classroom)</option>
                 <option value="cvi">CVI Mode (High Saturation)</option>
               </select>
+            </div>
+          </div>
+
+          <!-- Tablet & Motor Access Controls -->
+          <div class="form-group" style="background:var(--gh-canvas-inset); padding:12px; border-radius:10px; border:1px solid var(--gh-border-muted);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <strong style="font-size:0.9rem; color:var(--gh-accent-blue);">📱 Tablet & Motor Access Controls</strong>
+              <button class="header-btn" id="btn-open-kiosk-guide" style="height:28px; font-size:0.72rem; color:#38bdf8; border-color:#38bdf8;">🔒 Guided Access Setup</button>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px;">
+              <div>
+                <label class="form-label" style="font-size:0.75rem;">Touch Activation Mode</label>
+                <select id="setting-touch-mode" class="form-select" style="font-size:0.8rem; padding:4px 8px;">
+                  <option value="contact" selected>Touch on Contact (Immediate)</option>
+                  <option value="release">Touch on Release (Drag & Lift)</option>
+                  <option value="dwell">Dwell / Hold Duration Timer</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:0.75rem;">Physical Keyguard Spacing</label>
+                <select id="setting-keyguard-mode" class="form-select" style="font-size:0.8rem; padding:4px 8px;">
+                  <option value="none" selected>None / Flush (Modern 8px gap)</option>
+                  <option value="standard">Standard Keyguard (14px inset)</option>
+                  <option value="deep">Deep Recessed (20px 3D Plate Relief)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px;">
+              <div>
+                <label class="form-label" style="font-size:0.75rem;">Hold Duration (<span id="label-dwell-time">0ms / Off</span>)</label>
+                <input type="range" id="setting-dwell-slider" min="0" max="1500" step="100" value="0">
+              </div>
+              <div>
+                <label class="form-label" style="font-size:0.75rem;">Anti-Tremor Lockout (<span id="label-repeat-lockout">400ms</span>)</label>
+                <input type="range" id="setting-repeat-slider" min="0" max="1200" step="100" value="400">
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div>
+                <label class="form-label" style="font-size:0.75rem;">Motor Plan Orientation</label>
+                <select id="setting-orientation-lock" class="form-select" style="font-size:0.8rem; padding:4px 8px;">
+                  <option value="auto" selected>Auto / Responsive</option>
+                  <option value="landscape">Locked Landscape (Mounts & Slant)</option>
+                  <option value="portrait">Locked Portrait (Handheld)</option>
+                </select>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; padding-top:14px;">
+                <input type="checkbox" id="setting-palm-rejection" style="width:18px; height:18px;" checked>
+                <label for="setting-palm-rejection" style="font-size:0.75rem; color:var(--gh-text-primary); cursor:pointer;">Palm & Edge Rejection Filter</label>
+              </div>
             </div>
           </div>
 
@@ -252,6 +311,59 @@
           <div style="display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid var(--gh-border-muted);">
             <button class="header-btn" id="btn-reset-defaults" style="color:#f85149;">⚠️ Reset All to Default</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tablet Guided Access & Kiosk Guide Modal -->
+    <div class="modal-backdrop" id="kiosk-guide-modal" style="display:none;">
+      <div class="modal-card" style="max-width:620px;">
+        <div class="modal-header">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="font-size:1.6rem;">🔒</div>
+            <div>
+              <h3 class="modal-title" style="margin:0;">Tablet Kiosk & Guided Access Setup</h3>
+              <p style="font-size:0.75rem; color:var(--gh-text-secondary); margin:0;">Clinical Lock-in for Apple iPad & Android Tablets</p>
+            </div>
+          </div>
+          <button class="modal-close-btn" id="btn-close-kiosk-guide">&times;</button>
+        </div>
+        <div class="modal-body" style="line-height:1.5; font-size:0.85rem;">
+          <div style="background:rgba(56,189,248,0.1); border:1px solid #38bdf8; border-radius:10px; padding:12px; margin-bottom:12px;">
+            <strong style="color:#38bdf8; display:block; margin-bottom:4px;">🍎 Apple iPad Guided Access (Clinical Standard):</strong>
+            <ol style="margin-left:18px; color:var(--gh-text-primary); font-size:0.8rem;">
+              <li>Open iPad <strong>Settings</strong> ➔ <strong>Accessibility</strong> ➔ <strong>Guided Access</strong>.</li>
+              <li>Toggle Guided Access <strong>ON</strong> and set a Passcode.</li>
+              <li>Launch <strong>Amina AAC</strong> in Safari or from your Home Screen.</li>
+              <li><strong>Triple-click</strong> the Top Power button (or Home button) to start Guided Access!</li>
+              <li><em>Result:</em> The communicator cannot swipe out to YouTube, games, or close the app.</li>
+            </ol>
+          </div>
+
+          <div style="background:rgba(34,197,94,0.1); border:1px solid #22c55e; border-radius:10px; padding:12px; margin-bottom:12px;">
+            <strong style="color:#22c55e; display:block; margin-bottom:4px;">🤖 Android Tablet App Pinning (Samsung Galaxy Tab / Fire HD / Lenovo):</strong>
+            <ol style="margin-left:18px; color:var(--gh-text-primary); font-size:0.8rem;">
+              <li>Open Android <strong>Settings</strong> ➔ <strong>Security</strong> (or Biometrics) ➔ <strong>App Pinning</strong>.</li>
+              <li>Toggle App Pinning <strong>ON</strong>.</li>
+              <li>Open Amina AAC ➔ Swipe up to Recent Apps ➔ Tap the Amina app icon ➔ Select <strong>"Pin"</strong>.</li>
+              <li><em>Result:</em> The navigation bar is locked until the caregiver unpins with a PIN.</li>
+            </ol>
+          </div>
+
+          <div style="background:var(--gh-canvas-inset); border:1px solid var(--gh-border-muted); border-radius:10px; padding:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="font-size:0.85rem; color:#f0883e;">📊 Speech Therapy (SLP) Session Data</strong>
+              <p style="font-size:0.75rem; color:var(--gh-text-secondary); margin:0;">Export communication usage for IEP documentation.</p>
+            </div>
+            <button class="header-btn" id="btn-export-session-csv" style="color:var(--gh-accent-green); border-color:var(--gh-accent-green); font-size:0.78rem;">
+              ⬇️ Export Session CSV
+            </button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="header-btn accent-btn" id="btn-start-fullscreen-now" style="width:100%;">
+            🖥️ Enter Fullscreen Kiosk Mode Now
+          </button>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'amina-aac-v1';
+const CACHE_NAME = 'amina-aac-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -40,10 +40,17 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Network-first with cache fallback
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request).catch(() => caches.match('./index.html'));
-    })
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const resClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
+        }
+        return networkResponse;
+      })
+      .catch(() => caches.match(event.request).then((res) => res || caches.match('./index.html')))
   );
 });
