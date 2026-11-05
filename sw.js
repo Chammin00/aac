@@ -6,6 +6,7 @@ const ASSETS_TO_CACHE = [
   './js/aac-audio.js',
   './js/aac-data.js',
   './js/phonics-data.js',
+  './js/food-wheel.js',
   './js/aac-app.js',
   './manifest.json',
   './assets/amina-avatar.svg',

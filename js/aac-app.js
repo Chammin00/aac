@@ -69,6 +69,7 @@ class AacApp {
       appContainer: document.getElementById("app-container"),
       aacView: document.getElementById("aac-view"),
       phonicsView: document.getElementById("phonics-view"),
+      wheelsView: document.getElementById("wheels-view"),
       categoryNav: document.getElementById("category-nav"),
       aacGrid: document.getElementById("aac-grid"),
       sentenceDisplay: document.getElementById("sentence-display"),
@@ -87,6 +88,7 @@ class AacApp {
     // Top Navigation Tabs
     document.getElementById("btn-tab-aac").addEventListener("click", () => this.switchMainTab("aac"));
     document.getElementById("btn-tab-phonics").addEventListener("click", () => this.switchMainTab("phonics"));
+    document.getElementById("btn-tab-wheels").addEventListener("click", () => this.switchMainTab("wheels"));
 
     // Sentence Strip Controls
     document.getElementById("btn-speak-sentence").addEventListener("click", () => this.speakSentence());
@@ -183,17 +185,26 @@ class AacApp {
     this.activeTab = tab;
     document.getElementById("btn-tab-aac").classList.toggle("active", tab === "aac");
     document.getElementById("btn-tab-phonics").classList.toggle("active", tab === "phonics");
+    document.getElementById("btn-tab-wheels").classList.toggle("active", tab === "wheels");
 
     if (tab === "aac") {
       this.el.aacView.style.display = "flex";
       this.el.phonicsView.style.display = "none";
+      this.el.wheelsView.style.display = "none";
       this.el.categoryNav.style.display = "flex";
       this.renderCurrentBoard();
-    } else {
+    } else if (tab === "phonics") {
       this.el.aacView.style.display = "none";
       this.el.phonicsView.style.display = "flex";
+      this.el.wheelsView.style.display = "none";
       this.el.categoryNav.style.display = "none";
       this.renderPhonicsView();
+    } else if (tab === "wheels") {
+      this.el.aacView.style.display = "none";
+      this.el.phonicsView.style.display = "none";
+      this.el.wheelsView.style.display = "flex";
+      this.el.categoryNav.style.display = "none";
+      this.renderFoodWheelView();
     }
   }
 
@@ -355,6 +366,14 @@ class AacApp {
       setTimeout(() => {
         this.navigateToBoard(tile.targetBoard);
       }, 200);
+      return;
+    }
+
+    // If it triggers opening food decision wheel
+    if (tile.action === "open_wheel") {
+      setTimeout(() => {
+        this.switchMainTab("wheels");
+      }, 250);
       return;
     }
 
@@ -1080,6 +1099,185 @@ class AacApp {
     });
     this.navigateToBoard(newId);
     this.renderCategoryNav();
+  }
+
+  // =========================================================================
+  // INTERACTIVE FOOD DECISION WHEELS
+  // =========================================================================
+
+  renderFoodWheelView() {
+    const container = this.el.wheelsView;
+    const currentWheel = window.foodWheelManager.getActiveWheel();
+
+    container.innerHTML = `
+      <div class="phonics-panel" style="max-width:1100px; margin:0 auto; padding:16px; gap:16px;">
+        <div class="phonics-header" style="flex-wrap:wrap; gap:12px;">
+          <div class="brand-section">
+            <div class="brand-logo-icon" style="background:linear-gradient(135deg, #f0883e 0%, #22c55e 100%);">🎡</div>
+            <div>
+              <h2 style="font-size:1.15rem; font-weight:700;">Interactive Food Decision Wheels</h2>
+              <p style="font-size:0.78rem; color:var(--gh-text-secondary);">Spin to decide: Favorite Snacks, Restaurants & Takeout, or Homecooked Meals!</p>
+            </div>
+          </div>
+          <div class="phonics-nav-tabs">
+            <button class="phonics-tab ${window.foodWheelManager.activeWheelId === 'snacks' ? 'active' : ''}" id="wheel-tab-snacks">🍿 Favorite Snacks</button>
+            <button class="phonics-tab ${window.foodWheelManager.activeWheelId === 'restaurants' ? 'active' : ''}" id="wheel-tab-restaurants">🍔 Restaurants & Takeout</button>
+            <button class="phonics-tab ${window.foodWheelManager.activeWheelId === 'homecooked' ? 'active' : ''}" id="wheel-tab-homecooked">🍲 Homecooked Meals</button>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;" id="wheels-grid-layout">
+          <!-- Left: Wheel Canvas & Giant Spin Button -->
+          <div class="blending-board-card" style="padding:16px; gap:14px;">
+            <div style="position:relative; width:100%; max-width:440px; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;">
+              <canvas id="food-wheel-canvas" width="440" height="440" style="width:100%; height:100%; max-width:440px; max-height:440px; cursor:pointer;"></canvas>
+            </div>
+
+            <div style="display:flex; gap:12px; width:100%; justify-content:center;">
+              <button class="blend-action-btn" id="btn-spin-wheel" style="font-size:1.15rem; padding:14px 36px;">
+                <span>🎡 SPIN THE WHEEL</span>
+              </button>
+            </div>
+            <p style="font-size:0.75rem; color:var(--gh-text-muted);">Tip: Press Spacebar or tap wheel directly to spin!</p>
+          </div>
+
+          <!-- Right: Winner Announcement Card & Customizer -->
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <!-- Winner Card -->
+            <div class="blending-board-card" id="wheel-winner-card" style="align-items:center; text-align:center; border-color:${currentWheel.themeColor};">
+              <span style="font-size:0.75rem; font-weight:800; text-transform:uppercase; color:${currentWheel.themeColor};">Decision Result:</span>
+              <div id="winner-display-icon" style="font-size:3.8rem; margin:4px 0;">${window.foodWheelManager.lastWinner ? window.foodWheelManager.lastWinner.icon : currentWheel.icon}</div>
+              <h3 id="winner-display-name" style="font-size:1.4rem; font-weight:800; color:#fff;">
+                ${window.foodWheelManager.lastWinner ? window.foodWheelManager.lastWinner.name : "Ready to Spin!"}
+              </h3>
+              <p id="winner-display-sub" style="font-size:0.85rem; color:var(--gh-text-secondary); margin-bottom:6px;">
+                ${window.foodWheelManager.lastWinner ? "Amina announced your choice!" : "Tap 'SPIN THE WHEEL' to let the wheel pick."}
+              </p>
+
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%;">
+                <button class="header-btn accent-btn" id="btn-winner-to-aac" style="padding:10px 18px; font-size:0.9rem;">
+                  <span>➕ I Want This! (Send to AAC)</span>
+                </button>
+                <button class="header-btn" id="btn-winner-speak" style="padding:10px 14px; font-size:0.9rem;">
+                  <span>🔊 Announce Choice</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Customizer / Family Favorites Manager -->
+            <div class="blending-board-card" style="align-items:flex-start; padding:16px;">
+              <div style="display:flex; justify-content:space-between; width:100%; align-items:center; border-bottom:1px solid var(--gh-border-muted); padding-bottom:8px;">
+                <span style="font-size:0.85rem; font-weight:700; color:var(--gh-text-primary);">Customize ${currentWheel.name}</span>
+                <button class="header-btn" id="btn-reset-wheel" style="font-size:0.7rem; height:26px; padding:0 8px;">Reset Default</button>
+              </div>
+
+              <!-- List of items -->
+              <div style="display:flex; flex-wrap:wrap; gap:6px; max-height:140px; overflow-y:auto; width:100%; margin:8px 0;" id="wheel-items-list">
+                ${currentWheel.items.map(item => `
+                  <span style="display:inline-flex; align-items:center; gap:6px; background:var(--gh-canvas-inset); border:1px solid var(--gh-border-default); border-radius:6px; padding:3px 8px; font-size:0.78rem;">
+                    <span>${item.icon}</span>
+                    <span>${item.name}</span>
+                    <button class="delete-wheel-item-btn" data-id="${item.id}" style="background:none; border:none; color:#f85149; cursor:pointer; font-size:0.85rem; line-height:1; padding-left:4px;">&times;</button>
+                  </span>
+                `).join("")}
+              </div>
+
+              <!-- Add custom item form -->
+              <div style="display:flex; gap:6px; width:100%; margin-top:4px;">
+                <input type="text" id="new-food-name" class="form-input" placeholder="Add custom favorite (e.g. Mac & Cheese)" style="flex:1; font-size:0.82rem; padding:6px 10px;">
+                <input type="text" id="new-food-icon" class="form-input" placeholder="Emoji 🍕" style="width:70px; font-size:0.82rem; padding:6px 8px; text-align:center;">
+                <button class="header-btn accent-btn" id="btn-add-food-item" style="padding:0 14px; font-size:0.8rem;">Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Canvas init
+    const canvas = document.getElementById("food-wheel-canvas");
+    window.foodWheelManager.initCanvas(canvas);
+
+    // Tab buttons
+    document.getElementById("wheel-tab-snacks").onclick = () => {
+      window.foodWheelManager.setWheel("snacks");
+      this.renderFoodWheelView();
+    };
+    document.getElementById("wheel-tab-restaurants").onclick = () => {
+      window.foodWheelManager.setWheel("restaurants");
+      this.renderFoodWheelView();
+    };
+    document.getElementById("wheel-tab-homecooked").onclick = () => {
+      window.foodWheelManager.setWheel("homecooked");
+      this.renderFoodWheelView();
+    };
+
+    // Spin trigger
+    const triggerSpin = () => {
+      const spinBtn = document.getElementById("btn-spin-wheel");
+      if (spinBtn) spinBtn.disabled = true;
+
+      window.foodWheelManager.spin((winner) => {
+        if (spinBtn) spinBtn.disabled = false;
+        const iconEl = document.getElementById("winner-display-icon");
+        const nameEl = document.getElementById("winner-display-name");
+        const subEl = document.getElementById("winner-display-sub");
+        if (iconEl) iconEl.textContent = winner.icon;
+        if (nameEl) nameEl.textContent = winner.name;
+        if (subEl) subEl.textContent = `Selected for ${currentWheel.name}!`;
+      });
+    };
+
+    document.getElementById("btn-spin-wheel").onclick = triggerSpin;
+    canvas.onclick = triggerSpin;
+
+    // Send Winner to AAC Sentence Strip
+    document.getElementById("btn-winner-to-aac").onclick = () => {
+      const winner = window.foodWheelManager.lastWinner || currentWheel.items[0];
+      // Push: I -> WANT -> [FOOD] -> PLEASE
+      this.sentenceStrip.push(
+        { id: "w_i_" + Date.now(), label: "I", speech: "I", icon: "👤", category: "people" },
+        { id: "w_want_" + Date.now(), label: "WANT", speech: "want", icon: "🤲", category: "verb" },
+        { id: "w_food_" + Date.now(), label: winner.name.toUpperCase(), speech: winner.name, icon: winner.icon, category: "noun" },
+        { id: "w_please_" + Date.now(), label: "PLEASE", speech: "please", icon: "🙏", category: "social" }
+      );
+      this.switchMainTab("aac");
+      this.renderSentenceStrip();
+    };
+
+    // Announce Choice Again
+    document.getElementById("btn-winner-speak").onclick = () => {
+      const winner = window.foodWheelManager.lastWinner || currentWheel.items[0];
+      window.aacAudio.speak(`I would love ${winner.name} please!`);
+    };
+
+    // Delete item
+    container.querySelectorAll(".delete-wheel-item-btn").forEach(btn => {
+      btn.onclick = () => {
+        const id = btn.getAttribute("data-id");
+        window.foodWheelManager.deleteItem(window.foodWheelManager.activeWheelId, id);
+        this.renderFoodWheelView();
+      };
+    });
+
+    // Add Item
+    document.getElementById("btn-add-food-item").onclick = () => {
+      const name = document.getElementById("new-food-name").value.trim();
+      const icon = document.getElementById("new-food-icon").value.trim() || "🍽️";
+      if (!name) return;
+      const palette = ["#f59e0b", "#ef4444", "#3b82f6", "#10b981", "#8b5cf6", "#ec4899", "#14b8a6", "#f97316"];
+      const randomColor = palette[Math.floor(Math.random() * palette.length)];
+      window.foodWheelManager.addItem(window.foodWheelManager.activeWheelId, name, icon, randomColor);
+      this.renderFoodWheelView();
+    };
+
+    // Reset Wheel
+    document.getElementById("btn-reset-wheel").onclick = () => {
+      if (confirm(`Reset ${currentWheel.name} back to default menu items?`)) {
+        window.foodWheelManager.resetWheelToDefault(window.foodWheelManager.activeWheelId);
+        this.renderFoodWheelView();
+      }
+    };
   }
 }
 

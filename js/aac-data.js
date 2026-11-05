@@ -148,6 +148,7 @@ const DEFAULT_BOARDS = {
       { id: "fd_9", label: "Snack", speech: "snack", category: "noun", icon: "🥨" },
       { id: "fd_10", label: "Cookie", speech: "cookie", category: "noun", icon: "🍪" },
       { id: "fd_11", label: "More Please", speech: "more food please", category: "social", icon: "➕" },
+      { id: "fd_wheel", label: "Spin Food Wheel", speech: "Let us spin the food decision wheel!", category: "social", icon: "🎡", action: "open_wheel" },
       { id: "fd_12", label: "All Full", speech: "I am full thank you", category: "adjective", icon: "✋" }
     ]
   },

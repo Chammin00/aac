@@ -120,7 +120,22 @@ Designed specifically for gamers encountering lengthy in-game dialogues, quest l
 - **Dialogue History Quest Journal**:
   - Maintains a persistent running journal of all scanned dialogue lines with timestamps. Click any past entry to replay speech.
 
-### 6. 🛠️ Therapist & Educator PIN Customization
+### 6. 🎡 Interactive Food Decision Wheels
+Meal and snack choices can frequently trigger decision fatigue or anxiety for neurodivergent communicators. Amina includes three dedicated, physics-based decision wheels:
+- **Three Core Meal Wheels**:
+  1. 🍿 **Favorite Snacks Wheel**: *Goldfish crackers, buttery popcorn, apple slices, yogurt tube, crunchy pretzels, fruit gummies, string cheese, granola bar, chips & dip, carrot sticks.*
+  2. 🍔 **Restaurants & Takeout Wheel**: *Pizza parlor, burgers & fries, taco spot, crispy chicken, sub sandwich shop, Asian noodles / rice, ice cream shop, breakfast diner.*
+  3. 🍲 **Homecooked Meals Wheel**: *Spaghetti & meatballs, grilled cheese & tomato soup, taco night, creamy mac & cheese, baked chicken & rice, cheesy quesadillas, breakfast for dinner, homemade personal pizza.*
+- **Physics Canvas & Auditory Cues**:
+  - Inertia and friction-based spinning with realistic tick chimes as slices pass the pointer.
+  - Confetti burst and fanfare when the wheel settles.
+  - Spoken voice announcement by Amina: *"The wheel landed on: Buttery Popcorn! That sounds wonderful!"*
+- **One-Tap Bridge to AAC**:
+  - Clicking **"➕ I Want This! (Send to AAC)"** immediately constructs the sentence: `I` + `WANT` + `[WINNING FOOD]` + `PLEASE` directly on the AAC message strip!
+- **Family Favorites Customizer**:
+  - Add custom foods, pick icons/emojis, customize colors, or delete items to match each household or dietary need.
+
+### 7. 🛠️ Therapist & Educator PIN Customization
 - Secure PIN-protected Edit Mode (`Default: 1234`) prevents accidental button relocation during therapy sessions.
 - Edit button labels, speech pronunciations, symbols/emojis, colors, and folder targets.
 - Create new category folders and custom sub-boards.
@@ -142,6 +157,7 @@ AAC/
 │   ├── aac-audio.js        # Speech synthesis, Afro-Euro voice tuner & sound generator
 │   ├── aac-data.js         # Core vocabulary boards, categories & OBF import/export
 │   ├── phonics-data.js     # Hooked on Phonics curriculum, word families & sound wall
+│   ├── food-wheel.js       # Interactive physics Food Decision Wheels & customizer
 │   ├── aac-app.js          # Core app controller, switch scanner, and event pipeline
 │   ├── ocr-engine.js       # Video stream capture, contrast preprocessor & Tesseract OCR
 │   └── translator-engine.js# Multi-language translation, dyslexia simplifier & karaoke TTS
