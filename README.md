@@ -42,16 +42,26 @@ In designing Amina, we synthesized best practices and open standards from the le
 
 ## ✨ Key Architectural Features
 
-### 1. 🗣️ Default Afro-European Female Narrator Voice ("Amina")
-- **Intelligent Voice Discovery**:
+### 1. 🗣️ Default Afro-European Female Narrator Voice ("Amina") & Voice Studio
+- **Amina Voice Studio (1-Tap Header Access)**:
+  - Tapping the **Amina Narrator Pill** directly in the top header or opening Settings opens the dedicated **Voice Studio** modal.
+- **Authentic Voice Scoring & Male Voice Exclusion**:
   - Automatically queries available system and browser voices via `speechSynthesis`.
-  - Prioritizes authentic Afro-European, British, Nigerian (`en-NG`), South African (`en-ZA`), Ghanaian (`en-GH`), and expressive UK/European English female profiles (such as *Google UK English Female*, *Serena*, *Stephanie*, *Moov*, *Hazel*).
-- **Expressive Pacing**:
-  - Pre-tuned cadence (rate `0.92`, pitch `1.05`) designed to ensure phonetic clarity for emerging listeners and speech-language pathologists.
-- **Narrator Avatar HUD**:
+  - Implements an intelligent scoring algorithm that heavily penalizes male voices (e.g. David, Mark, Ryan, Google UK Male) to ensure Amina always uses a warm, expressive female voice.
+  - Automatically elevates authentic Afro-European, Nigerian (`en-NG`), South African (`en-ZA`), Ghanaian (`en-GH`), Kenyan (`en-KE`), and UK/European English female profiles (*Google UK English Female*, *Microsoft Sonia / Libby Natural*, *Serena*, *Stephanie*, *Tessa*, *Hazel*).
+- **Four Distinct Accent & Cultural Profiles**:
+  - 🌍 **Afro-British (Amina)** [Default]: Warm, melodic, rhythmic cadence (Pitch `1.06`, Rate `0.92`).
+  - 🇳🇬 **Nigerian English (Zainab)**: Syllable-timed, lively, expressive prosody (Pitch `1.04`, Rate `0.94`).
+  - 🇿🇦 **South African (Nandi)**: Crisp, articulate consonants and warm delivery (Pitch `1.05`, Rate `0.90`).
+  - 🇬🇧 **UK Multicultural (Serena)**: Melodic, supportive classroom tone (Pitch `1.08`, Rate `0.92`).
+- **One-Tap Interactive Voice Testing**:
+  - Tap **"🔊 Test Voice"** to hear Amina introduce herself.
+  - Quick phrase testing buttons: *"Hello, I am Amina!"*, *"I want water please"*, *"Let's learn new words"*, and *"Read this for me"*.
+- **Caregiver Platform Voice Installation Guide**:
+  - Built-in guidance for downloading free, natural offline African and UK voices across Windows 10/11, Android/Chromebook, and Apple iOS/iPadOS.
+- **Narrator Avatar HUD & Custom Voice Recording**:
   - Dynamic vector avatar portrait with animated lip/speaking glow states, speech bubble subtitles, and instant audio preview testing.
-- **Microphone Voice Recording (MediaRecorder API)**:
-  - Allows parents, teachers, and speech therapists to record real, personalized voices (e.g., Mom's voice saying custom nicknames or family phrases) directly onto any tile.
+  - Allows parents, teachers, and speech therapists to record real, personalized voices (e.g., Mom's voice saying custom nicknames or family phrases) directly onto any tile using the `MediaRecorder` API.
 
 ### 2. 🔤 Hooked on Phonics Learning Suite
 A systematic, multi-sensory reading and phonics curriculum built directly into the AAC interface:

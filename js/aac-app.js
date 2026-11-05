@@ -80,6 +80,7 @@ class AacApp {
       narratorSubtitle: document.getElementById("narrator-subtitle"),
       // Modals
       settingsModal: document.getElementById("settings-modal"),
+      voiceStudioModal: document.getElementById("voice-studio-modal"),
       editTileModal: document.getElementById("edit-tile-modal"),
       obfModal: document.getElementById("obf-modal"),
       pinModal: document.getElementById("pin-modal")
@@ -110,6 +111,96 @@ class AacApp {
     document.getElementById("btn-edit-mode").addEventListener("click", () => this.toggleEditModePrompt());
     document.getElementById("btn-quick-back").addEventListener("click", () => this.navigateBack());
 
+    // Narrator Avatar Pill -> Opens Afro-European Voice Studio
+    const narratorPill = document.getElementById("btn-narrator-pill");
+    if (narratorPill) {
+      narratorPill.addEventListener("click", () => this.openVoiceStudioModal());
+    }
+
+    // Voice Studio Modal Open / Close / Save
+    const openVoiceStudioBtn = document.getElementById("btn-open-voice-studio");
+    if (openVoiceStudioBtn) {
+      openVoiceStudioBtn.addEventListener("click", () => {
+        this.el.settingsModal.style.display = "none";
+        this.openVoiceStudioModal();
+      });
+    }
+
+    const closeVoiceStudioBtn = document.getElementById("btn-close-voice-studio");
+    if (closeVoiceStudioBtn) {
+      closeVoiceStudioBtn.addEventListener("click", () => this.closeVoiceStudioModal());
+    }
+
+    const saveVoiceStudioBtn = document.getElementById("btn-save-voice-studio");
+    if (saveVoiceStudioBtn) {
+      saveVoiceStudioBtn.addEventListener("click", () => this.closeVoiceStudioModal());
+    }
+
+    const testVoiceStudioBtn = document.getElementById("btn-test-voice-studio");
+    if (testVoiceStudioBtn) {
+      testVoiceStudioBtn.addEventListener("click", () => window.aacAudio.speakIntro());
+    }
+
+    // Voice Studio Presets (Afro-British, Nigerian, South African, UK Multicultural)
+    document.querySelectorAll(".preset-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const presetKey = btn.getAttribute("data-preset");
+        window.aacAudio.setPreset(presetKey);
+        document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        // Sync sliders
+        const rateSlider = document.getElementById("studio-rate-slider");
+        const pitchSlider = document.getElementById("studio-pitch-slider");
+        if (rateSlider) rateSlider.value = window.aacAudio.rate;
+        if (pitchSlider) pitchSlider.value = window.aacAudio.pitch;
+        const rateLabel = document.getElementById("studio-label-rate");
+        const pitchLabel = document.getElementById("studio-label-pitch");
+        if (rateLabel) rateLabel.textContent = `${Math.round(window.aacAudio.rate * 100)}%`;
+        if (pitchLabel) pitchLabel.textContent = `${Math.round(window.aacAudio.pitch * 100)}%`;
+
+        window.aacAudio.playTone(520, 0.08, "triangle");
+        window.aacAudio.speakIntro();
+      });
+    });
+
+    // Voice Studio Dropdown Selection
+    const studioVoiceSelect = document.getElementById("voice-studio-select");
+    if (studioVoiceSelect) {
+      studioVoiceSelect.addEventListener("change", (e) => {
+        window.aacAudio.setVoiceByName(e.target.value);
+        this.refreshVoiceUI();
+        window.aacAudio.speak("Voice updated. I am ready!");
+      });
+    }
+
+    // Voice Studio Rate & Pitch Sliders
+    const studioRate = document.getElementById("studio-rate-slider");
+    if (studioRate) {
+      studioRate.addEventListener("input", (e) => {
+        window.aacAudio.rate = parseFloat(e.target.value);
+        document.getElementById("studio-label-rate").textContent = `${Math.round(window.aacAudio.rate * 100)}%`;
+        window.aacAudio.saveSettings();
+      });
+    }
+
+    const studioPitch = document.getElementById("studio-pitch-slider");
+    if (studioPitch) {
+      studioPitch.addEventListener("input", (e) => {
+        window.aacAudio.pitch = parseFloat(e.target.value);
+        document.getElementById("studio-label-pitch").textContent = `${Math.round(window.aacAudio.pitch * 100)}%`;
+        window.aacAudio.saveSettings();
+      });
+    }
+
+    // Voice Studio Test Phrases
+    document.querySelectorAll(".test-phrase-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const phrase = btn.getAttribute("data-phrase");
+        window.aacAudio.speak(phrase);
+      });
+    });
+
     // Switch scanning keyboard trigger (Spacebar or Enter)
     window.addEventListener("keydown", (e) => {
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
@@ -124,6 +215,7 @@ class AacApp {
     if (voiceSelect) {
       voiceSelect.addEventListener("change", (e) => {
         window.aacAudio.setVoiceByName(e.target.value);
+        this.refreshVoiceUI();
       });
     }
 
@@ -132,6 +224,7 @@ class AacApp {
       rateSlider.addEventListener("input", (e) => {
         window.aacAudio.rate = parseFloat(e.target.value);
         document.getElementById("label-voice-rate").textContent = `${Math.round(window.aacAudio.rate * 100)}%`;
+        window.aacAudio.saveSettings();
       });
     }
 
@@ -140,6 +233,7 @@ class AacApp {
       pitchSlider.addEventListener("input", (e) => {
         window.aacAudio.pitch = parseFloat(e.target.value);
         document.getElementById("label-voice-pitch").textContent = `${Math.round(window.aacAudio.pitch * 100)}%`;
+        window.aacAudio.saveSettings();
       });
     }
 
@@ -178,6 +272,12 @@ class AacApp {
         this.el.narratorSubtitle.textContent = "Ready to speak with you";
       }
     };
+
+    window.aacAudio.onVoicesUpdated = () => {
+      this.refreshVoiceUI();
+    };
+
+    this.refreshVoiceUI();
   }
 
   // =========================================================================
@@ -1028,13 +1128,91 @@ class AacApp {
     };
   }
 
+  openVoiceStudioModal() {
+    this.refreshVoiceUI();
+    if (this.el.voiceStudioModal) {
+      this.el.voiceStudioModal.style.display = "flex";
+    }
+  }
+
+  closeVoiceStudioModal() {
+    if (this.el.voiceStudioModal) {
+      this.el.voiceStudioModal.style.display = "none";
+    }
+    this.refreshVoiceUI();
+  }
+
+  refreshVoiceUI() {
+    const voices = window.aacAudio.getVoiceList();
+    const curVoice = window.aacAudio.selectedVoice;
+    const curPreset = window.aacAudio.currentPreset || "afro_euro";
+
+    // Update active preset button highlighting
+    document.querySelectorAll(".preset-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.getAttribute("data-preset") === curPreset);
+    });
+
+    // Update active voice banner in Voice Studio Modal
+    const titleEl = document.getElementById("active-voice-title");
+    const badgeEl = document.getElementById("active-voice-badge");
+    const engineEl = document.getElementById("active-voice-engine-name");
+    if (titleEl) {
+      if (curPreset === "afro_euro") titleEl.textContent = "Amina (Afro-British / Euro-African)";
+      else if (curPreset === "nigerian") titleEl.textContent = "Zainab (Nigerian / West African English)";
+      else if (curPreset === "south_african") titleEl.textContent = "Nandi (South African English)";
+      else if (curPreset === "uk_multicultural") titleEl.textContent = "Serena (UK Multicultural English)";
+      else titleEl.textContent = "Amina (Afro-European Voice)";
+    }
+    if (badgeEl) {
+      badgeEl.textContent = curVoice ? (curVoice.localService ? "LOCAL ● ACTIVE" : "NATURAL ● ACTIVE") : "ACTIVE";
+    }
+    if (engineEl) {
+      engineEl.textContent = curVoice ? `${curVoice.name} (${curVoice.lang})` : "Default Speech Engine";
+    }
+
+    // Sync sliders
+    const rateSlider = document.getElementById("studio-rate-slider");
+    const pitchSlider = document.getElementById("studio-pitch-slider");
+    if (rateSlider) rateSlider.value = window.aacAudio.rate;
+    if (pitchSlider) pitchSlider.value = window.aacAudio.pitch;
+    const rateLabel = document.getElementById("studio-label-rate");
+    const pitchLabel = document.getElementById("studio-label-pitch");
+    if (rateLabel) rateLabel.textContent = `${Math.round(window.aacAudio.rate * 100)}%`;
+    if (pitchLabel) pitchLabel.textContent = `${Math.round(window.aacAudio.pitch * 100)}%`;
+
+    // Populate voice studio select dropdown
+    const studioSelect = document.getElementById("voice-studio-select");
+    if (studioSelect) {
+      studioSelect.innerHTML = voices.map(v => `
+        <option value="${v.name}" ${v.isDefault ? "selected" : ""}>
+          ${v.badge} ${v.name} (${v.lang})
+        </option>
+      `).join("");
+    }
+
+    // Populate Settings voice dropdown
+    this.populateVoiceSelect();
+
+    // Update top header narrator pill label
+    const pill = document.getElementById("btn-narrator-pill");
+    if (pill) {
+      const span = pill.querySelector("span:not([style*='color'])");
+      if (span) {
+        if (curPreset === "afro_euro") span.textContent = "Amina (Afro-Euro Voice)";
+        else if (curPreset === "nigerian") span.textContent = "Zainab (Nigerian Voice)";
+        else if (curPreset === "south_african") span.textContent = "Nandi (South African Voice)";
+        else span.textContent = "Amina (Afro-Euro Voice)";
+      }
+    }
+  }
+
   populateVoiceSelect() {
     const select = document.getElementById("setting-voice-select");
     if (!select) return;
     const voices = window.aacAudio.getVoiceList();
     select.innerHTML = voices.map(v => `
       <option value="${v.name}" ${v.isDefault ? "selected" : ""}>
-        ${v.name} (${v.lang})
+        ${v.badge} ${v.name} (${v.lang})
       </option>
     `).join("");
   }

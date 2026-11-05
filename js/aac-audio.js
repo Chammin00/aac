@@ -14,19 +14,71 @@ class AacAudioEngine {
     this.voices = [];
     this.selectedVoice = null;
     this.voiceName = "Default Afro-Euro Female";
-    this.pitch = 1.05; // Friendly, warm, slightly elevated pitch
-    this.rate = 0.92;  // Measured cadence optimized for AAC comprehension
+    this.currentPreset = "afro_euro"; // afro_euro, nigerian, south_african, uk_multicultural
+    this.pitch = 1.06; // Friendly, warm, slightly elevated pitch for Afro-Euro cadence
+    this.rate = 0.92;  // Measured syllable-timed cadence optimized for AAC comprehension
     this.volume = 1.0;
     this.isSpeaking = false;
     this.audioContext = null;
     this.onStateChange = null;
+    this.onVoicesUpdated = null;
 
+    this.loadSavedSettings();
     this.initAudioContext();
     this.loadVoices();
 
     if (typeof speechSynthesis !== "undefined") {
-      speechSynthesis.onvoiceschanged = () => this.loadVoices();
+      speechSynthesis.onvoiceschanged = () => {
+        this.loadVoices();
+        if (this.onVoicesUpdated) this.onVoicesUpdated(this.selectedVoice);
+      };
     }
+  }
+
+  loadSavedSettings() {
+    try {
+      const saved = localStorage.getItem("amina_aac_voice_settings_v1");
+      if (saved) {
+        const config = JSON.parse(saved);
+        if (config.pitch) this.pitch = parseFloat(config.pitch);
+        if (config.rate) this.rate = parseFloat(config.rate);
+        if (config.preset) this.currentPreset = config.preset;
+        if (config.voiceName) this.voiceName = config.voiceName;
+      }
+    } catch (e) {
+      console.warn("Could not load voice settings from localStorage", e);
+    }
+  }
+
+  saveSettings() {
+    try {
+      localStorage.setItem("amina_aac_voice_settings_v1", JSON.stringify({
+        voiceName: this.voiceName,
+        preset: this.currentPreset,
+        pitch: this.pitch,
+        rate: this.rate
+      }));
+    } catch (e) {
+      console.warn("Could not save voice settings", e);
+    }
+  }
+
+  setPreset(presetKey) {
+    this.currentPreset = presetKey;
+    if (presetKey === "afro_euro") {
+      this.pitch = 1.06;
+      this.rate = 0.92;
+    } else if (presetKey === "nigerian") {
+      this.pitch = 1.04;
+      this.rate = 0.94;
+    } else if (presetKey === "south_african") {
+      this.pitch = 1.05;
+      this.rate = 0.90;
+    } else if (presetKey === "uk_multicultural") {
+      this.pitch = 1.08;
+      this.rate = 0.92;
+    }
+    this.saveSettings();
   }
 
   initAudioContext() {
@@ -46,35 +98,88 @@ class AacAudioEngine {
     }
   }
 
+  /**
+   * Score voices to prioritize authentic Afro-European, African, and British Commonwealth female voices
+   * while strictly penalizing male voices.
+   */
+  scoreVoiceForAfroEuro(v) {
+    const name = (v.name || "").toLowerCase();
+    const lang = (v.lang || "").toLowerCase();
+
+    // 1. Male voices get an immediate heavy penalty so they are never default for Amina
+    const maleNames = ["male", "david", "mark", "george", "ryan", "guy", "james", "richard", "stefan", "paul", "daniel", "charles", "oliver", "tom"];
+    if (maleNames.some(m => name.includes(m))) {
+      return -1000;
+    }
+
+    let score = 0;
+
+    // 2. Direct African English Female Voices (Nigeria, South Africa, Kenya, Ghana, etc.)
+    if (lang.includes("en-ng") || lang.includes("en_ng") || name.includes("nigeria") || name.includes("ezinne") || name.includes("chiamaka") || name.includes("abeo") || name.includes("ada") || name.includes("oluwaseun")) {
+      score += 150;
+    }
+    if (lang.includes("en-za") || lang.includes("en_za") || name.includes("south africa") || name.includes("nandi") || name.includes("ayanda") || name.includes("tessa") || name.includes("thando")) {
+      score += 140;
+    }
+    if (lang.includes("en-ke") || lang.includes("en_ke") || name.includes("kenya") || name.includes("asilia") || name.includes("wanjiku")) {
+      score += 130;
+    }
+    if (lang.includes("en-gh") || lang.includes("en_gh") || name.includes("ghana")) {
+      score += 130;
+    }
+
+    // 3. British & Afro-European Dialect Bridge (UK / European English Female)
+    // Used clinically and in literacy education as the primary dialect bridge
+    if (lang.includes("en-gb") || lang.includes("en_gb") || lang.includes("en-ie")) {
+      score += 80;
+      if (name.includes("female") || name.includes("libby") || name.includes("sonia") || name.includes("mia") || name.includes("maisie") || name.includes("hazel") || name.includes("susan") || name.includes("serena") || name.includes("stephanie") || name.includes("martha") || name.includes("victoria") || name.includes("moira")) {
+        score += 30;
+      }
+      if (name.includes("natural") || name.includes("online") || name.includes("neural")) {
+        score += 25; // High-quality neural voices
+      }
+    }
+
+    // 4. Google UK English Female
+    if (name.includes("uk english female") || name.includes("google uk")) {
+      score += 95;
+    }
+
+    // 5. General English Female Voices (Fallback if no regional voices are installed)
+    if (lang.startsWith("en")) {
+      if (name.includes("female") || name.includes("woman") || name.includes("girl") || name.includes("zira") || name.includes("jenny") || name.includes("aria") || name.includes("samantha") || name.includes("karen")) {
+        score += 40;
+      } else {
+        score += 5;
+      }
+    }
+
+    return score;
+  }
+
   loadVoices() {
     if (!this.synth) return;
     this.voices = this.synth.getVoices();
+    if (!this.voices || this.voices.length === 0) return;
 
-    // Prioritized search for Afro-Euro / British / African / European English female voices
-    const searchPreferences = [
-      // Direct Nigerian, South African, Ghanaian, Kenyan English
-      (v) => (v.lang.includes("en-NG") || v.lang.includes("en-ZA") || v.lang.includes("en-KE") || v.lang.includes("en-GH")),
-      // British / UK English Female (classic Afro-Euro dialect bridge)
-      (v) => (v.lang.includes("en-GB") || v.lang.includes("en_GB")) && (v.name.toLowerCase().includes("female") || v.name.toLowerCase().includes("serena") || v.name.toLowerCase().includes("stephanie") || v.name.toLowerCase().includes("hazel") || v.name.toLowerCase().includes("sonia")),
-      // Google UK English Female
-      (v) => v.name.toLowerCase().includes("uk english female") || v.name.toLowerCase().includes("google uk female"),
-      // Moov / Samantha / Natural English Female
-      (v) => v.name.toLowerCase().includes("samantha") || v.name.toLowerCase().includes("victoria") || v.name.toLowerCase().includes("karen"),
-      // Any English Female
-      (v) => v.lang.startsWith("en") && (v.name.toLowerCase().includes("female") || v.name.toLowerCase().includes("woman") || v.name.toLowerCase().includes("girl")),
-      // Default English
-      (v) => v.lang.startsWith("en")
-    ];
-
-    let foundVoice = null;
-    for (const matcher of searchPreferences) {
-      foundVoice = this.voices.find(matcher);
-      if (foundVoice) break;
+    // Check if user previously saved a specific voice name that exists
+    if (this.voiceName && this.voiceName !== "Default Afro-Euro Female") {
+      const savedVoice = this.voices.find(v => v.name === this.voiceName);
+      if (savedVoice) {
+        this.selectedVoice = savedVoice;
+        return;
+      }
     }
 
-    if (foundVoice) {
-      this.selectedVoice = foundVoice;
-      this.voiceName = foundVoice.name;
+    // Score and rank all available voices
+    const scoredVoices = this.voices.map(v => ({
+      voice: v,
+      score: this.scoreVoiceForAfroEuro(v)
+    })).sort((a, b) => b.score - a.score);
+
+    if (scoredVoices.length > 0 && scoredVoices[0].score > -500) {
+      this.selectedVoice = scoredVoices[0].voice;
+      this.voiceName = this.selectedVoice.name;
     } else if (this.voices.length > 0) {
       this.selectedVoice = this.voices[0];
       this.voiceName = this.voices[0].name;
@@ -82,11 +187,24 @@ class AacAudioEngine {
   }
 
   getVoiceList() {
-    return this.voices.map(v => ({
-      name: v.name,
-      lang: v.lang,
-      isDefault: v === this.selectedVoice
-    }));
+    return this.voices.map(v => {
+      const score = this.scoreVoiceForAfroEuro(v);
+      const isAfroEuro = score >= 70;
+      let badge = "";
+      if (score >= 120) badge = "⭐ [Afro-African]";
+      else if (score >= 70) badge = "🌍 [Afro-Euro / UK]";
+      else if (score > 0) badge = "[Female]";
+      else badge = "[Standard]";
+
+      return {
+        name: v.name,
+        lang: v.lang,
+        score,
+        isAfroEuro,
+        badge,
+        isDefault: v === this.selectedVoice
+      };
+    }).sort((a, b) => b.score - a.score);
   }
 
   setVoiceByName(name) {
@@ -94,7 +212,12 @@ class AacAudioEngine {
     if (v) {
       this.selectedVoice = v;
       this.voiceName = v.name;
+      this.saveSettings();
     }
+  }
+
+  speakIntro() {
+    this.speak("Hello! I am Amina, your Afro-European voice. I am here to help you communicate, read, and learn!");
   }
 
   /**

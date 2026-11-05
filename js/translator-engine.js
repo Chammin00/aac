@@ -139,10 +139,10 @@ class GameTranslatorEngine {
     });
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.rate = this.speechRate;
-    utterance.pitch = this.speechPitch;
+    utterance.rate = window.aacAudio ? window.aacAudio.rate : this.speechRate;
+    utterance.pitch = window.aacAudio ? window.aacAudio.pitch : this.speechPitch;
 
-    // Try selecting our Afro-Euro narrator voice if loaded
+    // Use selected Afro-Euro narrator voice
     if (window.aacAudio && window.aacAudio.selectedVoice) {
       utterance.voice = window.aacAudio.selectedVoice;
     }

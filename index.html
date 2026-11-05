@@ -189,7 +189,10 @@
           <!-- Voice Selection -->
           <div class="form-group">
             <label class="form-label">Narrator Voice (Afro-Euro Female Priority)</label>
-            <select id="setting-voice-select" class="form-select"></select>
+            <div style="display:flex; gap:8px;">
+              <select id="setting-voice-select" class="form-select" style="flex:1;"></select>
+              <button class="header-btn" id="btn-open-voice-studio" style="color:#f0883e; border-color:#f0883e;">🌍 Voice Studio</button>
+            </div>
           </div>
 
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -198,8 +201,8 @@
               <input type="range" id="setting-voice-rate" min="0.5" max="1.5" step="0.05" value="0.92">
             </div>
             <div class="form-group">
-              <label class="form-label">Voice Pitch (<span id="label-voice-pitch">105%</span>)</label>
-              <input type="range" id="setting-voice-pitch" min="0.7" max="1.4" step="0.05" value="1.05">
+              <label class="form-label">Voice Pitch (<span id="label-voice-pitch">106%</span>)</label>
+              <input type="range" id="setting-voice-pitch" min="0.7" max="1.4" step="0.05" value="1.06">
             </div>
           </div>
 
@@ -249,6 +252,113 @@
           <div style="display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid var(--gh-border-muted);">
             <button class="header-btn" id="btn-reset-defaults" style="color:#f85149;">⚠️ Reset All to Default</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Amina Afro-European Voice Studio Modal -->
+    <div class="modal-backdrop" id="voice-studio-modal" style="display:none;">
+      <div class="modal-card" style="max-width:580px;">
+        <div class="modal-header">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <img src="assets/amina-avatar.svg" alt="Amina" style="width:36px; height:36px; border-radius:50%; border:2px solid #f0883e;">
+            <div>
+              <h3 class="modal-title" style="margin:0;">Amina Voice Studio</h3>
+              <p style="font-size:0.75rem; color:var(--gh-text-secondary); margin:0;">Afro-European Narrator & Accent Tuner</p>
+            </div>
+          </div>
+          <button class="modal-close-btn" id="btn-close-voice-studio">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+          <!-- Active Status Banner -->
+          <div class="voice-status-banner" style="background:linear-gradient(135deg, rgba(240,136,62,0.15) 0%, rgba(210,153,34,0.15) 100%); border:1px solid #f0883e; border-radius:12px; padding:12px; margin-bottom:14px; display:flex; align-items:center; gap:12px;">
+            <div style="font-size:2rem;">🌍</div>
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <strong id="active-voice-title" style="font-size:0.95rem; color:#fff;">Amina (Afro-European Female)</strong>
+                <span id="active-voice-badge" style="font-size:0.7rem; background:#238636; color:#fff; padding:2px 6px; border-radius:10px; font-weight:700;">ACTIVE</span>
+              </div>
+              <p id="active-voice-engine-name" style="font-size:0.75rem; color:var(--gh-text-secondary); margin-top:2px;">Loading speech engine...</p>
+            </div>
+            <button class="header-btn accent-btn" id="btn-test-voice-studio" style="height:36px; padding:0 14px;">
+              <span>🔊 Test Voice</span>
+            </button>
+          </div>
+
+          <!-- Regional Accent Presets -->
+          <div class="form-group">
+            <label class="form-label">Voice & Accent Profiles</label>
+            <div class="voice-presets-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <button class="preset-btn active" data-preset="afro_euro">
+                <span class="preset-flag">🌍</span>
+                <span class="preset-title">Afro-British (Amina)</span>
+                <span class="preset-sub">Warm, melodic & rhythmic</span>
+              </button>
+              <button class="preset-btn" data-preset="nigerian">
+                <span class="preset-flag">🇳🇬</span>
+                <span class="preset-title">Nigerian English (Zainab)</span>
+                <span class="preset-sub">Syllable-timed, lively</span>
+              </button>
+              <button class="preset-btn" data-preset="south_african">
+                <span class="preset-flag">🇿🇦</span>
+                <span class="preset-title">South African (Nandi)</span>
+                <span class="preset-sub">Crisp, articulate tone</span>
+              </button>
+              <button class="preset-btn" data-preset="uk_multicultural">
+                <span class="preset-flag">🇬🇧</span>
+                <span class="preset-title">UK Multicultural (Serena)</span>
+                <span class="preset-sub">Clear classroom prosody</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Voice Dropdown Selection -->
+          <div class="form-group">
+            <label class="form-label">Available System / Browser Speech Voices</label>
+            <select id="voice-studio-select" class="form-select" style="font-size:0.85rem;"></select>
+          </div>
+
+          <!-- Pacing & Pitch Sliders -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Speed / Cadence (<span id="studio-label-rate">92%</span>)</label>
+              <input type="range" id="studio-rate-slider" min="0.5" max="1.5" step="0.02" value="0.92">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pitch / Musicality (<span id="studio-label-pitch">106%</span>)</label>
+              <input type="range" id="studio-pitch-slider" min="0.7" max="1.4" step="0.02" value="1.06">
+            </div>
+          </div>
+
+          <!-- Quick Interactive Test Phrases -->
+          <div class="form-group">
+            <label class="form-label">Tap to Hear Sample Phrases with Amina's Voice:</label>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <button class="test-phrase-btn" data-phrase="Hello, I am Amina! How are you feeling today?">💬 "Hello, I am Amina!"</button>
+              <button class="test-phrase-btn" data-phrase="I would like a glass of water please.">💧 "I want water please"</button>
+              <button class="test-phrase-btn" data-phrase="Let's learn new words and play together!">🔤 "Let's learn new words"</button>
+              <button class="test-phrase-btn" data-phrase="Can you please read this dialogue for me?">🎮 "Read this for me"</button>
+            </div>
+          </div>
+
+          <!-- Caregiver Guide Accordion -->
+          <details class="caregiver-voice-guide" style="background:var(--gh-canvas-inset); border:1px solid var(--gh-border-muted); border-radius:8px; padding:8px 12px; margin-top:8px;">
+            <summary style="font-size:0.8rem; font-weight:700; color:var(--gh-accent-blue); cursor:pointer;">
+              💡 How to install authentic African & UK voices on your device
+            </summary>
+            <div style="font-size:0.75rem; color:var(--gh-text-secondary); margin-top:8px; line-height:1.4;">
+              <p>• <strong>Windows 10/11:</strong> Settings ➔ Time & Language ➔ Speech ➔ Add voices ➔ Search "English (United Kingdom)" or "English (Nigeria)" or "English (South Africa)".</p>
+              <p>• <strong>Android / Chromebook:</strong> Settings ➔ Accessibility ➔ Text-to-speech output ➔ Install voice data ➔ English (Nigeria / UK / South Africa).</p>
+              <p>• <strong>iPad & iPhone:</strong> Settings ➔ Accessibility ➔ Spoken Content ➔ Voices ➔ English ➔ Download Serena, Stephanie, or Tessa.</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="modal-footer">
+          <button class="header-btn" id="btn-save-voice-studio" style="background:var(--gh-accent-green); color:#fff; font-weight:700; width:100%;">
+            ✅ Keep Afro-European Voice
+          </button>
         </div>
       </div>
     </div>
