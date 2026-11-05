@@ -65,6 +65,9 @@ class AacApp {
     this.renderCategoryNav();
     this.renderFavoritesRibbon();
     this.checkIncomingGameDialogue();
+    if (window.deviceScaleEngine) {
+      window.deviceScaleEngine.setApp(this);
+    }
   }
 
   checkIncomingGameDialogue() {
@@ -111,7 +114,13 @@ class AacApp {
       searchResultCount: document.getElementById("search-result-count"),
       editTileModal: document.getElementById("edit-tile-modal"),
       obfModal: document.getElementById("obf-modal"),
-      pinModal: document.getElementById("pin-modal")
+      pinModal: document.getElementById("pin-modal"),
+      // Sorted Menu Screen Modal & Device Scaling Elements
+      menuScreenModal: document.getElementById("menu-screen-modal"),
+      btnOpenMenu: document.getElementById("btn-open-menu"),
+      btnCloseMenu: document.getElementById("btn-close-menu"),
+      deviceProfilePill: document.getElementById("device-profile-pill"),
+      checkboxAutoScale: document.getElementById("checkbox-auto-scale")
     };
   }
 
@@ -168,6 +177,97 @@ class AacApp {
     if (gotItHelpBtn) {
       gotItHelpBtn.addEventListener("click", () => this.closeHelpModal());
     }
+
+    // Sorted Master Menu Screen Controls
+    if (this.el.btnOpenMenu) {
+      this.el.btnOpenMenu.addEventListener("click", () => this.openMenuScreen());
+    }
+    if (this.el.btnCloseMenu) {
+      this.el.btnCloseMenu.addEventListener("click", () => this.closeMenuScreen());
+    }
+    if (this.el.deviceProfilePill) {
+      this.el.deviceProfilePill.addEventListener("click", () => this.openMenuScreen());
+    }
+
+    // Auto-scale toggle checkbox inside Menu Inspector
+    if (this.el.checkboxAutoScale) {
+      this.el.checkboxAutoScale.addEventListener("change", (e) => {
+        if (window.deviceScaleEngine) {
+          window.deviceScaleEngine.setAutoScale(e.target.checked);
+        }
+      });
+    }
+
+    // Menu Screen Urgent Assistance Cards
+    document.querySelectorAll(".menu-card.urgent-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const phrase = card.getAttribute("data-phrase");
+        const targetBoard = card.getAttribute("data-board");
+        window.aacAudio.speak(phrase);
+        const iconEl = card.querySelector(".menu-card-icon");
+        const nameEl = card.querySelector(".menu-card-name");
+        this.sentenceStrip.push({
+          id: "urg_" + Date.now(),
+          label: nameEl ? nameEl.textContent : phrase,
+          speech: phrase,
+          icon: iconEl ? iconEl.textContent : "🚨",
+          category: "social"
+        });
+        this.renderSentenceStrip();
+        this.closeMenuScreen();
+        if (targetBoard) {
+          this.navigateToBoard(targetBoard);
+        }
+      });
+    });
+
+    // Menu Screen Category Cards
+    document.querySelectorAll(".menu-card.category-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const boardId = card.getAttribute("data-nav-board");
+        if (boardId) {
+          this.navigateToBoard(boardId);
+          this.closeMenuScreen();
+          this.switchMainTab("aac");
+        }
+      });
+    });
+
+    // Menu Screen Learning Suite Cards
+    document.querySelectorAll(".menu-card.suite-card").forEach(card => {
+      card.addEventListener("click", (e) => {
+        const tab = card.getAttribute("data-switch-tab");
+        const sub = card.getAttribute("data-phonics-sub");
+        if (tab) {
+          e.preventDefault();
+          this.switchMainTab(tab);
+          if (sub) {
+            this.phonicsTab = sub;
+            this.renderPhonicsView();
+          }
+          this.closeMenuScreen();
+        }
+      });
+    });
+
+    // Menu Screen Tool Buttons
+    const menuKiosk = document.getElementById("menu-btn-kiosk");
+    if (menuKiosk) menuKiosk.addEventListener("click", () => { this.closeMenuScreen(); this.toggleFullscreen(); });
+
+    const menuVoice = document.getElementById("menu-btn-voice-studio");
+    if (menuVoice) menuVoice.addEventListener("click", () => { this.closeMenuScreen(); this.openVoiceStudioModal(); });
+
+    const menuEdit = document.getElementById("menu-btn-edit-mode");
+    if (menuEdit) menuEdit.addEventListener("click", () => { this.closeMenuScreen(); this.toggleEditModePrompt(); });
+
+    const menuSlp = document.getElementById("menu-btn-slp-export");
+    if (menuSlp) menuSlp.addEventListener("click", () => { this.closeMenuScreen(); this.exportSessionCSV(); });
+
+    const menuHelp = document.getElementById("menu-btn-help-guide");
+    if (menuHelp) menuHelp.addEventListener("click", () => { this.closeMenuScreen(); this.openHelpModal(); });
+
+    const menuSettings = document.getElementById("menu-btn-open-settings");
+    if (menuSettings) menuSettings.addEventListener("click", () => { this.closeMenuScreen(); this.openSettingsModal(); });
 
     // Settings & Quick Actions
     document.getElementById("btn-settings").addEventListener("click", () => this.openSettingsModal());
@@ -488,14 +588,14 @@ class AacApp {
     const boards = window.aacData.getAllBoardSummaries();
     this.el.categoryNav.innerHTML = "";
 
-    // Home / Back Button
+    // 1. 🏠 Home Core Button
     const homeBtn = document.createElement("button");
-    homeBtn.className = "category-tab";
+    homeBtn.className = `category-tab ${this.currentBoardId === "core_master" ? "active" : ""}`;
     homeBtn.innerHTML = `<span>🏠</span> Home Core`;
     homeBtn.addEventListener("click", () => this.navigateToBoard("core_master"));
     this.el.categoryNav.appendChild(homeBtn);
 
-    // ⭐ Favorites & Learned Phrases Button
+    // 2. ⭐ Favorites & Learned Phrases Button
     const favBtn = document.createElement("button");
     favBtn.className = `category-tab ${this.currentBoardId === "board_favorites" ? "active" : ""}`;
     favBtn.style.borderColor = "var(--gh-accent-yellow)";
@@ -504,15 +604,55 @@ class AacApp {
     favBtn.addEventListener("click", () => this.navigateToBoard("board_favorites"));
     this.el.categoryNav.appendChild(favBtn);
 
-    boards.forEach(b => {
+    // 3. Filter out core densities (they are switched via the density badge) and sort topics
+    const topicBoards = boards.filter(b => b.id !== "core_starter" && b.id !== "core_master");
+
+    const priorityOrder = [
+      "urgent_needs",
+      "food_drinks",
+      "feelings",
+      "actions_play",
+      "people_family",
+      "places"
+    ];
+
+    topicBoards.sort((a, b) => {
+      const idxA = priorityOrder.indexOf(a.id);
+      const idxB = priorityOrder.indexOf(b.id);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    const categoryIcons = {
+      urgent_needs: "🚨",
+      food_drinks: "🍎",
+      feelings: "😊",
+      actions_play: "🎮",
+      people_family: "👨‍👩‍👦",
+      places: "🏙️"
+    };
+
+    topicBoards.forEach(b => {
       const tab = document.createElement("button");
       tab.className = `category-tab ${b.id === this.currentBoardId ? "active" : ""}`;
-      tab.textContent = b.name;
+      const icon = categoryIcons[b.id] || "📂";
+      tab.innerHTML = `<span>${icon}</span> ${b.name}`;
       tab.addEventListener("click", () => this.navigateToBoard(b.id));
       this.el.categoryNav.appendChild(tab);
     });
 
-    // Add New Board Button (Therapist mode)
+    // 4. All Categories / Open Menu Button
+    const allMenuBtn = document.createElement("button");
+    allMenuBtn.className = "category-tab";
+    allMenuBtn.style.borderColor = "var(--gh-accent-blue)";
+    allMenuBtn.style.color = "#58a6ff";
+    allMenuBtn.innerHTML = `<span>☰</span> All Categories...`;
+    allMenuBtn.addEventListener("click", () => this.openMenuScreen());
+    this.el.categoryNav.appendChild(allMenuBtn);
+
+    // 5. Add New Board Button (Therapist mode)
     if (this.editMode) {
       const addBoardBtn = document.createElement("button");
       addBoardBtn.className = "category-tab";
@@ -2250,6 +2390,38 @@ class AacApp {
   closeHelpModal() {
     if (this.el.helpGuideModal) {
       this.el.helpGuideModal.style.display = "none";
+    }
+  }
+
+  // =========================================================================
+  // SORTED MASTER MENU SCREEN (CATEGORIES, PHONICS, DECISION WHEELS & TOOLS)
+  // =========================================================================
+
+  openMenuScreen() {
+    if (!this.el.menuScreenModal) return;
+    this.el.menuScreenModal.style.display = "flex";
+    window.aacAudio.playTone(520, 0.08, "triangle");
+
+    // Update live device inspector in menu header
+    if (window.deviceScaleEngine) {
+      const p = window.deviceScaleEngine.currentProfile;
+      if (p) {
+        const descEl = document.getElementById("menu-device-desc");
+        const iconEl = document.getElementById("menu-device-icon");
+        if (descEl) descEl.textContent = `${p.formFactorLabel.split(" ")[0]} (${p.width}×${p.height} • ${p.perfTier.toUpperCase()})`;
+        if (iconEl) iconEl.textContent = p.formFactorIcon;
+
+        const specsEl = document.getElementById("inspector-device-specs");
+        if (specsEl) {
+          specsEl.textContent = `${p.formFactorLabel} • ${p.width}×${p.height} (${p.isLandscape ? "Landscape" : "Portrait"}) • ${p.cores} CPU Cores • Optimal: ${p.recommendedColumns} Columns`;
+        }
+      }
+    }
+  }
+
+  closeMenuScreen() {
+    if (this.el.menuScreenModal) {
+      this.el.menuScreenModal.style.display = "none";
     }
   }
 }

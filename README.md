@@ -216,6 +216,37 @@ Engineered specifically to remove cognitive barriers and friction for young chil
 - **📱 Instant Sample Flashcards Dock in "Read For Me"**:
   - Preloaded test cards (`🐱 CAT`, `🍎 APPLE`, `🚗 CAR`, `⭐ STAR`, `🥛 MILK`) allow parents and children to experience magic scanning, syllable blending, and AAC board transfer immediately—even without pointing a physical camera at text.
 
+### 12. 📐 Dynamic Device Intelligence & Auto-Scaling Engine (`js/device-engine.js`)
+Inspired by the multi-device grid matrices in open-source projects like **Cboard** (`cboard-org/cboard`), the Device Intelligence Engine continuously inspects the user's hardware and viewport geometry:
+- **Automatic Form Factor Classification**:
+  - `phone` (<600px width): 3–4 column grid, compact sentence bar, hides desktop mode tabs.
+  - `tablet_compact` (600–840px): 4–5 column grid (iPad Mini, 7-8" Android tablets).
+  - `tablet_standard` (840–1200px): 6 column universal matrix (10"–11" iPad & Galaxy Tab).
+  - `tablet_large` (1200–1440px): 6–8 column matrix (iPad Pro 12.9", Surface Pro).
+  - `desktop` (>1200px non-touch): 8 column widescreen master matrix.
+- **Live Hardware Concurrency & Memory Tiering**:
+  - Inspects `navigator.hardwareConcurrency` and `navigator.deviceMemory`.
+  - Classifies device into `perf-tier-high`, `perf-tier-medium`, or `perf-tier-low`.
+  - **Low-End Hardware Guardrails**: On \$50 budget school tablets or older hardware, automatically strips costly multi-stop backdrop blurs and deep box shadows to lock smooth 60fps tile responsiveness.
+- **Dynamic Viewport Height Auto-Fit (`autoFitGridHeight`)**:
+  - Calculates available vertical height subtracting header, sentence bar, category navigation, and footer.
+  - Dynamically calculates exact tile row heights so communication boards fill 100% of the screen with zero vertical scrolling—essential for switch scanning and keyguards.
+- **Live Device Status Pill in Header**:
+  - Displays detected form factor (e.g. `📱 Clinical ●`, `📱 Tablet ●`, `📱 Mobile ●`) with color-coded performance indicator. Tapping the pill opens the Master Menu and hardware diagnostics.
+
+### 13. ☰ Sorted Clinical Master Menu Screen (`#menu-screen-modal`)
+To eliminate header clutter and navigation confusion on tablets and phones, the app features a dedicated full-screen Master Menu organized into 4 sorted clinical categories:
+1. **🚨 Urgent & Immediate Assistance**:
+   - High-contrast immediate emergency buttons: `🚻 Bathroom / Restroom`, `🆘 Need Help`, `🩹 Pain / Hurt`, `🧘 Sensory Break / Quiet`, `💧 Water / Thirsty`.
+   - Single-tap vocalization with instant vocal output and automated navigation to the medical/urgent board.
+2. **📂 Sorted Topic Communication Folders**:
+   - Clean, alphabetical and frequency-sorted directory of core folders: *🏠 Core Master (All 36)*, *⭐ Quick Favorites*, *🚨 Urgent Needs*, *🍎 Food & Drinks*, *😊 Feelings & Emotions*, *🎮 Activities & Play*, *👨‍👩‍👦 People & Family*, *🏙️ Places & Locations*, and *👶 Starter Core (12)*.
+3. **🔤 Learning, Phonics & Decision Suites**:
+   - Quick launch for *🔤 Interactive Blending Board*, *🗣️ Physiological Sound Wall*, *📖 Decodable Phonics Stories*, *🍕 Food Decision Wheels*, and *📷 Read This For Me Gaming Camera*.
+4. **⚙️ Clinical Tablet Tools & Hardware Inspector**:
+   - Clinical utilities: *🔒 Kiosk Full-Screen Lock*, *🗣️ Amina Voice Studio*, *✏️ Custom Tile Edit Mode*, *📊 Speech-Language Pathologist CSV Analytics Export*, and *❓ 30-Second Visual Caregiver Guide*.
+   - **Live Hardware Diagnostic Card**: Displays exact detected device name, live viewport dimensions, CPU concurrency count, and auto-grid density toggling.
+
 ---
 
 ## 📂 Project Structure
@@ -232,6 +263,7 @@ AAC/
 ├── js/
 │   ├── aac-audio.js        # Speech synthesis, Afro-Euro voice tuner & sound generator
 │   ├── aac-data.js         # Core vocabulary boards, categories & OBF import/export
+│   ├── device-engine.js    # Hardware concurrency, viewport auto-fit & device scaling
 │   ├── phonics-data.js     # Hooked on Phonics curriculum, word families & sound wall
 │   ├── food-wheel.js       # Interactive physics Food Decision Wheels & customizer
 │   ├── favorites-engine.js # Smart frequency tracker, phrase starring & next-word predictor

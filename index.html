@@ -28,6 +28,13 @@
           <span>AMINA AAC</span>
         </div>
 
+        <!-- Live Detected Device Profile & Performance Badge -->
+        <button class="device-profile-pill" id="device-profile-pill" title="Detected Device Profile & Performance Tier">
+          <span class="device-pill-icon">📱</span>
+          <span class="device-pill-text">Tablet</span>
+          <span class="device-pill-dot high">●</span>
+        </button>
+
         <button class="narrator-pill" id="btn-narrator-pill" title="Default Narrator: Afro-Euro Female Voice">
           <img src="assets/amina-avatar.svg" alt="Amina Avatar" class="narrator-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23f0883e\'/><circle cx=\'50\' cy=\'40\' r=\'24\' fill=\'%235c341b\'/><path d=\'M20 90 Q50 60 80 90\' fill=\'%235c341b\'/><circle cx=\'42\' cy=\'38\' r=\'3\' fill=\'%23fff\'/><circle cx=\'58\' cy=\'38\' r=\'3\' fill=\'%23fff\'/><path d=\'M42 50 Q50 58 58 50\' stroke=\'%23fff\' stroke-width=\'3\' fill=\'none\'/></svg>'">
           <span>Amina (Afro-Euro Voice)</span>
@@ -50,37 +57,44 @@
       </div>
 
       <div class="header-actions">
-        <!-- Main Mode Tabs -->
-        <button class="header-btn active" id="btn-tab-aac">
-          <span>💬</span>
-          <span>AAC Board</span>
-        </button>
-        <button class="header-btn" id="btn-tab-phonics">
-          <span>🔤</span>
-          <span>Hooked on Phonics</span>
-        </button>
-        <button class="header-btn" id="btn-tab-wheels" title="Spin Decision Wheels for Snacks, Restaurants, and Homecooked Meals">
-          <span>🎡</span>
-          <span>Food Wheels</span>
+        <!-- Prominent Sorted Menu Screen Launcher -->
+        <button class="header-btn accent-menu-btn" id="btn-open-menu" title="Open Sorted Menu: Categories, Phonics, Food Wheels & Tools">
+          <span style="font-size:1.1rem; line-height:1;">☰</span>
+          <span style="font-weight:700;">Menu</span>
         </button>
 
-        <a href="read-for-me.html" class="header-btn" style="text-decoration:none; background:rgba(240,136,62,0.15); border-color:#f0883e; color:#f0883e;" title="Open Read This For Me Gaming Dialogue Camera">
-          <span>🎮</span>
-          <span>Read For Me (Game Lens)</span>
-        </a>
+        <!-- Desktop Navigation Tabs (Adaptive: visible on large screens, collapsed into Menu on small screens) -->
+        <div class="desktop-mode-tabs" id="desktop-mode-tabs" style="display:flex; align-items:center; gap:6px;">
+          <button class="header-btn active" id="btn-tab-aac">
+            <span>💬</span>
+            <span>AAC Board</span>
+          </button>
+          <button class="header-btn" id="btn-tab-phonics">
+            <span>🔤</span>
+            <span>Hooked on Phonics</span>
+          </button>
+          <button class="header-btn" id="btn-tab-wheels" title="Spin Decision Wheels for Snacks, Restaurants, and Homecooked Meals">
+            <span>🎡</span>
+            <span>Food Wheels</span>
+          </button>
 
-        <!-- Tablet Kiosk & Edit & Settings -->
+          <a href="read-for-me.html" class="header-btn" style="text-decoration:none; background:rgba(240,136,62,0.15); border-color:#f0883e; color:#f0883e;" title="Open Read This For Me Gaming Dialogue Camera">
+            <span>🎮</span>
+            <span>Read For Me</span>
+          </a>
+        </div>
+
+        <!-- Quick Tablet Tools -->
         <button class="header-btn" id="btn-kiosk-fullscreen" title="Full-Screen Tablet Kiosk Mode (Safe Areas & Edge Lock)">
           <span>📱</span>
-          <span>Tablet Kiosk</span>
+          <span class="btn-text-optional">Kiosk</span>
         </button>
         <button class="header-btn" id="btn-edit-mode" title="Therapist/Caregiver PIN Edit Mode">
           <span>🔒</span>
-          <span>Edit Mode</span>
+          <span class="btn-text-optional">Edit</span>
         </button>
         <button class="header-btn" id="btn-help-guide" title="Quick-Start Help Guide: How to use Amina in 30 seconds" style="color:var(--gh-accent-amber); border-color:rgba(210,153,34,0.4);">
           <span>❓</span>
-          <span>Help</span>
         </button>
         <button class="header-btn" id="btn-settings" title="Settings & Accessibility">
           <span>⚙️</span>
@@ -653,6 +667,304 @@
       </div>
     </div>
 
+    <!-- Sorted Master Menu Screen Modal (Categories, Phonics, Food Wheels & Clinical Tools) -->
+    <div class="modal-backdrop" id="menu-screen-modal" style="display:none;">
+      <div class="modal-card menu-screen-card" style="max-width:980px; max-height:92vh; display:flex; flex-direction:column;">
+        <div class="modal-header">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:1.6rem;">📱</span>
+            <div>
+              <h3 class="modal-title" style="margin:0;">Amina Communication & Features Menu</h3>
+              <p style="font-size:0.75rem; color:var(--gh-text-secondary); margin:0;">Organized categories, learning suites, and clinical tablet settings</p>
+            </div>
+          </div>
+          <div class="menu-header-right" style="display:flex; align-items:center; gap:10px;">
+            <div id="menu-device-badge" class="device-spec-badge" title="Live Hardware Profile">
+              <span id="menu-device-icon">📱</span>
+              <span id="menu-device-desc">Detecting device...</span>
+            </div>
+            <button class="modal-close-btn" id="btn-close-menu">&times;</button>
+          </div>
+        </div>
+
+        <div class="modal-body menu-screen-body" style="overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:20px;">
+          
+          <!-- SECTION 1: 🚨 URGENT & HIGH-PRIORITY COMMUNICATION -->
+          <div class="menu-section">
+            <div class="menu-section-header">
+              <span class="menu-section-icon" style="background:rgba(248,81,73,0.15); color:#f85149; border-color:rgba(248,81,73,0.4);">🚨</span>
+              <div>
+                <h4 class="menu-section-title" style="color:#f85149;">1. Urgent & Immediate Assistance</h4>
+                <p class="menu-section-subtitle">High-priority buttons for restroom, emergency help, pain, and sensory regulation</p>
+              </div>
+            </div>
+            <div class="menu-cards-grid">
+              <button class="menu-card urgent-card" data-action="speak-urgent" data-phrase="I need to go to the bathroom" data-board="urgent_needs">
+                <span class="menu-card-icon">🚻</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Bathroom / Restroom</strong>
+                  <span class="menu-card-desc">"I need to go to the bathroom"</span>
+                </div>
+              </button>
+              <button class="menu-card urgent-card" data-action="speak-urgent" data-phrase="I need help right now please" data-board="urgent_needs">
+                <span class="menu-card-icon">🆘</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Need Help!</strong>
+                  <span class="menu-card-desc">"I need help right now please"</span>
+                </div>
+              </button>
+              <button class="menu-card urgent-card" data-action="speak-urgent" data-phrase="Something hurts me" data-board="urgent_needs">
+                <span class="menu-card-icon">⚡</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Pain / Hurt</strong>
+                  <span class="menu-card-desc">"Something hurts me"</span>
+                </div>
+              </button>
+              <button class="menu-card urgent-card" data-action="speak-urgent" data-phrase="I need a sensory break and quiet time" data-board="urgent_needs">
+                <span class="menu-card-icon">⏸️</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Sensory Break</strong>
+                  <span class="menu-card-desc">"I need quiet time"</span>
+                </div>
+              </button>
+              <button class="menu-card urgent-card" data-action="speak-urgent" data-phrase="I need a drink of water please" data-board="food_drinks">
+                <span class="menu-card-icon">💧</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Need Water</strong>
+                  <span class="menu-card-desc">"Drink of water please"</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- SECTION 2: 📂 SORTED TOPIC VOCABULARY FOLDERS -->
+          <div class="menu-section">
+            <div class="menu-section-header">
+              <span class="menu-section-icon" style="background:rgba(56,189,248,0.15); color:#38bdf8; border-color:rgba(56,189,248,0.4);">📂</span>
+              <div>
+                <h4 class="menu-section-title" style="color:#38bdf8;">2. Sorted Topic Folders & Core Vocabularies</h4>
+                <p class="menu-section-subtitle">Fitzgerald Key communication boards organized by frequency and daily life</p>
+              </div>
+            </div>
+            <div class="menu-cards-grid" id="menu-categories-grid">
+              <button class="menu-card category-card" data-nav-board="core_master">
+                <span class="menu-card-icon">🏠</span>
+                <div class="menu-card-content">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong class="menu-card-name">Universal Core 36</strong>
+                    <span class="menu-card-badge">36 Words</span>
+                  </div>
+                  <span class="menu-card-desc">Master Fitzgerald Key communication grid</span>
+                </div>
+              </button>
+              <button class="menu-card category-card" data-nav-board="board_favorites" style="border-color:rgba(234,179,8,0.4);">
+                <span class="menu-card-icon">⭐</span>
+                <div class="menu-card-content">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong class="menu-card-name" style="color:#fef08a;">Smart Favorites</strong>
+                    <span class="menu-card-badge" style="background:#eab308; color:#000;">Frequent</span>
+                  </div>
+                  <span class="menu-card-desc">Your pinned phrases & top learned words</span>
+                </div>
+              </button>
+              <button class="menu-card category-card" data-nav-board="urgent_needs">
+                <span class="menu-card-icon">🚨</span>
+                <div class="menu-card-content">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong class="menu-card-name">Urgent & Health</strong>
+                    <span class="menu-card-badge">12 Words</span>
+                  </div>
+                  <span class="menu-card-desc">Medical, sensory, and urgent bodily assistance</span>
+                </div>
+              </button>
+              <button class="menu-card category-card" data-nav-board="food_drinks">
+                <span class="menu-card-icon">🍎</span>
+                <div class="menu-card-content">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong class="menu-card-name">Food & Drinks</strong>
+                    <span class="menu-card-badge">12 Words</span>
+                  </div>
+                  <span class="menu-card-desc">Meals, snacks, drinks & Food Decision Wheels</span>
+                </div>
+              </button>
+              <button class="menu-card category-card" data-nav-board="feelings">
+                <span class="menu-card-icon">😊</span>
+                <div class="menu-card-content">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong class="menu-card-name">Feelings & Emotions</strong>
+                    <span class="menu-card-badge">12 Words</span>
+                  </div>
+                  <span class="menu-card-desc">Emotional regulation and internal state expression</span>
+                </div>
+              </button>
+              <button class="menu-card category-card" data-nav-board="actions_play">
+                <span class="menu-card-icon">🎮</span>
+                <div class="menu-card-content">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong class="menu-card-name">Activities & Play</strong>
+                    <span class="menu-card-badge">12 Words</span>
+                  </div>
+                  <span class="menu-card-desc">Games, sensory toys, drawing, music, and rest</span>
+                </div>
+              </button>
+              <button class="menu-card category-card" data-nav-board="people_family">
+                <span class="menu-card-icon">👨‍👩‍👦</span>
+                <div class="menu-card-content">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong class="menu-card-name">People & Family</strong>
+                    <span class="menu-card-badge">8 Words</span>
+                  </div>
+                  <span class="menu-card-desc">Mom, Dad, Teachers, Therapists, Friends, Doctor</span>
+                </div>
+              </button>
+              <button class="menu-card category-card" data-nav-board="places">
+                <span class="menu-card-icon">🏙️</span>
+                <div class="menu-card-content">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong class="menu-card-name">Places & Locations</strong>
+                    <span class="menu-card-badge">8 Words</span>
+                  </div>
+                  <span class="menu-card-desc">Home, School, Park, Store, Car, Doctor</span>
+                </div>
+              </button>
+              <button class="menu-card category-card" data-nav-board="core_starter">
+                <span class="menu-card-icon">🌟</span>
+                <div class="menu-card-content">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong class="menu-card-name">Starter Core 12</strong>
+                    <span class="menu-card-badge">Toddler</span>
+                  </div>
+                  <span class="menu-card-desc">High-impact oversized targets for early communicators</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- SECTION 3: 🔤 LEARNING, PHONICS & INTERACTIVE SUITES -->
+          <div class="menu-section">
+            <div class="menu-section-header">
+              <span class="menu-section-icon" style="background:rgba(34,197,94,0.15); color:#22c55e; border-color:rgba(34,197,94,0.4);">🔤</span>
+              <div>
+                <h4 class="menu-section-title" style="color:#22c55e;">3. Learning, Phonics & Decision Tools</h4>
+                <p class="menu-section-subtitle">Systematic reading instruction, decision wheels, and gaming dialogue screen reader</p>
+              </div>
+            </div>
+            <div class="menu-cards-grid">
+              <button class="menu-card suite-card" data-switch-tab="phonics" data-phonics-sub="blender">
+                <span class="menu-card-icon">🧩</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Phonics Blending Board</strong>
+                  <span class="menu-card-desc">3-tile onset/vowel/coda blending with audio sounds</span>
+                </div>
+              </button>
+              <button class="menu-card suite-card" data-switch-tab="phonics" data-phonics-sub="soundwall">
+                <span class="menu-card-icon">📢</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Articulation Sound Wall</strong>
+                  <span class="menu-card-desc">Phoneme mouth visualizer & vowel valley</span>
+                </div>
+              </button>
+              <button class="menu-card suite-card" data-switch-tab="phonics" data-phonics-sub="stories">
+                <span class="menu-card-icon">📖</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Decodable Stories</strong>
+                  <span class="menu-card-desc">Level-graded CVC reading integrated with AAC words</span>
+                </div>
+              </button>
+              <button class="menu-card suite-card" data-switch-tab="wheels">
+                <span class="menu-card-icon">🎡</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Food Decision Wheels</strong>
+                  <span class="menu-card-desc">Spin to decide Snacks, Restaurants, or Homecooked meals</span>
+                </div>
+              </button>
+              <a href="read-for-me.html" class="menu-card suite-card" style="text-decoration:none;">
+                <span class="menu-card-icon">🎮</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name" style="color:#f0883e;">Read For Me (Game Lens)</strong>
+                  <span class="menu-card-desc">Camera text reader, RPG dialogue OCR & audio translation</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- SECTION 4: ⚙️ CLINICAL TABLET TOOLS & DEVICE OPTIMIZATION -->
+          <div class="menu-section">
+            <div class="menu-section-header">
+              <span class="menu-section-icon" style="background:rgba(167,139,250,0.15); color:#a78bfa; border-color:rgba(167,139,250,0.4);">⚙️</span>
+              <div>
+                <h4 class="menu-section-title" style="color:#a78bfa;">4. Clinical Tablet Access & Device Optimization</h4>
+                <p class="menu-section-subtitle">Real-time device scaling, keyguards, voice studio, and therapist IEP tools</p>
+              </div>
+            </div>
+            <div class="menu-cards-grid">
+              <button class="menu-card tool-card" id="menu-btn-kiosk">
+                <span class="menu-card-icon">📱</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Tablet Kiosk Mode</strong>
+                  <span class="menu-card-desc">Full-screen lock with gesture bar suppression</span>
+                </div>
+              </button>
+              <button class="menu-card tool-card" id="menu-btn-voice-studio">
+                <span class="menu-card-icon">🌍</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Amina Voice Studio</strong>
+                  <span class="menu-card-desc">Afro-Euro narrator accents & screen reader sync</span>
+                </div>
+              </button>
+              <button class="menu-card tool-card" id="menu-btn-edit-mode">
+                <span class="menu-card-icon">🔒</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Therapist Edit Mode</strong>
+                  <span class="menu-card-desc">PIN-protected custom tile builder and board creator</span>
+                </div>
+              </button>
+              <button class="menu-card tool-card" id="menu-btn-slp-export">
+                <span class="menu-card-icon">📊</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">SLP Session CSV Export</strong>
+                  <span class="menu-card-desc">Download IEP-compliant clinical therapy logs</span>
+                </div>
+              </button>
+              <button class="menu-card tool-card" id="menu-btn-help-guide">
+                <span class="menu-card-icon">❓</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">30-Second Guide</strong>
+                  <span class="menu-card-desc">Illustrated caregiver & educator walkthrough</span>
+                </div>
+              </button>
+              <button class="menu-card tool-card" id="menu-btn-open-settings">
+                <span class="menu-card-icon">⚙️</span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name">Settings & Access</strong>
+                  <span class="menu-card-desc">Dwell time, release touch, keyguard insets & themes</span>
+                </div>
+              </button>
+            </div>
+
+            <!-- Live Hardware & Device Inspector Box -->
+            <div class="device-inspector-panel" id="device-inspector-panel" style="background:var(--gh-canvas-inset); border:1px solid var(--gh-border-default); border-radius:12px; padding:14px; margin-top:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:1.4rem;">💻</span>
+                  <div>
+                    <strong style="color:var(--gh-text-primary); font-size:0.9rem;" id="inspector-device-title">Device Profile Inspector</strong>
+                    <p style="font-size:0.75rem; color:var(--gh-text-secondary); margin:2px 0 0 0;" id="inspector-device-specs">Detecting hardware specs...</p>
+                  </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <label class="form-label" style="margin:0; font-size:0.8rem; cursor:pointer;" for="checkbox-auto-scale">Auto-Scale to Screen:</label>
+                  <input type="checkbox" id="checkbox-auto-scale" checked style="width:18px; height:18px; cursor:pointer;">
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Application Logic Scripts -->
@@ -661,6 +973,7 @@
   <script src="js/phonics-data.js?v=4"></script>
   <script src="js/food-wheel.js?v=4"></script>
   <script src="js/favorites-engine.js?v=4"></script>
+  <script src="js/device-engine.js?v=4"></script>
   <script src="js/aac-app.js?v=4"></script>
 
   <!-- Service Worker Registration for Offline PWA -->

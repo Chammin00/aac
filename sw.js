@@ -1,4 +1,4 @@
-const CACHE_NAME = 'amina-aac-v4';
+const CACHE_NAME = 'amina-aac-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const ASSETS_TO_CACHE = [
   './js/phonics-data.js',
   './js/food-wheel.js',
   './js/favorites-engine.js',
+  './js/device-engine.js',
   './js/aac-app.js',
   './manifest.json',
   './assets/amina-avatar.svg',
