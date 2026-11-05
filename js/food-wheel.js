@@ -117,6 +117,10 @@ class FoodWheelManager {
     }
   }
 
+  setActiveWheel(wheelId) {
+    return this.setWheel(wheelId);
+  }
+
   addItem(wheelId, name, icon = "🍽️", color = "#3b82f6") {
     const wheel = this.wheels[wheelId];
     if (!wheel) return;

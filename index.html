@@ -15,8 +15,7 @@
   <!-- Core Theme Stylesheets -->
   <link rel="stylesheet" href="css/aac-theme.css">
   
-  <!-- Canvas Confetti for Phonics Celebrations -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- Canvas Confetti dynamically lazy-loaded on demand if available -->
 </head>
 <body class="theme-dark">
   <div id="app-container">
@@ -40,8 +39,13 @@
           <span>Back</span>
         </button>
 
-        <div id="board-title-badge" style="font-size:0.85rem; font-weight:700; color:var(--gh-accent-blue); padding:4px 8px; background:rgba(88,166,255,0.1); border-radius:6px; border:1px solid rgba(88,166,255,0.2);">
-          Universal Core 36
+        <button class="header-btn" id="btn-open-search" title="Quick Search: Find any word or symbol across all boards">
+          <span>🔍</span>
+          <span>Find</span>
+        </button>
+
+        <div id="board-title-badge" class="interactive-density-badge" title="Quick Switch: Tap to cycle grid size (12, 24, 36, 48 buttons)" style="font-size:0.85rem; font-weight:700; color:var(--gh-accent-blue); padding:4px 8px; background:rgba(88,166,255,0.1); border-radius:6px; border:1px solid rgba(88,166,255,0.2); cursor:pointer;">
+          Universal Core 36 ▾
         </div>
       </div>
 
@@ -73,6 +77,10 @@
         <button class="header-btn" id="btn-edit-mode" title="Therapist/Caregiver PIN Edit Mode">
           <span>🔒</span>
           <span>Edit Mode</span>
+        </button>
+        <button class="header-btn" id="btn-help-guide" title="Quick-Start Help Guide: How to use Amina in 30 seconds" style="color:var(--gh-accent-amber); border-color:rgba(210,153,34,0.4);">
+          <span>❓</span>
+          <span>Help</span>
         </button>
         <button class="header-btn" id="btn-settings" title="Settings & Accessibility">
           <span>⚙️</span>
@@ -115,6 +123,10 @@
         <button class="strip-btn btn-clear" id="btn-clear-sentence" title="Clear all words">
           <span style="font-size:1.1rem;">🗑️</span>
           <span>Clear</span>
+        </button>
+        <button class="strip-btn btn-undo" id="btn-undo-sentence" title="Undo accidental clear (Restore sentence)" style="display:none; color:#38bdf8; border-color:rgba(56,189,248,0.4); background:rgba(56,189,248,0.12);">
+          <span style="font-size:1.1rem;">↩️</span>
+          <span>Undo</span>
         </button>
         <button class="strip-btn" id="btn-star-sentence" title="Save current sentence to Favorites" style="color:#eab308; border-color:rgba(234,179,8,0.4);">
           <span style="font-size:1.1rem;">⭐</span>
@@ -541,15 +553,115 @@
       </div>
     </div>
 
+    <!-- Quick Search & Symbol Finder Modal -->
+    <div class="modal-backdrop" id="search-modal" style="display:none;">
+      <div class="modal-card" style="max-width:680px; max-height:85vh;">
+        <div class="modal-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">🔍</span>
+            <div>
+              <h3 class="modal-title" style="margin:0;">Symbol & Word Finder</h3>
+              <p style="font-size:0.75rem; color:var(--gh-text-secondary); margin:0;">Search words across all boards and folders</p>
+            </div>
+          </div>
+          <button class="modal-close-btn" id="btn-close-search">&times;</button>
+        </div>
+        <div class="modal-body" style="gap:12px;">
+          <div style="position:relative;">
+            <input type="text" id="symbol-search-input" class="form-input" placeholder="Type to find a word (e.g. water, apple, play, help, go, mom)..." style="font-size:1.05rem; padding:12px 14px; border-radius:10px; border-color:var(--gh-accent-blue);">
+          </div>
+          
+          <div id="search-results-summary" style="font-size:0.78rem; color:var(--gh-text-secondary); display:flex; justify-content:space-between; align-items:center;">
+            <span>Tap any symbol to add directly to your message strip</span>
+            <span id="search-result-count" style="font-weight:700; color:var(--gh-accent-blue);">0 words</span>
+          </div>
+
+          <!-- Results Grid -->
+          <div id="search-results-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:10px; max-height:48vh; overflow-y:auto; padding:4px;">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Help & Caregiver Walkthrough Modal -->
+    <div class="modal-backdrop" id="help-guide-modal" style="display:none;">
+      <div class="modal-card" style="max-width:640px; max-height:90vh;">
+        <div class="modal-header">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1.5rem;">🌟</span>
+            <div>
+              <h3 class="modal-title" style="margin:0;">Quick Guide: Amina in 30 Seconds</h3>
+              <p style="font-size:0.75rem; color:var(--gh-text-secondary); margin:0;">Everything you need to know for toddlers, kids, and adults</p>
+            </div>
+          </div>
+          <button class="modal-close-btn" id="btn-close-help">&times;</button>
+        </div>
+        <div class="modal-body" style="gap:14px; line-height:1.45;">
+          
+          <!-- Card 1: Sentences -->
+          <div style="background:var(--gh-canvas-inset); border:1px solid var(--gh-border-default); border-radius:12px; padding:12px; display:flex; gap:12px; align-items:flex-start;">
+            <div style="font-size:2rem; background:rgba(35,134,54,0.15); border-radius:10px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">💬</div>
+            <div>
+              <strong style="color:var(--gh-accent-green); font-size:0.95rem;">1. Build Sentences & Speak</strong>
+              <p style="font-size:0.8rem; color:var(--gh-text-primary); margin:2px 0 0 0;">Tap colored symbols in order (e.g. <em>I ➔ WANT ➔ EAT ➔ APPLE</em>), then tap the green <strong>SPEAK</strong> button! Use <strong>+S</strong>, <strong>+ING</strong>, or <strong>+ED</strong> to expand grammar.</p>
+            </div>
+          </div>
+
+          <!-- Card 2: Accidental Clear Protection -->
+          <div style="background:var(--gh-canvas-inset); border:1px solid var(--gh-border-default); border-radius:12px; padding:12px; display:flex; gap:12px; align-items:flex-start;">
+            <div style="font-size:2rem; background:rgba(56,189,248,0.15); border-radius:10px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">↩️</div>
+            <div>
+              <strong style="color:#38bdf8; font-size:0.95rem;">2. Accidental Clear Protection</strong>
+              <p style="font-size:0.8rem; color:var(--gh-text-primary); margin:2px 0 0 0;">Did a child accidentally tap <strong>🗑️ Clear</strong>? An <strong>↩️ Undo</strong> button appears automatically so you can restore their sentence with a single tap!</p>
+            </div>
+          </div>
+
+          <!-- Card 3: Favorites -->
+          <div style="background:var(--gh-canvas-inset); border:1px solid var(--gh-border-default); border-radius:12px; padding:12px; display:flex; gap:12px; align-items:flex-start;">
+            <div style="font-size:2rem; background:rgba(234,179,8,0.15); border-radius:10px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">⭐</div>
+            <div>
+              <strong style="color:#eab308; font-size:0.95rem;">3. Star Favorite Phrases</strong>
+              <p style="font-size:0.8rem; color:var(--gh-text-primary); margin:2px 0 0 0;">Build a phrase you use all the time (like <em>"I need water please"</em>) and tap the golden <strong>⭐ Favorite</strong> button. It keeps it ready at the top forever!</p>
+            </div>
+          </div>
+
+          <!-- Card 4: Phonics & Wheels -->
+          <div style="background:var(--gh-canvas-inset); border:1px solid var(--gh-border-default); border-radius:12px; padding:12px; display:flex; gap:12px; align-items:flex-start;">
+            <div style="font-size:2rem; background:rgba(240,136,62,0.15); border-radius:10px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">🔤</div>
+            <div>
+              <strong style="color:#f0883e; font-size:0.95rem;">4. Phonics & Food Decision Wheels</strong>
+              <p style="font-size:0.8rem; color:var(--gh-text-primary); margin:2px 0 0 0;">Switch tabs anytime to practice reading on the <strong>Hooked on Phonics</strong> blending board, or spin the <strong>Food Wheels</strong> when a child is stuck deciding what to eat!</p>
+            </div>
+          </div>
+
+          <!-- Card 5: Tablet Keyguards -->
+          <div style="background:var(--gh-canvas-inset); border:1px solid var(--gh-border-default); border-radius:12px; padding:12px; display:flex; gap:12px; align-items:flex-start;">
+            <div style="font-size:2rem; background:rgba(139,92,246,0.15); border-radius:10px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">📱</div>
+            <div>
+              <strong style="color:#a78bfa; font-size:0.95rem;">5. Clinical Tablet Access & Keyguards</strong>
+              <p style="font-size:0.8rem; color:var(--gh-text-primary); margin:2px 0 0 0;">Have a child with tremors or cerebral palsy? Open <strong>⚙️ Settings</strong> to enable <em>Touch on Release</em>, <em>Hold Duration (Dwell)</em>, or <em>Deep Keyguard Insets</em>.</p>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="header-btn accent-btn" id="btn-got-it-help" style="width:100%;">
+            👍 Got it! Let's Communicate
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Application Logic Scripts -->
-  <script src="js/aac-audio.js"></script>
-  <script src="js/aac-data.js"></script>
-  <script src="js/phonics-data.js"></script>
-  <script src="js/food-wheel.js"></script>
-  <script src="js/favorites-engine.js"></script>
-  <script src="js/aac-app.js"></script>
+  <script src="js/aac-audio.js?v=4"></script>
+  <script src="js/aac-data.js?v=4"></script>
+  <script src="js/phonics-data.js?v=4"></script>
+  <script src="js/food-wheel.js?v=4"></script>
+  <script src="js/favorites-engine.js?v=4"></script>
+  <script src="js/aac-app.js?v=4"></script>
 
   <!-- Service Worker Registration for Offline PWA -->
   <script>

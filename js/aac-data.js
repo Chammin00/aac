@@ -253,6 +253,10 @@ class AacDataManager {
     }));
   }
 
+  getAllBoards() {
+    return Object.values(this.boards);
+  }
+
   addOrUpdateTile(boardId, tile) {
     if (!this.boards[boardId]) return false;
     const tiles = this.boards[boardId].tiles;

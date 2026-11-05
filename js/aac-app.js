@@ -47,6 +47,10 @@ class AacApp {
     this.sessionLog = [];          // SLP IEP session data logger
     this.sessionStartTime = Date.now();
 
+    // Sentence Strip Undo & Accidental Clear Protection
+    this.lastClearedSentence = [];
+    this.undoTimer = null;
+
     // Custom voice recording state
     this.mediaRecorder = null;
     this.audioChunks = [];
@@ -67,13 +71,17 @@ class AacApp {
     const incoming = sessionStorage.getItem("AAC_INCOMING_DIALOGUE");
     if (incoming) {
       sessionStorage.removeItem("AAC_INCOMING_DIALOGUE");
+      const cleanIncoming = incoming.replace(/^"+|"+$/g, '').trim();
       setTimeout(() => {
-        window.aacAudio.speak(`Game dialogue received: ${incoming}. You can formulate your response with the symbols below.`);
+        window.aacAudio.speak(`Game dialogue received: ${cleanIncoming}. You can formulate your response with the symbols below.`);
         const banner = document.createElement("div");
-        banner.style.cssText = "background:rgba(240,136,62,0.2); border:1px solid #f0883e; color:#fed7aa; padding:8px 14px; border-radius:8px; margin:6px 12px; font-size:0.85rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; z-index:35;";
-        banner.innerHTML = `<span>🎮 <strong>Game Dialogue:</strong> "${incoming}"</span><button style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.1rem; padding-left:8px;">&times;</button>`;
+        banner.className = "game-dialogue-banner";
+        banner.style.cssText = "background:rgba(240,136,62,0.18); border:1px solid #f0883e; color:#fed7aa; padding:8px 14px; border-radius:8px; margin:8px 12px 4px 12px; font-size:0.85rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; z-index:35;";
+        banner.innerHTML = `<span>🎮 <strong>Game Dialogue:</strong> "${cleanIncoming}"</span><button style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.1rem; padding-left:8px;" title="Dismiss">&times;</button>`;
         banner.querySelector("button").onclick = () => banner.remove();
-        this.el.aacView.parentElement.insertBefore(banner, this.el.aacView);
+        if (this.el.aacView) {
+          this.el.aacView.insertBefore(banner, this.el.aacView.firstChild);
+        }
       }, 500);
     }
   }
@@ -91,10 +99,16 @@ class AacApp {
       boardTitleBadge: document.getElementById("board-title-badge"),
       narratorHud: document.getElementById("narrator-hud"),
       narratorSubtitle: document.getElementById("narrator-subtitle"),
+      undoBtn: document.getElementById("btn-undo-sentence"),
       // Modals
       settingsModal: document.getElementById("settings-modal"),
       voiceStudioModal: document.getElementById("voice-studio-modal"),
       kioskGuideModal: document.getElementById("kiosk-guide-modal"),
+      searchModal: document.getElementById("search-modal"),
+      helpGuideModal: document.getElementById("help-guide-modal"),
+      symbolSearchInput: document.getElementById("symbol-search-input"),
+      searchResultsGrid: document.getElementById("search-results-grid"),
+      searchResultCount: document.getElementById("search-result-count"),
       editTileModal: document.getElementById("edit-tile-modal"),
       obfModal: document.getElementById("obf-modal"),
       pinModal: document.getElementById("pin-modal")
@@ -110,6 +124,9 @@ class AacApp {
     // Sentence Strip Controls
     document.getElementById("btn-speak-sentence").addEventListener("click", () => this.speakSentence());
     document.getElementById("btn-clear-sentence").addEventListener("click", () => this.clearSentence());
+    if (this.el.undoBtn) {
+      this.el.undoBtn.addEventListener("click", () => this.undoClearSentence());
+    }
     document.getElementById("btn-backspace").addEventListener("click", () => this.backspaceSentence());
     document.getElementById("btn-star-sentence").addEventListener("click", () => this.starCurrentSentence());
     document.getElementById("btn-copy-sentence").addEventListener("click", () => this.copySentenceText());
@@ -119,6 +136,38 @@ class AacApp {
     document.getElementById("btn-mod-s").addEventListener("click", () => this.applyModifier("s"));
     document.getElementById("btn-mod-ing").addEventListener("click", () => this.applyModifier("ing"));
     document.getElementById("btn-mod-ed").addEventListener("click", () => this.applyModifier("ed"));
+
+    // Quick Search & Symbol Finder
+    const openSearchBtn = document.getElementById("btn-open-search");
+    if (openSearchBtn) {
+      openSearchBtn.addEventListener("click", () => this.openSearchModal());
+    }
+    const closeSearchBtn = document.getElementById("btn-close-search");
+    if (closeSearchBtn) {
+      closeSearchBtn.addEventListener("click", () => this.closeSearchModal());
+    }
+    if (this.el.symbolSearchInput) {
+      this.el.symbolSearchInput.addEventListener("input", (e) => this.performSearch(e.target.value));
+    }
+
+    // Quick Density Badge Switcher
+    if (this.el.boardTitleBadge) {
+      this.el.boardTitleBadge.addEventListener("click", () => this.cycleGridDensity());
+    }
+
+    // Help & Walkthrough Guide Modal
+    const helpBtn = document.getElementById("btn-help-guide");
+    if (helpBtn) {
+      helpBtn.addEventListener("click", () => this.openHelpModal());
+    }
+    const closeHelpBtn = document.getElementById("btn-close-help");
+    if (closeHelpBtn) {
+      closeHelpBtn.addEventListener("click", () => this.closeHelpModal());
+    }
+    const gotItHelpBtn = document.getElementById("btn-got-it-help");
+    if (gotItHelpBtn) {
+      gotItHelpBtn.addEventListener("click", () => this.closeHelpModal());
+    }
 
     // Settings & Quick Actions
     document.getElementById("btn-settings").addEventListener("click", () => this.openSettingsModal());
@@ -553,7 +602,7 @@ class AacApp {
     }
 
     const board = window.aacData.getBoard(this.currentBoardId);
-    this.el.boardTitleBadge.textContent = board.name;
+    this.updateDensityBadgeText();
     
     // Set grid columns and keyguard spacing mode
     this.el.aacGrid.className = `aac-grid grid-cols-${this.gridDensity || board.columns || 4} keyguard-${this.keyguardMode || 'none'}`;
@@ -563,6 +612,7 @@ class AacApp {
       const tileBtn = document.createElement("button");
       tileBtn.className = `aac-tile cat-${tile.category} lacquer-sheen ${tile.targetBoard ? "cat-folder" : ""}`;
       tileBtn.setAttribute("data-index", index);
+      tileBtn.setAttribute("data-tile-id", tile.id);
       tileBtn.setAttribute("aria-label", tile.label);
 
       let folderIndicator = tile.targetBoard ? `<span class="tile-folder-indicator">FOLDER 📂</span>` : "";
@@ -925,9 +975,43 @@ class AacApp {
   }
 
   clearSentence() {
-    this.sentenceStrip = [];
-    window.aacAudio.playTone(280, 0.08, "sine");
-    this.renderSentenceStrip();
+    if (this.sentenceStrip.length > 0) {
+      this.lastClearedSentence = [...this.sentenceStrip];
+      this.sentenceStrip = [];
+      this.renderSentenceStrip();
+      this.showUndoButton();
+      window.aacAudio.playTone(280, 0.08, "sine");
+    }
+  }
+
+  showUndoButton() {
+    if (!this.el.undoBtn) return;
+    this.el.undoBtn.style.display = "inline-flex";
+    if (this.undoTimer) clearTimeout(this.undoTimer);
+    this.undoTimer = setTimeout(() => {
+      this.hideUndoButton();
+    }, 8000); // 8-second recovery window for young communicators
+  }
+
+  hideUndoButton() {
+    if (this.el.undoBtn) {
+      this.el.undoBtn.style.display = "none";
+    }
+    if (this.undoTimer) {
+      clearTimeout(this.undoTimer);
+      this.undoTimer = null;
+    }
+  }
+
+  undoClearSentence() {
+    if (this.lastClearedSentence && this.lastClearedSentence.length > 0) {
+      this.sentenceStrip = [...this.lastClearedSentence];
+      this.lastClearedSentence = null;
+      this.hideUndoButton();
+      this.renderSentenceStrip();
+      window.aacAudio.playTone(560, 0.12, "triangle");
+      window.aacAudio.speak("Restored sentence");
+    }
   }
 
   backspaceSentence() {
@@ -1488,9 +1572,36 @@ class AacApp {
   setGridDensity(columns) {
     this.gridDensity = columns;
     const board = window.aacData.getBoard(this.currentBoardId);
-    board.columns = columns;
-    window.aacData.saveBoards();
+    if (board) {
+      board.columns = columns;
+      window.aacData.saveBoards();
+    }
+    this.updateDensityBadgeText();
     this.renderCurrentBoard();
+  }
+
+  updateDensityBadgeText() {
+    if (!this.el.boardTitleBadge) return;
+    const board = window.aacData.getBoard(this.currentBoardId);
+    const boardName = board ? board.name : "Core";
+    const label = this.gridDensity === 4 ? "Starter 12" : (this.gridDensity === 8 ? "Tablet Full 48" : "Universal 36");
+    this.el.boardTitleBadge.textContent = `${boardName} (${label}) ▾`;
+  }
+
+  cycleGridDensity() {
+    // 1-Tap Quick Grid Density Switcher (Starter 4 cols -> Universal 6 cols -> Tablet Full 8 cols -> 4 cols)
+    let nextCols = 6;
+    if (this.gridDensity === 4) {
+      nextCols = 6;
+    } else if (this.gridDensity === 6) {
+      nextCols = 8;
+    } else {
+      nextCols = 4;
+    }
+    this.setGridDensity(nextCols);
+    const gridSelect = document.getElementById("setting-grid-density");
+    if (gridSelect) gridSelect.value = nextCols;
+    window.aacAudio.playTone(480, 0.08, "sine");
   }
 
   setTheme(theme) {
@@ -2013,6 +2124,133 @@ class AacApp {
     a.click();
     URL.revokeObjectURL(url);
     window.aacAudio.playCelebrationChime();
+  }
+
+  // =========================================================================
+  // QUICK SEARCH / SYMBOL FINDER & MOTOR PATHWAY LOCATOR
+  // =========================================================================
+
+  openSearchModal() {
+    if (!this.el.searchModal) return;
+    this.el.searchModal.style.display = "flex";
+    if (this.el.symbolSearchInput) {
+      this.el.symbolSearchInput.value = "";
+      setTimeout(() => this.el.symbolSearchInput.focus(), 80);
+    }
+    this.performSearch("");
+  }
+
+  closeSearchModal() {
+    if (this.el.searchModal) {
+      this.el.searchModal.style.display = "none";
+    }
+  }
+
+  performSearch(rawQuery) {
+    if (!this.el.searchResultsGrid) return;
+    const query = (rawQuery || "").trim().toLowerCase();
+    const allBoards = (typeof window.aacData.getAllBoards === "function") ? window.aacData.getAllBoards() : Object.values(window.aacData.boards || {});
+    const results = [];
+    const seenKeys = new Set();
+
+    // Iterate through all boards and tiles
+    for (const board of allBoards) {
+      if (!board.tiles) continue;
+      for (const tile of board.tiles) {
+        const label = (tile.label || "").toLowerCase();
+        const speech = (tile.speech || "").toLowerCase();
+        if (!query || label.includes(query) || speech.includes(query)) {
+          const key = `${tile.label}_${board.id}`;
+          if (!seenKeys.has(key)) {
+            seenKeys.add(key);
+            results.push({
+              tile,
+              boardId: board.id,
+              boardName: board.name
+            });
+          }
+        }
+      }
+    }
+
+    if (this.el.searchResultCount) {
+      this.el.searchResultCount.textContent = `${results.length} word${results.length === 1 ? '' : 's'}`;
+    }
+
+    if (results.length === 0) {
+      this.el.searchResultsGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align:center; padding:32px 16px; color:var(--gh-text-secondary);">
+          <span style="font-size:2.2rem; display:block; margin-bottom:8px;">🔍</span>
+          <p style="font-size:0.95rem; font-weight:700; color:var(--gh-text-primary);">No symbols found matching "${rawQuery}"</p>
+          <p style="font-size:0.8rem; margin-top:4px;">Try searching for another core word (e.g., "want", "apple", "happy", "water")</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Limit to top 60 results for smooth performance
+    const displayList = results.slice(0, 60);
+    this.el.searchResultsGrid.innerHTML = "";
+
+    displayList.forEach(({ tile, boardId, boardName }) => {
+      const card = document.createElement("button");
+      card.className = `search-result-tile cat-${tile.category || 'misc'} lacquer-sheen`;
+      card.innerHTML = `
+        <div style="font-size:2rem; line-height:1; margin-bottom:4px;">${tile.icon || "💬"}</div>
+        <div style="font-size:0.95rem; font-weight:800; color:#fff; text-transform:uppercase;">${tile.label}</div>
+        <div class="search-tile-folder">📂 ${boardName}</div>
+      `;
+
+      card.title = `Tap to add "${tile.label}" to message strip, or shift-click to locate on board`;
+
+      card.addEventListener("click", (e) => {
+        if (e.shiftKey) {
+          this.navigateToTileLocation(boardId, tile.id);
+        } else {
+          this.activateTile(tile);
+          this.closeSearchModal();
+          window.aacAudio.playTone(520, 0.08, "triangle");
+        }
+      });
+
+      this.el.searchResultsGrid.appendChild(card);
+    });
+  }
+
+  navigateToTileLocation(boardId, tileId) {
+    this.closeSearchModal();
+    this.switchMainTab("aac");
+    this.navigateToBoard(boardId);
+
+    // Motor pathway highlight flashing
+    setTimeout(() => {
+      const tiles = this.el.aacGrid.querySelectorAll(".aac-tile");
+      tiles.forEach(btn => {
+        const id = btn.getAttribute("data-tile-id");
+        if (id === tileId) {
+          btn.classList.add("search-highlight-flash");
+          btn.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => btn.classList.remove("search-highlight-flash"), 3500);
+        }
+      });
+    }, 250);
+  }
+
+  // =========================================================================
+  // CAREGIVER 30-SECOND GUIDE MODAL
+  // =========================================================================
+
+  openHelpModal() {
+    if (this.el.helpGuideModal) {
+      this.el.helpGuideModal.style.display = "flex";
+      window.aacAudio.playTone(480, 0.08, "sine");
+    }
+  }
+
+  closeHelpModal() {
+    if (this.el.helpGuideModal) {
+      this.el.helpGuideModal.style.display = "none";
+    }
   }
 }
 

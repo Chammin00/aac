@@ -197,6 +197,25 @@ For communicators with motor challenges or low fatigue thresholds, re-navigating
 - Includes Levenshtein phonetic spell-correction for OCR misreads (e.g. `c4t` ➔ `cat`, `0k` ➔ `OK`).
 - Real-time symbol auto-mapper associates spoken and written words with corresponding AAC icons (e.g., `dog` ➔ 🐶, `happy` ➔ 😊).
 
+### 11. 🧸 Early Communicator & Caregiver Usability Suite (Ages 3+)
+Engineered specifically to remove cognitive barriers and friction for young children, parents, teachers, and speech clinicians:
+- **🔍 Symbol & Word Finder with Motor Pathway Modeling**:
+  - Instant word search across all core boards and subfolders (`🔍 Find` in header).
+  - Tapping any result appends it directly to the active message strip.
+  - Shift-clicking navigates directly to the word's home folder and highlights the tile with a pulsing golden glow (`@keyframes searchTileFlash`), reinforcing clinical motor planning.
+- **↩️ Accidental Clear Protection (Undo Clear)**:
+  - For emerging communicators and individuals with motor tremors, accidentally hitting `🗑️ Clear` previously erased minutes of sentence formulation.
+  - An animated `↩️ Undo` button slides in for 8 seconds after every clear, enabling 1-tap sentence restoration.
+- **👶 1-Tap Quick Grid Density Switcher**:
+  - The header badge (`Universal Core 36 ▾`) cycles densities directly on tap:
+    - **Starter Core 12** (4 columns, extra large touch targets for toddlers)
+    - **Universal Core 36** (6 columns, balanced core communication)
+    - **Tablet Full 48** (8 columns, high-vocabulary communication)
+- **🌟 30-Second Caregiver & Educator Walkthrough**:
+  - Accessible via `❓ Help` in the header; provides 5 quick, illustrated walkthrough cards covering sentence building, undo recovery, starring favorites, phonics/wheels, and tablet keyguard setup.
+- **📱 Instant Sample Flashcards Dock in "Read For Me"**:
+  - Preloaded test cards (`🐱 CAT`, `🍎 APPLE`, `🚗 CAR`, `⭐ STAR`, `🥛 MILK`) allow parents and children to experience magic scanning, syllable blending, and AAC board transfer immediately—even without pointing a physical camera at text.
+
 ---
 
 ## 📂 Project Structure

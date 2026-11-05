@@ -25,23 +25,43 @@ class GameTranslatorEngine {
     const cleanText = text.trim();
     if (!cleanText) return { translatedText: "", detectedSource: targetLang };
 
-    // If source and target are the same, return as is
-    if (sourceLang === targetLang && sourceLang !== "autodetect") {
+    // Check if text already has English translation in parentheses e.g. "長老: 急ぎ神殿へ (Elder: Make haste!)"
+    const parenMatch = cleanText.match(/\((?:Elder|Hero|Quest|Tip|Guide|English)?:\s*([^\)]+)\)/i);
+    if (parenMatch && parenMatch[1]) {
+      return { translatedText: parenMatch[1].trim(), detectedSource: "ja" };
+    }
+
+    // Auto-detect script
+    let detectedSrc = sourceLang;
+    const hasCJK = /[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf]/.test(cleanText);
+    const hasCyrillic = /[\u0400-\u04ff]/.test(cleanText);
+    const hasHangul = /[\uac00-\ud7af]/.test(cleanText);
+
+    if (sourceLang === "autodetect" || sourceLang === "auto") {
+      if (hasCJK) detectedSrc = "ja";
+      else if (hasHangul) detectedSrc = "ko";
+      else if (hasCyrillic) detectedSrc = "ru";
+      else detectedSrc = "en";
+    }
+
+    // If source and target are the same, return clean text directly
+    if (detectedSrc === targetLang) {
       return { translatedText: cleanText, detectedSource: targetLang };
     }
 
     try {
-      const srcParam = sourceLang === "autodetect" ? "en" : sourceLang;
-      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanText.slice(0, 500))}&langpair=${srcParam}|${targetLang}`;
-      
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanText.slice(0, 500))}&langpair=${detectedSrc}|${targetLang}`;
       const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
         if (data.responseData && data.responseData.translatedText) {
-          return {
-            translatedText: data.responseData.translatedText,
-            detectedSource: sourceLang
-          };
+          const trans = data.responseData.translatedText;
+          if (!trans.toUpperCase().includes("PLEASE SELECT TWO DISTINCT")) {
+            return {
+              translatedText: trans,
+              detectedSource: detectedSrc
+            };
+          }
         }
       }
     } catch (e) {
@@ -51,7 +71,7 @@ class GameTranslatorEngine {
     // Client-side fallback dictionary for common gaming dialogue phrases
     return {
       translatedText: this.fallbackGamingTranslation(cleanText, targetLang),
-      detectedSource: sourceLang
+      detectedSource: detectedSrc
     };
   }
 

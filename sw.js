@@ -1,4 +1,4 @@
-const CACHE_NAME = 'amina-aac-v2';
+const CACHE_NAME = 'amina-aac-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

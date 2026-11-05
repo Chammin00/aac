@@ -12,11 +12,7 @@
   <!-- HUD Stylesheet -->
   <link rel="stylesheet" href="css/game-hud.css">
   
-  <!-- Canvas Confetti for Celebrations -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-
-  <!-- Tesseract.js for Client-Side Zero-Latency OCR -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <!-- Optional CDN Scripts dynamically lazy-loaded on demand if network permits -->
 
   <style>
     /* Kids & Magic Scan View Styling */
@@ -250,6 +246,26 @@
 
     <!-- Bottom Giant Result Dock -->
     <section class="kids-result-dock">
+      <!-- Instant Test Sample Flashcards for Kids & Parents -->
+      <div class="sample-cards-dock" style="display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; width:100%; max-width:620px; margin-bottom:4px;">
+        <span style="font-size:0.75rem; color:var(--hud-accent-cyan); font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Sample Flashcards:</span>
+        <button class="sample-card-btn" data-word="CAT" data-icon="🐱" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px; color:#fff; font-size:0.85rem; font-weight:700; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s ease;">
+          <span>🐱</span><span>CAT</span>
+        </button>
+        <button class="sample-card-btn" data-word="APPLE" data-icon="🍎" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px; color:#fff; font-size:0.85rem; font-weight:700; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s ease;">
+          <span>🍎</span><span>APPLE</span>
+        </button>
+        <button class="sample-card-btn" data-word="CAR" data-icon="🚗" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px; color:#fff; font-size:0.85rem; font-weight:700; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s ease;">
+          <span>🚗</span><span>CAR</span>
+        </button>
+        <button class="sample-card-btn" data-word="STAR" data-icon="⭐" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px; color:#fff; font-size:0.85rem; font-weight:700; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s ease;">
+          <span>⭐</span><span>STAR</span>
+        </button>
+        <button class="sample-card-btn" data-word="MILK" data-icon="🥛" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px; color:#fff; font-size:0.85rem; font-weight:700; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s ease;">
+          <span>🥛</span><span>MILK</span>
+        </button>
+      </div>
+
       <div class="kids-word-display">
         <span class="kids-word-icon" id="kids-icon">📖</span>
         <span class="kids-word-text" id="kids-word">Point camera at a word!</span>
@@ -349,10 +365,10 @@
   </main>
 
   <!-- Application Engines -->
-  <script src="js/aac-audio.js"></script>
-  <script src="js/dictionary-engine.js"></script>
-  <script src="js/ocr-engine.js"></script>
-  <script src="js/translator-engine.js"></script>
+  <script src="js/aac-audio.js?v=3"></script>
+  <script src="js/dictionary-engine.js?v=3"></script>
+  <script src="js/ocr-engine.js?v=3"></script>
+  <script src="js/translator-engine.js?v=3"></script>
 
   <!-- Interactive Logic Script -->
   <script>
@@ -373,16 +389,9 @@
       let autoScanTimer = null;
       let isScanningActive = false;
 
-      // Start Camera
-      try {
-        await window.gameOcr.startCamera();
-        kidsStatusLabel.textContent = "Scanning automatically ●";
-        startKidsAutoScan();
-      } catch (err) {
-        kidsStatusLabel.textContent = "Camera notice: " + err.message;
-      }
-
       // Mode Switcher: Kids (Age 3+) vs Gamer Pro
+      const btnToggleKids = document.getElementById("btn-toggle-kids");
+      const btnToggleGamer = document.getElementById("btn-toggle-gamer");
       document.getElementById("btn-toggle-kids").addEventListener("click", () => {
         currentMode = "kids";
         document.getElementById("btn-toggle-kids").classList.add("active");
@@ -492,6 +501,15 @@
         window.location.href = "index.html?fromKidsScan=1";
       });
 
+      // Sample Flashcards Instant Test
+      document.querySelectorAll(".sample-card-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const word = btn.getAttribute("data-word");
+          const icon = btn.getAttribute("data-icon");
+          applyDetectedKidsWord(word, icon);
+        });
+      });
+
       // Touch camera viewfinder directly to trigger instant scan
       videoEl.addEventListener("click", async () => {
         if (currentMode === "kids") {
@@ -589,6 +607,14 @@
           window.aacAudio.speakIntro();
         });
       }
+
+      // Non-blocking Camera Initialization
+      window.gameOcr.startCamera().then(() => {
+        kidsStatusLabel.textContent = "Scanning automatically ●";
+        startKidsAutoScan();
+      }).catch(err => {
+        kidsStatusLabel.textContent = "Camera idle (Tap sample word below or touch screen)";
+      });
     });
   </script>
 </body>
