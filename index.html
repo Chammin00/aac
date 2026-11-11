@@ -100,6 +100,11 @@
             <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             <span>Read For Me</span>
           </a>
+
+          <a href="chance-invaders.html" class="header-btn" style="text-decoration:none; background:rgba(188,140,255,0.15); border-color:#bc8cff; color:#bc8cff;" title="Play Chance Invaders 1978 Space Invaders Arcade Game">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4m8-2h.01m3 0h.01"/></svg>
+            <span>Chance Invaders</span>
+          </a>
         </div>
 
         <!-- Quick Tablet Tools -->
@@ -977,6 +982,15 @@
                   <span class="menu-card-desc">Camera text reader, RPG dialogue OCR & audio translation</span>
                 </div>
               </a>
+              <a href="chance-invaders.html" class="menu-card suite-card" style="text-decoration:none;">
+                <span class="menu-card-icon">
+                  <svg class="ui-icon ui-icon-lg" style="color:#bc8cff;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4m8-2h.01m3 0h.01"/></svg>
+                </span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name" style="color:#bc8cff;">Chance Invaders 1978</strong>
+                  <span class="menu-card-desc">Arcade space shooter, motor skills training & 1-switch play</span>
+                </div>
+              </a>
             </div>
           </div>
 
@@ -1075,14 +1089,33 @@
 
   </div>
 
+  <!-- In-App Chance Invaders Arcade Modal (Quick Play without leaving active board) -->
+  <div class="modal-backdrop" id="arcade-game-modal" style="display:none; z-index:9000;">
+    <div class="modal-card" style="max-width:680px; width:95vw; height:92vh; padding:0; display:flex; flex-direction:column; background:#000; overflow:hidden;">
+      <div class="modal-header" style="padding:10px 16px; background:#0d1117; border-bottom:1px solid #30363d;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">👾</span>
+          <h3 class="modal-title" style="margin:0; font-size:1rem;">Chance Invaders 1978 Arcade</h3>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <a href="chance-invaders.html" target="_blank" class="header-btn" style="text-decoration:none; font-size:0.75rem;" title="Open in Full Window">↗️ Full Window</a>
+          <button class="modal-close-btn" id="btn-close-arcade-modal">&times;</button>
+        </div>
+      </div>
+      <div style="flex:1; width:100%; height:100%; overflow:hidden;">
+        <iframe id="arcade-modal-iframe" src="" style="width:100%; height:100%; border:none;" title="Chance Invaders Game"></iframe>
+      </div>
+    </div>
+  </div>
+
   <!-- Application Logic Scripts -->
-  <script src="js/aac-audio.js?v=7"></script>
-  <script src="js/aac-data.js?v=7"></script>
-  <script src="js/phonics-data.js?v=7"></script>
-  <script src="js/food-wheel.js?v=7"></script>
-  <script src="js/favorites-engine.js?v=7"></script>
-  <script src="js/device-engine.js?v=7"></script>
-  <script src="js/aac-app.js?v=7"></script>
+  <script src="js/aac-audio.js?v=8"></script>
+  <script src="js/aac-data.js?v=8"></script>
+  <script src="js/phonics-data.js?v=8"></script>
+  <script src="js/food-wheel.js?v=8"></script>
+  <script src="js/favorites-engine.js?v=8"></script>
+  <script src="js/device-engine.js?v=8"></script>
+  <script src="js/aac-app.js?v=8"></script>
 
   <!-- Service Worker Registration for Offline PWA -->
   <script>

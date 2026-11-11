@@ -75,12 +75,22 @@ class AacApp {
     if (incoming) {
       sessionStorage.removeItem("AAC_INCOMING_DIALOGUE");
       const cleanIncoming = incoming.replace(/^"+|"+$/g, '').trim();
+      const isArcadeGame = cleanIncoming.includes("Chance Invaders");
       setTimeout(() => {
-        window.aacAudio.speak(`Game dialogue received: ${cleanIncoming}. You can formulate your response with the symbols below.`);
+        if (isArcadeGame) {
+          window.aacAudio.speak(`Arcade achievement: ${cleanIncoming}`);
+        } else {
+          window.aacAudio.speak(`Game dialogue received: ${cleanIncoming}. You can formulate your response with the symbols below.`);
+        }
         const banner = document.createElement("div");
         banner.className = "game-dialogue-banner";
-        banner.style.cssText = "background:rgba(240,136,62,0.18); border:1px solid #f0883e; color:#fed7aa; padding:8px 14px; border-radius:8px; margin:8px 12px 4px 12px; font-size:0.85rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; z-index:35;";
-        banner.innerHTML = `<span>🎮 <strong>Game Dialogue:</strong> "${cleanIncoming}"</span><button style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.1rem; padding-left:8px;" title="Dismiss">&times;</button>`;
+        if (isArcadeGame) {
+          banner.style.cssText = "background:rgba(188,140,255,0.18); border:1px solid #bc8cff; color:#e9d5ff; padding:8px 14px; border-radius:8px; margin:8px 12px 4px 12px; font-size:0.85rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; z-index:35;";
+          banner.innerHTML = `<span>👾 <strong>Chance Invaders Arcade:</strong> "${cleanIncoming}"</span><button style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.1rem; padding-left:8px;" title="Dismiss">&times;</button>`;
+        } else {
+          banner.style.cssText = "background:rgba(240,136,62,0.18); border:1px solid #f0883e; color:#fed7aa; padding:8px 14px; border-radius:8px; margin:8px 12px 4px 12px; font-size:0.85rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; z-index:35;";
+          banner.innerHTML = `<span>🎮 <strong>Game Dialogue:</strong> "${cleanIncoming}"</span><button style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.1rem; padding-left:8px;" title="Dismiss">&times;</button>`;
+        }
         banner.querySelector("button").onclick = () => banner.remove();
         if (this.el.aacView) {
           this.el.aacView.insertBefore(banner, this.el.aacView.firstChild);
@@ -273,6 +283,17 @@ class AacApp {
     document.getElementById("btn-settings").addEventListener("click", () => this.openSettingsModal());
     document.getElementById("btn-edit-mode").addEventListener("click", () => this.toggleEditModePrompt());
     document.getElementById("btn-quick-back").addEventListener("click", () => this.navigateBack());
+
+    // In-App Chance Invaders Arcade Modal Bindings
+    const arcadeModal = document.getElementById("arcade-game-modal");
+    const closeArcadeModalBtn = document.getElementById("btn-close-arcade-modal");
+    if (closeArcadeModalBtn && arcadeModal) {
+      closeArcadeModalBtn.addEventListener("click", () => {
+        arcadeModal.style.display = "none";
+        const iframe = document.getElementById("arcade-modal-iframe");
+        if (iframe) iframe.src = "";
+      });
+    }
 
     // Narrator Avatar Pill -> Opens Afro-European Voice Studio
     const narratorPill = document.getElementById("btn-narrator-pill");

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'amina-aac-v7';
+const CACHE_NAME = 'amina-aac-v8';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -16,7 +16,15 @@ const ASSETS_TO_CACHE = [
   './css/game-hud.css',
   './js/dictionary-engine.js',
   './js/ocr-engine.js',
-  './js/translator-engine.js'
+  './js/translator-engine.js',
+  './chance-invaders.html',
+  './css/chance-invaders.css',
+  './js/arcade/sprites.js',
+  './js/arcade/audio.js',
+  './js/arcade/backdrop.js',
+  './js/arcade/bunkers.js',
+  './js/arcade/controls.js',
+  './js/arcade/game.js'
 ];
 
 self.addEventListener('install', (event) => {

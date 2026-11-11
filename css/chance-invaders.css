@@ -1,0 +1,539 @@
+/**
+ * CHANCENVADERS 1978 - Authentic Arcade Cabinet Styling & CRT Shaders
+ */
+
+:root {
+  --bg-cabinet: #0d0f12;
+  --bezel-outer: #1c2028;
+  --bezel-inner: #101216;
+  --bezel-border: #2a313d;
+  --arcade-red: #ff2233;
+  --arcade-green: #00ff55;
+  --arcade-yellow: #ffcc00;
+  --arcade-cyan: #00e5ff;
+  --arcade-gold: #e5a710;
+  --crt-glow: rgba(0, 255, 85, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: radial-gradient(circle at center, #1b2029 0%, #080a0d 100%);
+  color: #e0e6ed;
+  font-family: 'Courier New', Courier, monospace, system-ui;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  padding: 12px;
+}
+
+/* Cabinet Enclosure */
+.arcade-cabinet {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  background: linear-gradient(180deg, #181d24 0%, #0e1116 100%);
+  border: 4px solid #2f3744;
+  border-radius: 18px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), inset 0 2px 4px rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 16px 20px 16px;
+}
+
+/* Marquee Header */
+.marquee {
+  width: 100%;
+  background: #05070a;
+  border: 3px solid #2b3341;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: inset 0 0 18px rgba(0, 229, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.7);
+}
+
+.marquee-title {
+  font-family: 'Courier New', monospace;
+  font-weight: 900;
+  font-size: 1.35rem;
+  letter-spacing: 3px;
+  color: #fff;
+  text-shadow: 0 0 8px #ff2233, 0 0 16px #ff2233;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.marquee-badge {
+  font-size: 0.65rem;
+  background: #ff2233;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.marquee-meta {
+  font-size: 0.75rem;
+  color: #8fa0b5;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+/* CRT Screen Bezel Housing */
+.crt-housing {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 7 / 8;
+  max-height: 72vh;
+  background: radial-gradient(circle at center, #14171d 0%, #06080a 100%);
+  border: 12px solid #1c212a;
+  outline: 3px solid #0b0d11;
+  border-radius: 28px;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.95), 0 8px 24px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* Canvas Display */
+canvas#backdropCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  pointer-events: none;
+}
+
+canvas#gameCanvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  display: block;
+  z-index: 2;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* 1978 Cabinet Angled Mirror Shelf Reflection (Pepper's Ghost Bezel) */
+.cab-mirror-shelf {
+  width: 100%;
+  height: 48px;
+  margin-top: -6px;
+  background: linear-gradient(180deg, rgba(8, 11, 16, 0.95) 0%, #05070a 100%);
+  border: 2px solid #202633;
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+canvas#mirrorCanvas {
+  width: 90%;
+  height: 100%;
+  opacity: 0.35;
+  filter: blur(1.5px) contrast(1.2);
+  transform: scaleY(-1);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 10%, rgba(0, 0, 0, 0.8) 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 10%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+/* CRT Scanlines Overlay */
+.crt-scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.45) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 10;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.crt-scanlines.disabled {
+  opacity: 0;
+}
+
+/* CRT Glass Curvature & Glare Overlay */
+.crt-glass-glare {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(0, 0, 0, 0.1) 60%,
+    rgba(0, 0, 0, 0.75) 100%
+  );
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9);
+  z-index: 11;
+  border-radius: 20px;
+}
+
+.crt-housing.curved {
+  border-radius: 40px;
+}
+
+.crt-housing.curved canvas#gameCanvas {
+  filter: contrast(1.15) brightness(1.05);
+}
+
+/* Arcade Control Panel */
+.control-panel {
+  width: 100%;
+  margin-top: 14px;
+  background: linear-gradient(180deg, #1b2029 0%, #12151c 100%);
+  border: 3px solid #2a3342;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05), 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Top Mini Controls: Coin, 1P Start, Mode */
+.panel-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.arcade-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Arcade Buttons */
+.btn-arcade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  min-height: 44px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid;
+  transition: transform 0.08s ease, filter 0.1s ease, box-shadow 0.08s ease;
+}
+
+.btn-arcade:active {
+  transform: translateY(2px);
+  filter: brightness(1.2);
+}
+
+/* Coin Reject Button (Orange/Gold Glow) */
+.btn-coin {
+  background: linear-gradient(180deg, #e59400 0%, #995c00 100%);
+  border-color: #ffaa11;
+  color: #ffffff;
+  box-shadow: 0 4px 0 #663d00, 0 0 10px rgba(255, 170, 17, 0.4);
+}
+
+.btn-coin:active {
+  box-shadow: 0 1px 0 #663d00, 0 0 15px rgba(255, 170, 17, 0.8);
+}
+
+/* 1-Player Start Button (White/Yellow Arcade Dome) */
+.btn-start {
+  background: linear-gradient(180deg, #ffffff 0%, #b0b8c4 100%);
+  border-color: #ffffff;
+  color: #11141a;
+  box-shadow: 0 4px 0 #6c788a, 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+.btn-start:active {
+  box-shadow: 0 1px 0 #6c788a;
+}
+
+/* Dip Switch / Options Selectors */
+.select-arcade {
+  background: #0b0e13;
+  color: #4df3a3;
+  border: 2px solid #283344;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: bold;
+  outline: none;
+  cursor: pointer;
+}
+
+.select-arcade:focus {
+  border-color: #00ff66;
+}
+
+/* Gameplay Buttons Row: Left, Right, Fire */
+.panel-play-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.dpad-container {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-dpad {
+  width: 58px;
+  height: 52px;
+  background: linear-gradient(180deg, #2b3341 0%, #171c24 100%);
+  border: 3px solid #445166;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #0f1217;
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+}
+
+.btn-dpad:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #0f1217;
+  background: #3b4659;
+}
+
+/* Giant Red Arcade Fire Button */
+.btn-fire {
+  flex-grow: 1;
+  max-width: 180px;
+  height: 54px;
+  background: radial-gradient(circle at 40% 30%, #ff4d5a 0%, #cc001a 75%, #880011 100%);
+  border: 3px solid #ff7380;
+  border-radius: 28px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #5c000c, 0 0 16px rgba(255, 34, 51, 0.45);
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+}
+
+.btn-fire:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #5c000c, 0 0 24px rgba(255, 34, 51, 0.8);
+}
+
+/* Audio & Settings Bar */
+.cabinet-footer {
+  width: 100%;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: #7b8b9f;
+}
+
+.footer-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.toggle-label input[type="checkbox"] {
+  accent-color: #00ff55;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.vol-slider {
+  accent-color: #00e5ff;
+  width: 75px;
+  cursor: pointer;
+}
+
+/* Instructions / Keyboard Guide */
+.keyboard-guide {
+  margin-top: 14px;
+  background: rgba(14, 18, 24, 0.85);
+  border: 1px solid #232b38;
+  border-radius: 8px;
+  padding: 8px 14px;
+  width: 100%;
+  max-width: 600px;
+  font-size: 0.72rem;
+  color: #8c9cb0;
+  line-height: 1.5;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.key-badge {
+  display: inline-block;
+  background: #1e2430;
+  border: 1px solid #3d4a60;
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: #4df3a3;
+  font-weight: bold;
+  font-size: 0.7rem;
+}
+
+/* Media Queries for Mobile Responsiveness */
+@media (max-width: 480px) {
+  .marquee-title {
+    font-size: 1.1rem;
+  }
+  .panel-top-row {
+    justify-content: center;
+  }
+  .btn-dpad {
+    width: 50px;
+    height: 48px;
+  }
+  .btn-fire {
+    height: 48px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ==========================================================================
+   AMINA AAC ADAPTIVE INTEGRATION (ACCESSIBILITY & TOP NAV)
+   ========================================================================== */
+
+.arcade-header-bar {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.arcade-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arcade-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #f8fafc;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.35);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.arcade-nav-btn:hover {
+  background: rgba(51, 65, 85, 0.95);
+  border-color: #64748b;
+  transform: translateY(-1px);
+}
+.arcade-nav-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+.arcade-nav-btn.accent-talk {
+  background: rgba(34, 197, 94, 0.18);
+  border-color: #22c55e;
+  color: #4ade80;
+}
+.arcade-nav-btn.accent-talk:hover {
+  background: rgba(34, 197, 94, 0.3);
+}
+.arcade-nav-btn.accent-switch {
+  background: rgba(168, 85, 247, 0.18);
+  border-color: #a855f7;
+  color: #c084fc;
+}
+.arcade-nav-btn.accent-switch.active {
+  background: #a855f7;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.6);
+}
+
+.game-aac-banner {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+

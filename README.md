@@ -275,6 +275,15 @@ To eliminate header clutter and navigation confusion on tablets and phones, the 
 - **Preserved Fitzgerald Key Visual Symbols**:
   - Communication vocabulary tiles retain their rich, accessible semantic symbols and images, maintaining clear distinction between navigational system chrome and communicable AAC vocabulary.
 
+### 12. 👾 Chance Invaders 1978: Retro Arcade Replica & Motor Accessibility Game
+- **Authentic Space Invaders Arcade Simulation**:
+  - Museum-grade recreation of the 1978 Taito/Midway classic featuring the 1978 Pepper's Ghost optical lunar backdrop mirror illusion, curved CRT scanlines, pixel-eroding defense bunkers, mystery UFO flying saucers, and discrete Web Audio 4-tone accelerated heartbeat marches.
+- **Adaptive Motor Training & AAC Accessibility**:
+  - **Direct Point-and-Click Touch Tracking**: Tap or drag anywhere on screen; the laser cannon tracks directly under the child's finger and rapid-fires.
+  - **♿ 1-Switch Assistance Mode**: The cannon sweeps back and forth automatically, and any single switch press, spacebar, or screen tap fires lasers and inserts coins.
+  - **🗣️ Amina Voice Cheering**: Synthesizes congratulatory voice cheers for wave completions ("Wave 2! Get ready!"), power-up pickups, and high score achievements.
+  - **💬 Live Communication Bridge ("Send to Board")**: Single tap transfers game achievements (e.g., *"I played Chance Invaders! My score was 2400 points!"*) directly onto the AAC communication strip, allowing emerging communicators to share their gaming triumphs!
+
 ---
 
 ## 📂 Project Structure
@@ -283,11 +292,13 @@ To eliminate header clutter and navigation confusion on tablets and phones, the 
 AAC/
 ├── index.html              # Main AAC communication board & literacy suite
 ├── read-for-me.html        # "Read This For Me" Gaming Dialogue Camera & Screen Reader
+├── chance-invaders.html    # Chance Invaders 1978 Space Invaders arcade & motor game
 ├── manifest.json           # Web App Manifest for mobile PWA installation
-├── sw.js                   # Service Worker for offline caching & zero latency
+├── sw.js                   # Service Worker for offline caching & zero latency (v8)
 ├── css/
 │   ├── aac-theme.css       # High-Gloss Lacquer, Fitzgerald Key tokens & WCAG rules
-│   └── game-hud.css        # Cyberpunk gaming HUD, targeting reticle & karaoke text
+│   ├── game-hud.css        # Cyberpunk gaming HUD, targeting reticle & karaoke text
+│   └── chance-invaders.css # Retro arcade cabinet styling, CRT scanlines & overlays
 ├── js/
 │   ├── aac-audio.js        # Speech synthesis, Afro-Euro voice tuner & sound generator
 │   ├── aac-data.js         # Core vocabulary boards, categories & OBF import/export
@@ -298,7 +309,14 @@ AAC/
 │   ├── dictionary-engine.js# 2,500+ core dictionary with Levenshtein autocorrect & symbols
 │   ├── aac-app.js          # Core app controller, switch scanner, and event pipeline
 │   ├── ocr-engine.js       # Video stream capture, contrast preprocessor & Tesseract OCR
-│   └── translator-engine.js# Multi-language translation, dyslexia simplifier & karaoke TTS
+│   ├── translator-engine.js# Multi-language translation, dyslexia simplifier & karaoke TTS
+│   └── arcade/             # Chance Invaders 1978 Game Engine
+│       ├── sprites.js      # Pixel-perfect 8080 bitmasks & 1978 arcade font
+│       ├── audio.js        # Discrete procedural Web Audio API synthesizer
+│       ├── backdrop.js     # 1978 Pepper's Ghost lunar diorama canvas
+│       ├── bunkers.js      # Procedural pixel-carving defense bunkers
+│       ├── controls.js     # Pointer, touch, keyboard & gamepad bindings
+│       └── game.js         # Continuous swept-raycast game loop & ascension elevator
 └── assets/
     └── amina-avatar.svg    # Vector avatar artwork for Amina Narrator
 ```
