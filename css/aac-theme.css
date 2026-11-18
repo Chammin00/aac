@@ -291,7 +291,7 @@ html, body {
   font-size: 0.78rem;
   color: var(--gh-accent-blue);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .narrator-pill:hover {
   background: rgba(88, 166, 255, 0.22);
@@ -325,7 +325,7 @@ html, body {
   font-weight: 500;
   cursor: pointer;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.25);
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .header-btn:hover {
   background: rgba(255, 255, 255, 0.08);
@@ -465,7 +465,7 @@ html, body {
   font-weight: 600;
   gap: 4px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 3px 8px rgba(0, 0, 0, 0.3);
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .strip-btn:hover {
   transform: translateY(-2px);
@@ -546,7 +546,7 @@ html, body {
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 .fav-chip:hover {
@@ -592,7 +592,7 @@ html, body {
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .category-tab:hover {
   color: var(--gh-text-primary);
@@ -820,7 +820,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .phonics-tab.active {
   background: rgba(240, 136, 62, 0.15);
@@ -906,7 +906,7 @@ html, body {
   border: 1px solid #fdba74;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(240, 136, 62, 0.4);
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .blend-action-btn:hover {
   transform: translateY(-2px);
@@ -930,7 +930,7 @@ html, body {
   background: var(--gh-card-bg);
   border: 1px solid var(--gh-border-default);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   text-align: center;
 }
 .phoneme-card:hover {
@@ -981,7 +981,7 @@ html, body {
   font-weight: 800;
   cursor: pointer;
   box-shadow: var(--shadow-bevel);
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   user-select: none;
 }
 .sound-btn:hover {
@@ -1027,7 +1027,7 @@ html, body {
   padding: 4px 6px;
   border-radius: 6px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   border-bottom: 2px solid transparent;
 }
 .story-word-interactive:hover {
@@ -1056,7 +1056,7 @@ html, body {
   background: var(--gh-card-bg);
   color: var(--gh-text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .soundwall-filter-btn:hover {
   border-color: var(--gh-accent-blue);
@@ -1158,7 +1158,7 @@ html, body {
   border-radius: 8px;
   color: var(--gh-text-primary);
   font-size: 0.95rem;
-  outline: none;
+  outline: 2px solid transparent; outline-offset: 2px;
   transition: border-color var(--transition-fast);
 }
 .form-input:focus, .form-select:focus {
@@ -1273,7 +1273,7 @@ html, body {
   align-items: flex-start;
   text-align: left;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
   color: var(--gh-text-primary);
 }
 
@@ -1315,7 +1315,7 @@ html, body {
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .test-phrase-btn:hover {
@@ -1413,7 +1413,7 @@ body.orientation-warning #app-container::before {
 
 /* Interactive Density Badge */
 .interactive-density-badge {
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   user-select: none;
 }
 .interactive-density-badge:hover {
@@ -1444,7 +1444,7 @@ body.orientation-warning #app-container::before {
   border: 2px solid var(--gh-border-default);
   background: var(--gh-canvas-subtle);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   text-align: center;
 }
 .search-result-tile:hover {
@@ -1497,7 +1497,7 @@ body.orientation-warning #app-container::before {
   font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .device-profile-pill:hover {
   background: rgba(56, 189, 248, 0.22);
@@ -1604,7 +1604,7 @@ body.orientation-warning #app-container::before {
   color: var(--gh-text-primary);
   text-align: left;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 3px 8px rgba(0, 0, 0, 0.25);
 }
 .menu-card:hover {
@@ -1797,3 +1797,10 @@ body.device-tablet-compact .btn-text-optional {
   }
 }
 
+
+
+/* Accessible keyboard focus ring (Web Design Guidelines) */
+:focus-visible {
+  outline: 2px solid #58a6ff;
+  outline-offset: 2px;
+}

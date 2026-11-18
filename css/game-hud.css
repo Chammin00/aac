@@ -89,7 +89,7 @@ body {
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 .hud-btn:hover {
   background: rgba(255, 255, 255, 0.1);
@@ -231,7 +231,7 @@ body {
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 4px 18px rgba(240, 136, 62, 0.6);
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 .btn-snap-giant:hover {
   transform: scale(1.04);
