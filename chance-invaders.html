@@ -151,7 +151,7 @@
 
   </main>
 
-  <!-- Keyboard Shortcuts & Specs Guide -->
+  <!-- Keyboard & Gamepad Shortcuts Guide -->
   <footer class="keyboard-guide">
     <div><span class="key-badge">Tap Screen</span> Point-and-Click Aim & Fire</div>
     <div><span class="key-badge">◀</span> <span class="key-badge">▶</span> / <span class="key-badge">A</span> <span class="key-badge">D</span> Move</div>
@@ -160,6 +160,7 @@
     <div><span class="key-badge">P</span> Pause</div>
     <div><span class="key-badge">C</span> Cycle Overlay</div>
     <div><span class="key-badge">M</span> Mute</div>
+    <div id="gamepad-guide-item"><span class="key-badge">Gamepad</span> Stick/D-Pad Move · A/B/RT Fire · Start Play · Select Exit</div>
   </footer>
 
   <!-- Arcade Game Engine Scripts -->
@@ -167,7 +168,7 @@
   <script src="js/arcade/audio.js"></script>
   <script src="js/arcade/backdrop.js"></script>
   <script src="js/arcade/bunkers.js"></script>
-  <script src="js/arcade/controls.js"></script>
+  <script src="js/arcade/controls.js?v=20261124"></script>
   <script src="js/arcade/game.js"></script>
 
   <script>
@@ -363,7 +364,18 @@
 
       // Ambient Animation Loop (Diorama Stars Twinkle & Lower Glass Mirror Reflection)
       let mirrorFrameSkip = 0;
+      const gpGuideEl = document.getElementById('gamepad-guide-item');
+      let prevGpConn = null;
       function renderCabinetFx() {
+        if (window.SpaceInvadersInput && gpGuideEl) {
+          const conn = Boolean(window.SpaceInvadersInput.gamepadConnected);
+          if (conn !== prevGpConn) {
+            prevGpConn = conn;
+            gpGuideEl.innerHTML = conn
+              ? `<span class="key-badge" style="background:#10b981;color:#052e16">PAD READY</span> ${String(window.SpaceInvadersInput.gamepadName || 'Controller').slice(0, 22)} · Stick/D-Pad Move · A/B/RT Fire · Start Play`
+              : `<span class="key-badge">Gamepad</span> Stick/D-Pad Move · A/B/RT Fire · Start Play · Select Exit`;
+          }
+        }
         if (game.palette.overlayMode === 'lunar') {
           backdrop.render(backdropCanvas.width, backdropCanvas.height);
         }
