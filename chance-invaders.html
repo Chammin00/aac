@@ -22,6 +22,67 @@
   <script src="cosmic-background.js"></script>
   <script src="mcp-baseline.js"></script>
   <script src="aws-enterprise-baseline.js"></script>
+  <style id="arcade-3d-override">
+    html.arcade-3d-mode,
+    html.arcade-3d-mode body {
+      background: transparent !important;
+      background-image: none !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      padding: 2px 6px !important;
+      overflow: hidden !important;
+      justify-content: center !important;
+    }
+    html.arcade-3d-mode #cosmic-still-backdrop,
+    html.arcade-3d-mode .arcade-header-bar,
+    html.arcade-3d-mode .cab-mirror-shelf,
+    html.arcade-3d-mode .cabinet-footer,
+    html.arcade-3d-mode .keyboard-guide,
+    html.arcade-3d-mode .game-aac-banner {
+      display: none !important;
+      opacity: 0 !important;
+    }
+    html.arcade-3d-mode .arcade-cabinet {
+      max-width: min(460px, 94vw) !important;
+      max-height: calc(100dvh - 8px) !important;
+      padding: 8px 10px 10px !important;
+      background: linear-gradient(180deg, rgba(20, 25, 34, 0.94) 0%, rgba(10, 13, 18, 0.96) 100%) !important;
+      border-color: #34d399 !important;
+      box-shadow: 0 0 28px rgba(52, 211, 153, 0.25), 0 18px 40px rgba(0, 0, 0, 0.78) !important;
+    }
+    html.arcade-3d-mode .marquee {
+      padding: 5px 10px !important;
+      margin-bottom: 6px !important;
+    }
+    html.arcade-3d-mode .marquee-title {
+      font-size: 0.95rem !important;
+      letter-spacing: 2px !important;
+    }
+    html.arcade-3d-mode .crt-housing {
+      width: auto !important;
+      height: min(calc(100dvh - 148px), 440px) !important;
+      max-height: calc(100dvh - 148px) !important;
+      aspect-ratio: 7 / 8 !important;
+      max-width: 100% !important;
+      border-width: 6px !important;
+      border-radius: 16px !important;
+    }
+    html.arcade-3d-mode .control-panel {
+      margin-top: 6px !important;
+      padding: 6px 8px !important;
+      gap: 6px !important;
+    }
+    html.arcade-3d-mode .btn-dpad,
+    html.arcade-3d-mode .btn-fire {
+      height: 36px !important;
+      padding: 4px 10px !important;
+      font-size: 0.8rem !important;
+    }
+    html.arcade-3d-mode .btn-arcade {
+      padding: 4px 8px !important;
+      font-size: 0.72rem !important;
+    }
+  </style>
 </head>
 <body>
 
@@ -177,6 +238,28 @@
 
       const canvas = document.getElementById('gameCanvas');
       const backdropCanvas = document.getElementById('backdropCanvas');
+
+      const applyArcade3d = (enabled) => {
+        const on = Boolean(enabled);
+        document.documentElement.classList.toggle('arcade-3d-mode', on);
+        document.body.classList.toggle('arcade-3d-mode', on);
+        const bgEl = document.getElementById('cosmic-still-backdrop');
+        if (bgEl) bgEl.style.display = on ? 'none' : '';
+      };
+      if (new URLSearchParams(window.location.search).get('arcade3d') === '1') {
+        applyArcade3d(true);
+      }
+      window.addEventListener('message', (ev) => {
+        if (ev.data && ev.data.type === 'arcade-3d-mode') applyArcade3d(ev.data.enabled);
+      });
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && window.parent && window.parent !== window) {
+          try { window.parent.postMessage({ type: 'arcade-action', game: 'chance_invaders', intensity: 0.65 }, '*'); } catch (_) {}
+        }
+        if (e.code === 'Escape' && window.parent && window.parent !== window) {
+          try { window.parent.postMessage({ type: 'CLOSE_WEB_ARCADE' }, '*'); } catch (_) {}
+        }
+      });
       const mirrorCanvas = document.getElementById('mirrorCanvas');
       const mirrorCtx = mirrorCanvas.getContext('2d');
       const cabMirrorShelf = document.getElementById('cabMirrorShelf');
