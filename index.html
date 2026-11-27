@@ -105,6 +105,10 @@
             <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4m8-2h.01m3 0h.01"/></svg>
             <span>Chance Invaders</span>
           </a>
+          <a href="dallas-cowboys-studio.html" class="header-btn" style="text-decoration:none; background:rgba(0,53,148,0.2); border-color:#003594; color:#60a5fa;" title="Play Dallas Cowboys Mega Stadium 3D Studio">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Cowboys Studio</span>
+          </a>
         </div>
 
         <!-- Quick Tablet Tools -->
@@ -991,6 +995,15 @@
                   <span class="menu-card-desc">Arcade space shooter, motor skills training & 1-switch play</span>
                 </div>
               </a>
+              <a href="dallas-cowboys-studio.html" class="menu-card suite-card" style="text-decoration:none;">
+                <span class="menu-card-icon">
+                  <svg class="ui-icon ui-icon-lg" style="color:#60a5fa;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </span>
+                <div class="menu-card-content">
+                  <strong class="menu-card-name" style="color:#60a5fa;">Dallas Cowboys Studio</strong>
+                  <span class="menu-card-desc">3D Mega Stadium, QB pass challenge, field goal kicking & 1-switch play</span>
+                </div>
+              </a>
             </div>
           </div>
 
@@ -1108,14 +1121,33 @@
     </div>
   </div>
 
+  <!-- In-App Dallas Cowboys Studio Modal (Quick Play without leaving active board) -->
+  <div class="modal-backdrop" id="cowboys-game-modal" style="display:none; z-index:9000;">
+    <div class="modal-card" style="max-width:760px; width:95vw; height:92vh; padding:0; display:flex; flex-direction:column; background:#041e42; overflow:hidden;">
+      <div class="modal-header" style="padding:10px 16px; background:#020e20; border-bottom:1px solid #1e3a8a;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">⭐</span>
+          <h3 class="modal-title" style="margin:0; font-size:1rem; color:#fff;">Dallas Cowboys Mega Stadium 3D Studio</h3>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <a href="dallas-cowboys-studio.html" target="_blank" class="header-btn" style="text-decoration:none; font-size:0.75rem;" title="Open in Full Window">↗️ Full Window</a>
+          <button class="modal-close-btn" id="btn-close-cowboys-modal">&times;</button>
+        </div>
+      </div>
+      <div style="flex:1; width:100%; height:100%; overflow:hidden;">
+        <iframe id="cowboys-modal-iframe" src="" style="width:100%; height:100%; border:none;" title="Dallas Cowboys Studio"></iframe>
+      </div>
+    </div>
+  </div>
+
   <!-- Application Logic Scripts -->
-  <script src="js/aac-audio.js?v=8"></script>
-  <script src="js/aac-data.js?v=8"></script>
-  <script src="js/phonics-data.js?v=8"></script>
-  <script src="js/food-wheel.js?v=8"></script>
-  <script src="js/favorites-engine.js?v=8"></script>
-  <script src="js/device-engine.js?v=8"></script>
-  <script src="js/aac-app.js?v=8"></script>
+  <script src="js/aac-audio.js?v=9"></script>
+  <script src="js/aac-data.js?v=9"></script>
+  <script src="js/phonics-data.js?v=9"></script>
+  <script src="js/food-wheel.js?v=9"></script>
+  <script src="js/favorites-engine.js?v=9"></script>
+  <script src="js/device-engine.js?v=9"></script>
+  <script src="js/aac-app.js?v=9"></script>
 
   <!-- Service Worker Registration for Offline PWA -->
   <script>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Dallas Cowboys Mega Stadium 3D Studio | Amina AAC & Phonics</title>
+
+  <meta name="theme-color" content="#041e42">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="3D AT&T-style Dallas Cowboys football stadium with QB Throw challenge, field goal kicking, single-switch motor accessibility, and AAC sentence strip bridge.">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Cowboys Studio Stylesheet -->
+  <link rel="stylesheet" href="css/cowboys-studio.css">
+  <link rel="stylesheet" href="css/aac-theme.css">
+
+  <!-- Antigravity Baseline Integration -->
+  <link rel="stylesheet" href="high-gloss-lacquer.css">
+  <link rel="stylesheet" href="aws-enterprise-baseline.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar (Amina AAC Return & Accessibility Tools) -->
+  <header class="stadium-header-bar" role="banner">
+    <div class="brand-group">
+      <a href="index.html" class="nav-btn" title="Return to Amina AAC Communication Board">
+        <svg class="ui-icon" style="width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <span>AAC Board</span>
+      </a>
+      <div class="stadium-logo-star">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="#003594" stroke="#ffffff" stroke-width="1.5">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        <span>COWBOYS STUDIO</span>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <!-- Send Phrase to AAC Sentence Strip -->
+      <button class="nav-btn accent-talk" id="btn-send-aac-board" title="Send your football achievement or celebration to the AAC Sentence Strip">
+        <svg class="ui-icon" style="width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Send to Board</span>
+      </button>
+
+      <!-- 1-Switch Accessibility Toggle -->
+      <button class="nav-btn accent-switch" id="btn-toggle-switch-mode" title="Toggle 1-Switch Mode (auto-sweep aiming and one-tap kicking)">
+        <svg class="ui-icon" style="width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>♿ 1-Switch Mode</span>
+      </button>
+
+      <!-- Voice Cheer Commentary Toggle -->
+      <button class="nav-btn accent-voice active" id="btn-toggle-voice-cheer" title="Toggle Voice Cheer Commentary">
+        <svg class="ui-icon" style="width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        <span>🗣️ Voice Cheer</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 3D Viewport Container -->
+  <main class="viewport-container" id="viewport-container">
+    <canvas id="stadium-canvas"></canvas>
+
+    <!-- Top Heads-Up Display (HUD) -->
+    <div class="hud-top-bar">
+      <!-- Scoreboard Card -->
+      <div class="scoreboard-card">
+        <div class="score-stat">
+          <span class="score-stat-label">SCORE</span>
+          <span class="score-stat-val gold" id="hud-score-val">0</span>
+        </div>
+        <div class="score-stat">
+          <span class="score-stat-label">STREAK</span>
+          <span class="score-stat-val" id="hud-streak-val">x1</span>
+        </div>
+        <div class="score-stat">
+          <span class="score-stat-label">BEST</span>
+          <span class="score-stat-val" id="hud-best-val">0</span>
+        </div>
+        <div class="score-stat">
+          <span class="score-stat-label">AIM</span>
+          <span class="score-stat-val" id="hud-aim-deg">0°</span>
+        </div>
+      </div>
+
+      <!-- Mode Selector Pills -->
+      <div class="mode-selector-pill">
+        <button class="mode-pill-btn" id="pill-mode-roam" title="Free Roam Stadium Tour">⭐ ROAM</button>
+        <button class="mode-pill-btn active" id="pill-mode-throw" title="QB Throw Pass Challenge">🏈 QB THROW</button>
+        <button class="mode-pill-btn" id="pill-mode-fg" title="Field Goal Kicking">👟 FIELD GOAL</button>
+      </div>
+    </div>
+
+    <!-- Big Outcome Callout (Touchdown / It's Good / Doink) -->
+    <div class="outcome-callout" id="outcome-callout">
+      <div class="outcome-title" id="outcome-title">TOUCHDOWN STAR PASS</div>
+      <div class="outcome-subtitle" id="outcome-subtitle">Aim at moving route targets and launch spiral pass!</div>
+    </div>
+
+    <!-- 1-Switch Mode Indicator Banner & Touch Shield -->
+    <div class="switch-indicator-banner" id="switch-banner">
+      ♿ 1-Switch Active: Tap Anywhere to Throw / Kick
+    </div>
+    <div class="switch-tap-shield" id="switch-shield"></div>
+
+    <!-- Bottom Action Dock (Tablet Touch Controls) -->
+    <div class="action-dock" id="action-dock">
+      <!-- Kicking Meter (Visible in Field Goal Mode) -->
+      <div class="meter-container" id="kicking-meter-box" style="display:none;">
+        <div class="meter-labels">
+          <span>KICK POWER</span>
+          <span>ACCURACY SWEET SPOT</span>
+        </div>
+        <div class="meter-track">
+          <div class="meter-sweetspot"></div>
+          <div class="meter-fill" id="meter-fill"></div>
+          <div class="meter-marker" id="meter-marker"></div>
+        </div>
+      </div>
+
+      <!-- Controls Row -->
+      <div class="dock-controls-row">
+        <!-- Aim Controls -->
+        <div class="aim-btn-group" id="aim-controls">
+          <button class="ctrl-btn" id="btn-aim-left" title="Aim Left">◀ AIM L</button>
+          <button class="ctrl-btn" id="btn-aim-right" title="Aim Right">AIM R ▶</button>
+        </div>
+
+        <!-- FG Distance Cycle Button -->
+        <button class="ctrl-btn" id="btn-distance-cycle" style="display:none;" title="Change Kick Distance">📏 45 YDS</button>
+
+        <!-- Big Primary Action Button (Throw / Kick / Teleport) -->
+        <button class="ctrl-btn btn-primary-action" id="btn-main-action">
+          <span>🏈 THROW PASS</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- AAC Sentence Strip Phrase Picker Modal -->
+  <div class="dialog-modal-backdrop" id="phrase-picker-modal" role="dialog" aria-modal="true" aria-labelledby="picker-title">
+    <div class="phrase-picker-card">
+      <div class="picker-header">
+        <h3 class="picker-title" id="picker-title">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#003594" stroke="#ffffff" stroke-width="1.5">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          Send Phrase to AAC Sentence Strip
+        </h3>
+        <button class="btn-close-picker" id="btn-close-picker" aria-label="Close dialog">&times;</button>
+      </div>
+      <p style="font-size:0.85rem; color:#cbd5e1; margin-top:-6px;">
+        Choose a celebration phrase to speak aloud and add to your Amina communication strip:
+      </p>
+      <div class="phrase-options-list">
+        <button class="phrase-option-btn" data-phrase="I scored a touchdown in Dallas Cowboys Studio!">
+          <span>⭐ "I scored a touchdown in Dallas Cowboys Studio!"</span>
+          <span>📢</span>
+        </button>
+        <button class="phrase-option-btn" data-phrase="It is good! Split the uprights from 50 yards!">
+          <span>👟 "It is good! Split the uprights from 50 yards!"</span>
+          <span>📢</span>
+        </button>
+        <button class="phrase-option-btn" data-phrase="I threw a touchdown pass!">
+          <span>🏈 "I threw a touchdown pass!"</span>
+          <span>📢</span>
+        </button>
+        <button class="phrase-option-btn" data-phrase="Go Cowboys! Touchdown!">
+          <span>🙌 "Go Cowboys! Touchdown!"</span>
+          <span>📢</span>
+        </button>
+        <button class="phrase-option-btn" data-phrase="I want to play football!">
+          <span>🏃 "I want to play football!"</span>
+          <span>📢</span>
+        </button>
+        <button class="phrase-option-btn" data-phrase="Let's go Dallas Cowboys!">
+          <span>⭐ "Let's go Dallas Cowboys!"</span>
+          <span>📢</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Three.js Offline Library & Cowboys Studio Engine -->
+  <script src="js/lib/three.min.js"></script>
+  <script src="js/cowboys-studio.js"></script>
+
+  <!-- Service Worker Registration for Offline PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW notice:', err));
+      });
+    }
+  </script>
+</body>
+</html>

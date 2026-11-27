@@ -284,39 +284,56 @@ To eliminate header clutter and navigation confusion on tablets and phones, the 
   - **🗣️ Amina Voice Cheering**: Synthesizes congratulatory voice cheers for wave completions ("Wave 2! Get ready!"), power-up pickups, and high score achievements.
   - **💬 Live Communication Bridge ("Send to Board")**: Single tap transfers game achievements (e.g., *"I played Chance Invaders! My score was 2400 points!"*) directly onto the AAC communication strip, allowing emerging communicators to share their gaming triumphs!
 
+### 13. ⭐ Dallas Cowboys Mega Stadium 3D Studio: Interactive Football & Accessible Play
+- **3D AT&T-Style Colossal Domed Stadium**:
+  - Full regulation 120-yard NFL football field with emerald turf striping, hash marks, 50-yard Dallas Cowboys star, end zones ("COWBOYS"), padded benches, goalposts, tunnel arch, grandstand tiers, luxury VIP suites, and a center-hung 4-sided mega Jumbotron screen with real-time dynamic score updates.
+- **Three Playable Modes**:
+  - **Mode 1: Free Roam Stadium Tour**: Explore the field, midfield star, team benches, endzones, and tunnel with smooth touch/drag camera orbit.
+  - **Mode 2: QB Throw Challenge**: Aim trajectory slider or auto-sweep across 6 moving route targets (Slant 22yd, Out Route 25yd, Dig Cross 36yd, Skinny Post 45yd, Corner TD 55yd, Endzone Star 64yd) with 3D spiral aerodynamics and streak score multipliers.
+  - **Mode 3: Field Goal Kicking**: 25, 35, 45, 52, 60 yard attempts with a 3-step or single-tap power/accuracy kicking meter, dynamic wind physics, and real-time upright collision acoustics ("DOINK!" vs "IT'S GOOD!").
+- **Pediatric & Motor Accessibility**:
+  - **♿ 1-Switch Sweep Mode**: Auto-sweeping aim in QB Throw and auto-cycling power gauge in Field Goal — single screen tap or adaptive switch locks and launches the ball.
+  - **🗣️ Amina Voice Cheering**: Integrated with Web Speech API using the British/Afro-European voice profile to announce waves, touchdowns, and field goals.
+  - **💬 AAC Dialogue Bridge**: 1-tap transfer of celebration phrases (*"I scored a touchdown in Dallas Cowboys Studio!"*, *"It is good! Split the uprights from 50 yards!"*) into the sentence strip.
+
 ---
 
 ## 📂 Project Structure
 
 ```
 AAC/
-├── index.html              # Main AAC communication board & literacy suite
-├── read-for-me.html        # "Read This For Me" Gaming Dialogue Camera & Screen Reader
-├── chance-invaders.html    # Chance Invaders 1978 Space Invaders arcade & motor game
-├── manifest.json           # Web App Manifest for mobile PWA installation
-├── sw.js                   # Service Worker for offline caching & zero latency (v8)
+├── index.html                  # Main AAC communication board & literacy suite
+├── read-for-me.html            # "Read This For Me" Gaming Dialogue Camera & Screen Reader
+├── chance-invaders.html        # Chance Invaders 1978 Space Invaders arcade & motor game
+├── dallas-cowboys-studio.html  # Dallas Cowboys Mega Stadium 3D interactive football studio
+├── manifest.json               # Web App Manifest for mobile PWA installation
+├── sw.js                       # Service Worker for offline caching & zero latency (v9)
 ├── css/
-│   ├── aac-theme.css       # High-Gloss Lacquer, Fitzgerald Key tokens & WCAG rules
-│   ├── game-hud.css        # Cyberpunk gaming HUD, targeting reticle & karaoke text
-│   └── chance-invaders.css # Retro arcade cabinet styling, CRT scanlines & overlays
+│   ├── aac-theme.css           # High-Gloss Lacquer, Fitzgerald Key tokens & WCAG rules
+│   ├── game-hud.css            # Cyberpunk gaming HUD, targeting reticle & karaoke text
+│   ├── chance-invaders.css     # Retro arcade cabinet styling, CRT scanlines & overlays
+│   └── cowboys-studio.css      # Dallas Cowboys navy/silver stadium styling & tablet HUD
 ├── js/
-│   ├── aac-audio.js        # Speech synthesis, Afro-Euro voice tuner & sound generator
-│   ├── aac-data.js         # Core vocabulary boards, categories & OBF import/export
-│   ├── device-engine.js    # Hardware concurrency, viewport auto-fit & device scaling
-│   ├── phonics-data.js     # Phonics curriculum, word families & sound wall
-│   ├── food-wheel.js       # Interactive physics Food Decision Wheels & customizer
-│   ├── favorites-engine.js # Smart frequency tracker, phrase starring & next-word predictor
-│   ├── dictionary-engine.js# 2,500+ core dictionary with Levenshtein autocorrect & symbols
-│   ├── aac-app.js          # Core app controller, switch scanner, and event pipeline
-│   ├── ocr-engine.js       # Video stream capture, contrast preprocessor & Tesseract OCR
-│   ├── translator-engine.js# Multi-language translation, dyslexia simplifier & karaoke TTS
-│   └── arcade/             # Chance Invaders 1978 Game Engine
-│       ├── sprites.js      # Pixel-perfect 8080 bitmasks & 1978 arcade font
-│       ├── audio.js        # Discrete procedural Web Audio API synthesizer
-│       ├── backdrop.js     # 1978 Pepper's Ghost lunar diorama canvas
-│       ├── bunkers.js      # Procedural pixel-carving defense bunkers
-│       ├── controls.js     # Pointer, touch, keyboard & gamepad bindings
-│       └── game.js         # Continuous swept-raycast game loop & ascension elevator
+│   ├── aac-audio.js            # Speech synthesis, Afro-Euro voice tuner & sound generator
+│   ├── aac-data.js             # Core vocabulary boards, categories & OBF import/export
+│   ├── device-engine.js        # Hardware concurrency, viewport auto-fit & device scaling
+│   ├── phonics-data.js         # Phonics curriculum, word families & sound wall
+│   ├── food-wheel.js           # Interactive physics Food Decision Wheels & customizer
+│   ├── favorites-engine.js     # Smart frequency tracker, phrase starring & next-word predictor
+│   ├── dictionary-engine.js    # 2,500+ core dictionary with Levenshtein autocorrect & symbols
+│   ├── aac-app.js              # Core app controller, switch scanner, and event pipeline
+│   ├── ocr-engine.js           # Video stream capture, contrast preprocessor & Tesseract OCR
+│   ├── translator-engine.js    # Multi-language translation, dyslexia simplifier & karaoke TTS
+│   ├── cowboys-studio.js       # 3D Dallas Cowboys Mega Stadium engine, physics & audio
+│   ├── lib/
+│   │   └── three.min.js        # Bundled Three.js WebGL 3D renderer for offline PWA
+│   └── arcade/                 # Chance Invaders 1978 Game Engine
+│       ├── sprites.js          # Pixel-perfect 8080 bitmasks & 1978 arcade font
+│       ├── audio.js            # Discrete procedural Web Audio API synthesizer
+│       ├── backdrop.js         # 1978 Pepper's Ghost lunar diorama canvas
+│       ├── bunkers.js          # Procedural pixel-carving defense bunkers
+│       ├── controls.js         # Pointer, touch, keyboard & gamepad bindings
+│       └── game.js             # Continuous swept-raycast game loop & ascension elevator
 └── assets/
     └── amina-avatar.svg    # Vector avatar artwork for Amina Narrator
 ```

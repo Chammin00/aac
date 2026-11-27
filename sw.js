@@ -1,4 +1,4 @@
-const CACHE_NAME = 'amina-aac-v8';
+const CACHE_NAME = 'amina-aac-v9';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -24,7 +24,11 @@ const ASSETS_TO_CACHE = [
   './js/arcade/backdrop.js',
   './js/arcade/bunkers.js',
   './js/arcade/controls.js',
-  './js/arcade/game.js'
+  './js/arcade/game.js',
+  './dallas-cowboys-studio.html',
+  './css/cowboys-studio.css',
+  './js/cowboys-studio.js',
+  './js/lib/three.min.js'
 ];
 
 self.addEventListener('install', (event) => {

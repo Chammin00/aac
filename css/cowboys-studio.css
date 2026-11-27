@@ -1,0 +1,586 @@
+/**
+ * DALLAS COWBOYS MEGA STADIUM 3D STUDIO - AMINA AAC INTEGRATION
+ * Accessible 3D Stadium, QB Throw Challenge, Field Goal Kicking & AAC Dialogue Bridge
+ */
+
+:root {
+  --cowboys-navy: #041e42;
+  --cowboys-blue: #003594;
+  --cowboys-silver: #869397;
+  --cowboys-silver-light: #cbd5e1;
+  --cowboys-white: #ffffff;
+  --cowboys-gold: #facc15;
+  --turf-green: #0d4c21;
+  --turf-light: #15803d;
+  --bg-deep: #030712;
+  --panel-bg: rgba(4, 30, 66, 0.88);
+  --panel-border: rgba(134, 147, 151, 0.35);
+  --btn-glow: rgba(0, 53, 148, 0.6);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg-deep);
+  color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ==========================================================================
+   TOP HEADER NAVIGATION BAR (Amina AAC Return & Accessibility Tools)
+   ========================================================================== */
+
+.stadium-header-bar {
+  width: 100%;
+  padding: 8px 14px;
+  background: linear-gradient(180deg, rgba(4, 30, 66, 0.98) 0%, rgba(2, 14, 32, 0.94) 100%);
+  border-bottom: 2px solid var(--cowboys-silver);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stadium-logo-star {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--cowboys-white);
+  font-weight: 900;
+  font-size: 1.05rem;
+  letter-spacing: 1px;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid #475569;
+  border-radius: 8px;
+  color: #f8fafc;
+  padding: 7px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nav-btn:hover {
+  background: rgba(51, 65, 85, 0.95);
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.nav-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.nav-btn.accent-talk {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22c55e;
+  color: #4ade80;
+}
+.nav-btn.accent-talk:hover {
+  background: rgba(34, 197, 94, 0.35);
+}
+
+.nav-btn.accent-switch {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: #a855f7;
+  color: #c084fc;
+}
+.nav-btn.accent-switch.active {
+  background: #a855f7;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.7);
+}
+
+.nav-btn.accent-voice {
+  background: rgba(240, 136, 62, 0.2);
+  border-color: #f0883e;
+  color: #fb923c;
+}
+.nav-btn.accent-voice.active {
+  background: #f0883e;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(240, 136, 62, 0.7);
+}
+
+/* ==========================================================================
+   MAIN 3D VIEWPORT CONTAINER
+   ========================================================================== */
+
+.viewport-container {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: calc(100vh - 54px);
+  height: calc(100dvh - 54px);
+  overflow: hidden;
+  background: #000000;
+}
+
+#stadium-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+}
+
+/* ==========================================================================
+   HEADS-UP DISPLAY (HUD) & SCOREBOARD OVERLAY
+   ========================================================================== */
+
+.hud-top-bar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.scoreboard-card {
+  pointer-events: auto;
+  background: var(--panel-bg);
+  border: 2px solid var(--cowboys-silver);
+  border-radius: 12px;
+  padding: 8px 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  backdrop-filter: blur(8px);
+}
+
+.score-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.score-stat-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--cowboys-silver-light);
+  letter-spacing: 0.5px;
+}
+
+.score-stat-val {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.score-stat-val.gold {
+  color: var(--cowboys-gold);
+  text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+}
+
+.mode-selector-pill {
+  pointer-events: auto;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid #334155;
+  border-radius: 30px;
+  padding: 4px;
+  display: flex;
+  gap: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+.mode-pill-btn {
+  background: none;
+  border: none;
+  border-radius: 20px;
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mode-pill-btn:hover {
+  color: #ffffff;
+}
+
+.mode-pill-btn.active {
+  background: var(--cowboys-blue);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(0, 53, 148, 0.8);
+}
+
+/* Big Outcome Banner (IT'S GOOD! / TOUCHDOWN! / DOINK!) */
+.outcome-callout {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  background: linear-gradient(180deg, rgba(4, 30, 66, 0.95) 0%, rgba(2, 14, 32, 0.95) 100%);
+  border: 3px solid var(--cowboys-gold);
+  border-radius: 16px;
+  padding: 12px 28px;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(250, 204, 21, 0.35);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 50;
+  max-width: 90vw;
+}
+
+.outcome-callout.show {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.outcome-title {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--cowboys-gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.outcome-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   BOTTOM CONTROLS & TABLET MOTOR ACTION DOCK
+   ========================================================================== */
+
+.action-dock {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  max-width: 680px;
+  background: var(--panel-bg);
+  border: 2px solid var(--panel-border);
+  border-radius: 18px;
+  padding: 10px 14px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 25;
+}
+
+.dock-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.aim-btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+.ctrl-btn {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid #475569;
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  transition: all 0.12s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.ctrl-btn:hover {
+  background: rgba(51, 65, 85, 0.95);
+  border-color: #94a3b8;
+  transform: translateY(-2px);
+}
+
+.ctrl-btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary-action {
+  flex: 1;
+  min-width: 160px;
+  background: linear-gradient(180deg, #0047cc 0%, #002e80 100%);
+  border: 2px solid #60a5fa;
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  border-radius: 12px;
+  padding: 12px 20px;
+  box-shadow: 0 0 20px rgba(0, 71, 204, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary-action:hover {
+  background: linear-gradient(180deg, #1d64f2 0%, #003db3 100%);
+  box-shadow: 0 0 26px rgba(29, 100, 242, 0.8);
+}
+
+.btn-primary-action:active {
+  transform: scale(0.98);
+}
+
+/* Kicking Meter Bar (Power & Accuracy) */
+.meter-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meter-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--cowboys-silver-light);
+  text-transform: uppercase;
+}
+
+.meter-track {
+  width: 100%;
+  height: 18px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 9px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.meter-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #22c55e 0%, #eab308 60%, #ef4444 100%);
+  transition: width 0.05s linear;
+}
+
+.meter-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: #ffffff;
+  box-shadow: 0 0 8px #ffffff;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  left: 50%;
+}
+
+.meter-sweetspot {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24%;
+  left: 38%;
+  background: rgba(34, 197, 94, 0.35);
+  border-left: 1px solid #22c55e;
+  border-right: 1px solid #22c55e;
+}
+
+/* 1-Switch Mode Fullscreen Active Tap Surface */
+.switch-tap-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: none;
+  cursor: pointer;
+  background: rgba(168, 85, 247, 0.06);
+}
+
+.switch-tap-shield.active {
+  display: block;
+}
+
+.switch-indicator-banner {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(168, 85, 247, 0.95);
+  border: 2px solid #ffffff;
+  border-radius: 30px;
+  padding: 6px 18px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+  pointer-events: none;
+  animation: pulse-switch 1.5s infinite;
+  z-index: 45;
+  display: none;
+}
+
+.switch-indicator-banner.active {
+  display: block;
+}
+
+@keyframes pulse-switch {
+  0% { transform: translateX(-50%) scale(1); opacity: 0.9; }
+  50% { transform: translateX(-50%) scale(1.05); opacity: 1; }
+  100% { transform: translateX(-50%) scale(1); opacity: 0.9; }
+}
+
+/* ==========================================================================
+   AAC PHRASE PICKER MODAL (Send to Sentence Strip)
+   ========================================================================== */
+
+.dialog-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.dialog-modal-backdrop.open {
+  display: flex;
+}
+
+.phrase-picker-card {
+  width: 100%;
+  max-width: 520px;
+  background: linear-gradient(180deg, #041e42 0%, #081528 100%);
+  border: 2px solid var(--cowboys-silver);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.picker-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.phrase-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.phrase-option-btn {
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid #475569;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.15s ease;
+}
+
+.phrase-option-btn:hover {
+  background: var(--cowboys-blue);
+  border-color: #60a5fa;
+  transform: translateX(4px);
+}
+
+.btn-close-picker {
+  background: none;
+  border: none;
+  color: var(--cowboys-silver-light);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Responsive Tablet Rules */
+@media (max-width: 768px) {
+  .stadium-header-bar {
+    padding: 6px 10px;
+  }
+  .stadium-logo-star span {
+    display: none;
+  }
+  .score-stat-val {
+    font-size: 1.1rem;
+  }
+  .action-dock {
+    width: 98%;
+    padding: 8px 10px;
+  }
+  .ctrl-btn {
+    padding: 8px 12px;
+    font-size: 0.82rem;
+  }
+  .btn-primary-action {
+    font-size: 1rem;
+    padding: 10px 14px;
+  }
+}

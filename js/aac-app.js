@@ -75,21 +75,56 @@ class AacApp {
     if (incoming) {
       sessionStorage.removeItem("AAC_INCOMING_DIALOGUE");
       const cleanIncoming = incoming.replace(/^"+|"+$/g, '').trim();
-      const isArcadeGame = cleanIncoming.includes("Chance Invaders");
+      let phraseText = cleanIncoming;
+      let isCowboys = false;
+      try {
+        if (cleanIncoming.startsWith('{')) {
+          const parsed = JSON.parse(cleanIncoming);
+          phraseText = parsed.text || parsed.phrase || cleanIncoming;
+          if (parsed.source === 'Dallas Cowboys Studio' || phraseText.includes('Cowboys')) {
+            isCowboys = true;
+          }
+        }
+      } catch (_) {}
+      if (!isCowboys) {
+        isCowboys = phraseText.includes("Cowboys") || phraseText.includes("touchdown") || phraseText.includes("uprights") || phraseText.includes("football");
+      }
+      const isArcadeGame = phraseText.includes("Chance Invaders");
       setTimeout(() => {
-        if (isArcadeGame) {
-          window.aacAudio.speak(`Arcade achievement: ${cleanIncoming}`);
+        if (isCowboys) {
+          window.aacAudio.speak(`Cowboys touchdown celebration: ${phraseText}`);
+          this.sentenceStrip.push({
+            id: "phrase_cowboys_" + Date.now(),
+            label: phraseText.toUpperCase(),
+            speech: phraseText,
+            icon: "⭐",
+            category: "social"
+          });
+          this.renderSentenceStrip();
+        } else if (isArcadeGame) {
+          window.aacAudio.speak(`Arcade achievement: ${phraseText}`);
+          this.sentenceStrip.push({
+            id: "phrase_arcade_" + Date.now(),
+            label: phraseText.toUpperCase(),
+            speech: phraseText,
+            icon: "👾",
+            category: "social"
+          });
+          this.renderSentenceStrip();
         } else {
-          window.aacAudio.speak(`Game dialogue received: ${cleanIncoming}. You can formulate your response with the symbols below.`);
+          window.aacAudio.speak(`Game dialogue received: ${phraseText}. You can formulate your response with the symbols below.`);
         }
         const banner = document.createElement("div");
         banner.className = "game-dialogue-banner";
-        if (isArcadeGame) {
+        if (isCowboys) {
+          banner.style.cssText = "background:rgba(0,53,148,0.22); border:1px solid #60a5fa; color:#dbeafe; padding:8px 14px; border-radius:8px; margin:8px 12px 4px 12px; font-size:0.85rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; z-index:35;";
+          banner.innerHTML = `<span>⭐ <strong>Dallas Cowboys Studio:</strong> "${phraseText}"</span><button style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.1rem; padding-left:8px;" title="Dismiss">&times;</button>`;
+        } else if (isArcadeGame) {
           banner.style.cssText = "background:rgba(188,140,255,0.18); border:1px solid #bc8cff; color:#e9d5ff; padding:8px 14px; border-radius:8px; margin:8px 12px 4px 12px; font-size:0.85rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; z-index:35;";
-          banner.innerHTML = `<span>👾 <strong>Chance Invaders Arcade:</strong> "${cleanIncoming}"</span><button style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.1rem; padding-left:8px;" title="Dismiss">&times;</button>`;
+          banner.innerHTML = `<span>👾 <strong>Chance Invaders Arcade:</strong> "${phraseText}"</span><button style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.1rem; padding-left:8px;" title="Dismiss">&times;</button>`;
         } else {
           banner.style.cssText = "background:rgba(240,136,62,0.18); border:1px solid #f0883e; color:#fed7aa; padding:8px 14px; border-radius:8px; margin:8px 12px 4px 12px; font-size:0.85rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; z-index:35;";
-          banner.innerHTML = `<span>🎮 <strong>Game Dialogue:</strong> "${cleanIncoming}"</span><button style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.1rem; padding-left:8px;" title="Dismiss">&times;</button>`;
+          banner.innerHTML = `<span>🎮 <strong>Game Dialogue:</strong> "${phraseText}"</span><button style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.1rem; padding-left:8px;" title="Dismiss">&times;</button>`;
         }
         banner.querySelector("button").onclick = () => banner.remove();
         if (this.el.aacView) {
@@ -291,6 +326,15 @@ class AacApp {
       closeArcadeModalBtn.addEventListener("click", () => {
         arcadeModal.style.display = "none";
         const iframe = document.getElementById("arcade-modal-iframe");
+        if (iframe) iframe.src = "";
+      });
+    }
+    const cowboysModal = document.getElementById("cowboys-game-modal");
+    const closeCowboysModalBtn = document.getElementById("btn-close-cowboys-modal");
+    if (closeCowboysModalBtn && cowboysModal) {
+      closeCowboysModalBtn.addEventListener("click", () => {
+        cowboysModal.style.display = "none";
+        const iframe = document.getElementById("cowboys-modal-iframe");
         if (iframe) iframe.src = "";
       });
     }
